@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { useEditorStore, useStyleStore, useUIStore, usePrintStore } from '@/stores';
 import { Header } from '@/components/layout/Header';
 import { SplitPane } from '@/components/layout/SplitPane';
@@ -8,6 +8,7 @@ import { EditorPanel } from '@/components/editor/EditorPanel';
 import { PreviewPanel } from '@/components/preview/PreviewPanel';
 import { StylePanel } from '@/components/style/StylePanel';
 import { PrintPreview } from '@/components/print/PrintPreview';
+import { createDragDropHandler, type FileInfo } from '@/lib/file';
 import '@/styles/editor.css';
 import '@/styles/preview.css';
 import '@/styles/print.css';
@@ -49,6 +50,7 @@ console.log(hello);
 
 export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Editor store
   const content = useEditorStore((state) => state.content);
@@ -114,6 +116,38 @@ export default function Home() {
     // Reset input
     e.target.value = '';
   }, [setContent]);
+
+  // Drag and drop handlers
+  const handleFileDrop = useCallback((file: FileInfo) => {
+    setContent(file.content);
+  }, [setContent]);
+
+  const dragDropHandlers = createDragDropHandler({
+    onDragEnter: () => setIsDragging(true),
+    onDragLeave: () => setIsDragging(false),
+    onDrop: handleFileDrop,
+    onError: (error) => console.error('Drop error:', error),
+  });
+
+  // Setup global drag-drop
+  useEffect(() => {
+    const handleDragEnter = (e: DragEvent) => dragDropHandlers.handleDragEnter(e);
+    const handleDragLeave = (e: DragEvent) => dragDropHandlers.handleDragLeave(e);
+    const handleDragOver = (e: DragEvent) => dragDropHandlers.handleDragOver(e);
+    const handleDrop = (e: DragEvent) => dragDropHandlers.handleDrop(e);
+
+    document.addEventListener('dragenter', handleDragEnter);
+    document.addEventListener('dragleave', handleDragLeave);
+    document.addEventListener('dragover', handleDragOver);
+    document.addEventListener('drop', handleDrop);
+
+    return () => {
+      document.removeEventListener('dragenter', handleDragEnter);
+      document.removeEventListener('dragleave', handleDragLeave);
+      document.removeEventListener('dragover', handleDragOver);
+      document.removeEventListener('drop', handleDrop);
+    };
+  }, [dragDropHandlers]);
 
   // Render content based on view mode
   const renderContent = () => {
@@ -189,6 +223,33 @@ export default function Home() {
 
       {/* Print Preview */}
       <PrintPreview isOpen={isPrintPreviewOpen} onClose={closePrintPreview} />
+
+      {/* Drag and Drop Overlay */}
+      {isDragging && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-blue-500/20 backdrop-blur-sm">
+          <div className="rounded-2xl border-4 border-dashed border-blue-500 bg-white/90 p-12 text-center shadow-2xl">
+            <svg
+              className="mx-auto h-16 w-16 text-blue-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+            <p className="mt-4 text-xl font-semibold text-gray-700">
+              마크다운 파일을 여기에 놓으세요
+            </p>
+            <p className="mt-2 text-sm text-gray-500">
+              .md, .markdown, .txt 파일 지원
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
