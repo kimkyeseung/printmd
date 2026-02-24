@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+:root {
+  /* Base colors */
+  --background: #ffffff;
+  --foreground: #171717;
+
+  /* printmd theme variables */
+  --printmd-font-size: 16px;
+  --printmd-font-family: system-ui, -apple-system, sans-serif;
+  --printmd-text-color: #1a1a1a;
+  --printmd-bg-color: #ffffff;
+  --printmd-line-height: 1.6;
+  --printmd-link-color: #0066cc;
+  --printmd-code-bg: #f5f5f5;
+  --printmd-max-width: 800px;
+  --printmd-padding-top: 40px;
+  --printmd-padding-right: 40px;
+  --printmd-padding-bottom: 40px;
+  --printmd-padding-left: 40px;
+
+  /* UI colors */
+  --ui-border: #e5e5e5;
+  --ui-border-hover: #d0d0d0;
+  --ui-bg-secondary: #f9f9f9;
+  --ui-bg-hover: #f0f0f0;
+  --ui-text-muted: #666666;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --ui-border: #333333;
+    --ui-border-hover: #444444;
+    --ui-bg-secondary: #1a1a1a;
+    --ui-bg-hover: #252525;
+    --ui-text-muted: #999999;
+  }
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--printmd-font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ui-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ui-border-hover);
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--printmd-link-color);
+  outline-offset: 2px;
+}
+
+/* Print styles - hide UI elements */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .no-print,
+  header,
+  .sidebar,
+  .style-panel,
+  .toolbar,
+  .adsense {
+    display: none !important;
+  }
+
+  .print-content {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+/* Utility classes */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
