@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header';
 import { SplitPane } from '@/components/layout/SplitPane';
 import { EditorPanel } from '@/components/editor/EditorPanel';
 import { PreviewPanel } from '@/components/preview/PreviewPanel';
+import { StylePanel } from '@/components/style/StylePanel';
 import '@/styles/editor.css';
 import '@/styles/preview.css';
 
@@ -58,7 +59,9 @@ export default function Home() {
   // UI store
   const viewMode = useUIStore((state) => state.viewMode);
   const setViewMode = useUIStore((state) => state.setViewMode);
+  const isStylePanelOpen = useUIStore((state) => state.isStylePanelOpen);
   const toggleStylePanel = useUIStore((state) => state.toggleStylePanel);
+  const closeStylePanel = useUIStore((state) => state.closeStylePanel);
   const editorWidth = useUIStore((state) => state.editorWidth);
   const setEditorWidth = useUIStore((state) => state.setEditorWidth);
 
@@ -173,6 +176,9 @@ export default function Home() {
       <main className="flex-1 overflow-hidden">
         {renderContent()}
       </main>
+
+      {/* Style Panel */}
+      <StylePanel isOpen={isStylePanelOpen} onClose={closeStylePanel} />
     </div>
   );
 }
