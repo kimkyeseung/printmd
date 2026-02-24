@@ -9,6 +9,7 @@ import { PreviewPanel } from '@/components/preview/PreviewPanel';
 import { StylePanel } from '@/components/style/StylePanel';
 import { PrintPreview } from '@/components/print/PrintPreview';
 import { createDragDropHandler, type FileInfo } from '@/lib/file';
+import { useExtensionReceiver } from '@/hooks';
 import '@/styles/editor.css';
 import '@/styles/preview.css';
 import '@/styles/print.css';
@@ -51,6 +52,9 @@ console.log(hello);
 export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  // Extension receiver (handles ?src= URL param)
+  useExtensionReceiver();
 
   // Editor store
   const content = useEditorStore((state) => state.content);

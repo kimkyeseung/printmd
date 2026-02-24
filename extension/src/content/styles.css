@@ -1,0 +1,106 @@
+/* printmd Extension Styles */
+
+.printmd-button-wrapper {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+}
+
+.printmd-button-wrapper.readme {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.printmd-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid;
+  border-radius: 6px;
+  appearance: none;
+  text-decoration: none;
+  transition: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+  transition-property: color, background-color, border-color;
+
+  /* GitHub-like button colors */
+  color: #24292f;
+  background-color: #f6f8fa;
+  border-color: rgba(31, 35, 40, 0.15);
+}
+
+.printmd-button:hover {
+  background-color: #f3f4f6;
+  border-color: rgba(31, 35, 40, 0.15);
+}
+
+.printmd-button:active {
+  background-color: hsla(220, 14%, 93%, 1);
+}
+
+.printmd-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.printmd-button.loading {
+  cursor: wait;
+}
+
+.printmd-button.loading .printmd-icon {
+  animation: printmd-spin 1s linear infinite;
+}
+
+.printmd-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+@keyframes printmd-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .printmd-button {
+    color: #c9d1d9;
+    background-color: #21262d;
+    border-color: rgba(240, 246, 252, 0.1);
+  }
+
+  .printmd-button:hover {
+    background-color: #30363d;
+    border-color: rgba(240, 246, 252, 0.1);
+  }
+
+  .printmd-button:active {
+    background-color: hsla(212, 12%, 18%, 1);
+  }
+}
+
+/* GitHub dark theme class support */
+[data-color-mode="dark"] .printmd-button,
+[data-dark-theme="dark"] .printmd-button {
+  color: #c9d1d9;
+  background-color: #21262d;
+  border-color: rgba(240, 246, 252, 0.1);
+}
+
+[data-color-mode="dark"] .printmd-button:hover,
+[data-dark-theme="dark"] .printmd-button:hover {
+  background-color: #30363d;
+  border-color: rgba(240, 246, 252, 0.1);
+}
