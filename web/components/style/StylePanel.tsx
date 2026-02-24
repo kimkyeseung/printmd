@@ -42,26 +42,32 @@ export function StylePanel({ isOpen, onClose }: StylePanelProps) {
       <div
         className="fixed inset-0 z-40 bg-black/20"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Panel */}
-      <div className="fixed right-0 top-0 z-50 flex h-full w-80 flex-col border-l border-[var(--ui-border)] bg-[var(--background)] shadow-lg">
+      <aside
+        className="fixed right-0 top-0 z-50 flex h-full w-full flex-col border-l border-[var(--ui-border)] bg-[var(--background)] shadow-lg sm:w-80"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="style-panel-title"
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--ui-border)] px-4 py-3">
-          <h2 className="font-medium">Style Settings</h2>
+          <h2 id="style-panel-title" className="font-medium">Style Settings</h2>
           <button
             onClick={onClose}
             className="rounded p-1 hover:bg-[var(--ui-bg-hover)]"
-            aria-label="Close"
+            aria-label="스타일 패널 닫기"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-[var(--ui-border)]">
+        <div className="flex border-b border-[var(--ui-border)]" role="tablist" aria-label="스타일 설정 탭">
           {tabs.map(({ key, label }) => (
             <button
               key={key}
@@ -71,6 +77,10 @@ export function StylePanel({ isOpen, onClose }: StylePanelProps) {
                   ? 'border-b-2 border-[var(--printmd-link-color)] font-medium'
                   : 'text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)]'
               }`}
+              role="tab"
+              aria-selected={activeTab === key}
+              aria-controls={`tabpanel-${key}`}
+              id={`tab-${key}`}
             >
               {label}
             </button>
@@ -123,7 +133,7 @@ export function StylePanel({ isOpen, onClose }: StylePanelProps) {
             Done
           </button>
         </div>
-      </div>
+      </aside>
     </>
   );
 }

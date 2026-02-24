@@ -9,7 +9,7 @@ import { PreviewPanel } from '@/components/preview/PreviewPanel';
 import { StylePanel } from '@/components/style/StylePanel';
 import { PrintPreview } from '@/components/print/PrintPreview';
 import { createDragDropHandler, type FileInfo } from '@/lib/file';
-import { useExtensionReceiver } from '@/hooks';
+import { useExtensionReceiver, useKeyboardShortcuts, useFullscreen } from '@/hooks';
 import '@/styles/editor.css';
 import '@/styles/preview.css';
 import '@/styles/print.css';
@@ -55,6 +55,9 @@ export default function Home() {
 
   // Extension receiver (handles ?src= URL param)
   useExtensionReceiver();
+
+  // Fullscreen management
+  const { toggleFullscreen } = useFullscreen();
 
   // Editor store
   const content = useEditorStore((state) => state.content);
@@ -133,6 +136,23 @@ export default function Home() {
     onError: (error) => console.error('Drop error:', error),
   });
 
+  // Keyboard shortcuts
+  const handleEscape = useCallback(() => {
+    if (isPrintPreviewOpen) {
+      closePrintPreview();
+    } else if (isStylePanelOpen) {
+      closeStylePanel();
+    }
+  }, [isPrintPreviewOpen, isStylePanelOpen, closePrintPreview, closeStylePanel]);
+
+  useKeyboardShortcuts({
+    onSave: handleSave,
+    onPrint: handlePrint,
+    onToggleStylePanel: toggleStylePanel,
+    onToggleFullscreen: toggleFullscreen,
+    onEscape: handleEscape,
+  });
+
   // Setup global drag-drop
   useEffect(() => {
     const handleDragEnter = (e: DragEvent) => dragDropHandlers.handleDragEnter(e);
@@ -198,6 +218,11 @@ export default function Home() {
 
   return (
     <div className="flex h-screen flex-col">
+      {/* Skip link for accessibility */}
+      <a href="#main-content" className="skip-link">
+        본문으로 건너뛰기
+      </a>
+
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -205,6 +230,7 @@ export default function Home() {
         accept=".md,.markdown,.txt"
         className="hidden"
         onChange={handleFileChange}
+        aria-label="마크다운 파일 선택"
       />
 
       {/* Header */}
@@ -218,7 +244,7 @@ export default function Home() {
       />
 
       {/* Main content */}
-      <main className="flex-1 overflow-hidden">
+      <main id="main-content" className="flex-1 overflow-hidden" role="main">
         {renderContent()}
       </main>
 
@@ -230,13 +256,19 @@ export default function Home() {
 
       {/* Drag and Drop Overlay */}
       {isDragging && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-blue-500/20 backdrop-blur-sm">
-          <div className="rounded-2xl border-4 border-dashed border-blue-500 bg-white/90 p-12 text-center shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-blue-500/20 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="파일 드롭 영역"
+        >
+          <div className="rounded-2xl border-4 border-dashed border-blue-500 bg-white/90 p-8 text-center shadow-2xl sm:p-12">
             <svg
-              className="mx-auto h-16 w-16 text-blue-500"
+              className="mx-auto h-12 w-12 text-blue-500 sm:h-16 sm:w-16"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -245,10 +277,10 @@ export default function Home() {
                 d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
               />
             </svg>
-            <p className="mt-4 text-xl font-semibold text-gray-700">
+            <p className="mt-4 text-lg font-semibold text-gray-700 sm:text-xl">
               마크다운 파일을 여기에 놓으세요
             </p>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-xs text-gray-500 sm:text-sm">
               .md, .markdown, .txt 파일 지원
             </p>
           </div>
