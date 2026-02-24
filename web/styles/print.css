@@ -1,0 +1,141 @@
+/* Print-specific styles */
+
+@media print {
+  /* Reset */
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Hide all UI elements */
+  header,
+  .no-print,
+  .style-panel,
+  .toolbar,
+  .editor-panel,
+  .split-divider,
+  .adsense,
+  .print-preview-modal,
+  [role="dialog"],
+  button,
+  input,
+  select,
+  textarea {
+    display: none !important;
+  }
+
+  /* Show and reset preview content */
+  main,
+  .preview-panel,
+  .preview-container {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    position: static !important;
+    border: none !important;
+  }
+
+  .preview-content {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 20mm !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Typography adjustments for print */
+  .preview-content h1,
+  .preview-content h2,
+  .preview-content h3,
+  .preview-content h4,
+  .preview-content h5,
+  .preview-content h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  .preview-content p,
+  .preview-content li,
+  .preview-content blockquote {
+    orphans: 3;
+    widows: 3;
+  }
+
+  .preview-content pre,
+  .preview-content code,
+  .preview-content table,
+  .preview-content figure,
+  .preview-content img {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .preview-content table {
+    border-collapse: collapse;
+  }
+
+  .preview-content table th,
+  .preview-content table td {
+    border: 1px solid #ccc;
+  }
+
+  /* Links */
+  .preview-content a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .preview-content a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+
+  /* Code blocks */
+  .preview-content pre {
+    background: #f5f5f5 !important;
+    border: 1px solid #ddd;
+    padding: 1em;
+    overflow-x: visible;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .preview-content code {
+    background: #f5f5f5 !important;
+  }
+
+  /* Images */
+  .preview-content img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Blockquote */
+  .preview-content blockquote {
+    border-left: 4px solid #ccc;
+    margin-left: 0;
+    padding-left: 1em;
+    color: #555;
+  }
+}
+
+/* Print preview modal - hide during actual print */
+@media print {
+  .print-preview-backdrop,
+  .print-preview-modal {
+    display: none !important;
+  }
+}

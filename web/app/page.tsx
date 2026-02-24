@@ -1,14 +1,16 @@
 'use client';
 
 import { useCallback, useRef } from 'react';
-import { useEditorStore, useStyleStore, useUIStore } from '@/stores';
+import { useEditorStore, useStyleStore, useUIStore, usePrintStore } from '@/stores';
 import { Header } from '@/components/layout/Header';
 import { SplitPane } from '@/components/layout/SplitPane';
 import { EditorPanel } from '@/components/editor/EditorPanel';
 import { PreviewPanel } from '@/components/preview/PreviewPanel';
 import { StylePanel } from '@/components/style/StylePanel';
+import { PrintPreview } from '@/components/print/PrintPreview';
 import '@/styles/editor.css';
 import '@/styles/preview.css';
+import '@/styles/print.css';
 
 const DEFAULT_CONTENT = `# Hello printmd
 
@@ -65,6 +67,11 @@ export default function Home() {
   const editorWidth = useUIStore((state) => state.editorWidth);
   const setEditorWidth = useUIStore((state) => state.setEditorWidth);
 
+  // Print store
+  const isPrintPreviewOpen = usePrintStore((state) => state.isPreviewOpen);
+  const openPrintPreview = usePrintStore((state) => state.openPreview);
+  const closePrintPreview = usePrintStore((state) => state.closePreview);
+
   // Initialize content if empty
   const displayContent = content || DEFAULT_CONTENT;
 
@@ -74,8 +81,8 @@ export default function Home() {
   }, [setContent]);
 
   const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
+    openPrintPreview();
+  }, [openPrintPreview]);
 
   const handleSave = useCallback(() => {
     const blob = new Blob([displayContent], { type: 'text/markdown' });
@@ -179,6 +186,9 @@ export default function Home() {
 
       {/* Style Panel */}
       <StylePanel isOpen={isStylePanelOpen} onClose={closeStylePanel} />
+
+      {/* Print Preview */}
+      <PrintPreview isOpen={isPrintPreviewOpen} onClose={closePrintPreview} />
     </div>
   );
 }
