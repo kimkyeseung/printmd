@@ -1,0 +1,78 @@
+/* CodeMirror editor styles */
+.cm-editor {
+  height: 100%;
+}
+
+.cm-editor.cm-focused {
+  outline: none;
+}
+
+/* Markdown syntax highlighting */
+.cm-header-1 {
+  font-size: 1.5em;
+  font-weight: 700;
+}
+
+.cm-header-2 {
+  font-size: 1.3em;
+  font-weight: 600;
+}
+
+.cm-header-3 {
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: 600;
+}
+
+.cm-strong {
+  font-weight: 700;
+}
+
+.cm-em {
+  font-style: italic;
+}
+
+.cm-strikethrough {
+  text-decoration: line-through;
+}
+
+.cm-link {
+  color: var(--printmd-link-color);
+  text-decoration: underline;
+}
+
+.cm-url {
+  color: var(--ui-text-muted);
+}
+
+.cm-formatting {
+  color: var(--ui-text-muted);
+}
+
+.cm-quote {
+  color: var(--ui-text-muted);
+  font-style: italic;
+}
+
+.cm-hr {
+  color: var(--ui-border);
+}
+
+/* Code */
+.cm-monospace {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+.cm-fenced-code {
+  background-color: var(--printmd-code-bg);
+}
+
+/* Selection */
+.cm-selectionBackground {
+  background-color: rgba(0, 102, 204, 0.2) !important;
+}
