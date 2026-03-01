@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from 'react';
 import { usePrintStore, useStyleStore, useEditorStore } from '@/stores';
 import { PrintSettings } from './PrintSettings';
 import { HeaderFooter } from './HeaderFooter';
+import { PagedPreview } from './PagedPreview';
 import { Preview } from '@/components/preview/Preview';
 import { getPaperDimensions, mmToPx } from '@/lib/print/paperSizes';
 
@@ -77,10 +78,11 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
   if (!isOpen) return null;
 
   // Scale factor for preview (fit in viewport)
+  // Use a larger base size for better readability
   const scale = Math.min(
-    400 / paperDimensions.width,
-    600 / paperDimensions.height,
-    1
+    600 / paperDimensions.width,
+    800 / paperDimensions.height,
+    0.8
   );
 
   return (
@@ -111,71 +113,19 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
         <div className="flex flex-1 overflow-hidden">
           {/* Preview area */}
           <div className="flex-1 overflow-auto bg-[var(--ui-bg-secondary)] p-8">
-            <div className="flex items-center justify-center min-h-full">
-              {/* Paper */}
-              <div
-                className="bg-white shadow-lg relative"
-                style={{
-                  width: paperDimensions.width * scale,
-                  height: paperDimensions.height * scale,
-                  transform: `scale(${scale})`,
-                  transformOrigin: 'top center',
-                }}
-              >
-                {/* Header preview */}
-                {settings.header.enabled && (
-                  <div
-                    className="absolute top-0 left-0 right-0 flex justify-between text-[8px] text-gray-500 px-4 py-2"
-                    style={{ fontSize: 8 * scale }}
-                  >
-                    <span>{settings.header.left.replace(/{title}/g, 'Document').replace(/{date}/g, new Date().toLocaleDateString())}</span>
-                    <span>{settings.header.center}</span>
-                    <span>{settings.header.right.replace(/{title}/g, 'Document').replace(/{date}/g, new Date().toLocaleDateString())}</span>
-                  </div>
-                )}
-
-                {/* Content area with margins */}
-                <div
-                  className="overflow-hidden"
-                  style={{
-                    position: 'absolute',
-                    top: settings.margins.top * (96 / 25.4) * scale,
-                    left: settings.margins.left * (96 / 25.4) * scale,
-                    right: settings.margins.right * (96 / 25.4) * scale,
-                    bottom: settings.margins.bottom * (96 / 25.4) * scale,
-                  }}
-                >
-                  <div style={{ transform: `scale(${scale * 0.5})`, transformOrigin: 'top left' }}>
-                    <Preview
-                      markdown={content || '# Preview\n\nYour content will appear here.'}
-                      styles={globalStyles}
-                    />
-                  </div>
-                </div>
-
-                {/* Footer preview */}
-                {settings.footer.enabled && (
-                  <div
-                    className="absolute bottom-0 left-0 right-0 flex justify-between text-[8px] text-gray-500 px-4 py-2"
-                    style={{ fontSize: 8 * scale }}
-                  >
-                    <span>{settings.footer.left}</span>
-                    <span>{settings.footer.center.replace(/{page}/g, '1').replace(/{pages}/g, '1')}</span>
-                    <span>{settings.footer.right}</span>
-                  </div>
-                )}
-
-                {/* Margin guides (subtle) */}
-                <div
-                  className="absolute border border-dashed border-blue-200 pointer-events-none"
-                  style={{
-                    top: settings.margins.top * (96 / 25.4) * scale,
-                    left: settings.margins.left * (96 / 25.4) * scale,
-                    right: settings.margins.right * (96 / 25.4) * scale,
-                    bottom: settings.margins.bottom * (96 / 25.4) * scale,
-                  }}
-                />
-              </div>
+            <div
+              style={{
+                transform: `scale(${scale})`,
+                transformOrigin: 'top center',
+              }}
+            >
+              <PagedPreview
+                markdown={content || '# Preview\n\nYour content will appear here.'}
+                styles={globalStyles}
+                settings={settings}
+                paperWidth={paperDimensions.width}
+                paperHeight={paperDimensions.height}
+              />
             </div>
 
             {/* Paper info */}
