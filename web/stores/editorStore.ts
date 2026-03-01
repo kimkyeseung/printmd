@@ -6,6 +6,7 @@ const initialState = {
   sourceUrl: null,
   isFromExtension: false,
   isDirty: false,
+  currentDocumentId: null,
 };
 
 export const useEditorStore = create<EditorStore>((set) => ({
@@ -17,12 +18,16 @@ export const useEditorStore = create<EditorStore>((set) => ({
   setSourceUrl: (sourceUrl: string | null) =>
     set({ sourceUrl }),
 
+  setCurrentDocumentId: (currentDocumentId: string | null) =>
+    set({ currentDocumentId }),
+
   loadFromExtension: (content: string, sourceUrl?: string) =>
     set({
       content,
       sourceUrl: sourceUrl ?? null,
       isFromExtension: true,
       isDirty: false,
+      currentDocumentId: null,
     }),
 
   markClean: () =>

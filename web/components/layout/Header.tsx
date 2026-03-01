@@ -9,9 +9,12 @@ interface HeaderProps {
   onStylePanelToggle: () => void;
   onPrintClick: () => void;
   onSaveClick: () => void;
+  onSaveAsClick: () => void;
   onLoadClick: () => void;
+  onOpenFileClick: () => void;
   onDownloadMd: () => void;
   onDownloadPdf: () => void;
+  hasCurrentDocument?: boolean;
 }
 
 export function Header({
@@ -20,12 +23,17 @@ export function Header({
   onStylePanelToggle,
   onPrintClick,
   onSaveClick,
+  onSaveAsClick,
   onLoadClick,
+  onOpenFileClick,
   onDownloadMd,
   onDownloadPdf,
+  hasCurrentDocument = false,
 }: HeaderProps) {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
+  const [showOpen, setShowOpen] = useState(false);
+  const [showSave, setShowSave] = useState(false);
 
   return (
     <header
@@ -119,24 +127,112 @@ export function Header({
           )}
         </div>
 
-        <button
-          onClick={onLoadClick}
-          className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm"
-          aria-label="Open markdown file"
-          title="Open file"
-        >
-          <span className="hidden sm:inline">Open</span>
-          <span className="sm:hidden">📂</span>
-        </button>
-        <button
-          onClick={onSaveClick}
-          className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm"
-          aria-label="Save to browser (Ctrl+S)"
-          title="Save to browser (⌘S)"
-        >
-          <span className="hidden sm:inline">Save</span>
-          <span className="sm:hidden">💾</span>
-        </button>
+        {/* Open dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowOpen(!showOpen)}
+            onBlur={() => setTimeout(() => setShowOpen(false), 200)}
+            className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
+            aria-label="Open options"
+            aria-expanded={showOpen}
+            aria-haspopup="true"
+          >
+            <span className="hidden sm:inline">Open</span>
+            <span className="sm:hidden">📂</span>
+            <svg className="h-3 w-3 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {showOpen && (
+            <div
+              className="dropdown-menu absolute left-0 top-full z-50 mt-1 w-48 rounded-lg border border-[var(--ui-border)] py-1 shadow-lg"
+              role="menu"
+            >
+              <button
+                onClick={() => {
+                  onOpenFileClick();
+                  setShowOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2"
+                role="menuitem"
+              >
+                <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+                </svg>
+                From File...
+              </button>
+              <button
+                onClick={() => {
+                  onLoadClick();
+                  setShowOpen(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2"
+                role="menuitem"
+              >
+                <svg className="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                From Saved...
+              </button>
+            </div>
+          )}
+        </div>
+        {/* Save dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowSave(!showSave)}
+            onBlur={() => setTimeout(() => setShowSave(false), 200)}
+            className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
+            aria-label="Save options"
+            aria-expanded={showSave}
+            aria-haspopup="true"
+          >
+            <span className="hidden sm:inline">Save</span>
+            <span className="sm:hidden">💾</span>
+            <svg className="h-3 w-3 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {showSave && (
+            <div
+              className="dropdown-menu absolute left-0 top-full z-50 mt-1 w-44 rounded-lg border border-[var(--ui-border)] py-1 shadow-lg"
+              role="menu"
+            >
+              <button
+                onClick={() => {
+                  onSaveClick();
+                  setShowSave(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2"
+                role="menuitem"
+              >
+                <svg className="h-4 w-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                Save
+                {hasCurrentDocument && (
+                  <span className="ml-auto text-xs text-[var(--ui-text-muted)]">⌘S</span>
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  onSaveAsClick();
+                  setShowSave(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2"
+                role="menuitem"
+              >
+                <svg className="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Save As...
+                {!hasCurrentDocument && (
+                  <span className="ml-auto text-xs text-[var(--ui-text-muted)]">⌘S</span>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Download dropdown */}
         <div className="relative">

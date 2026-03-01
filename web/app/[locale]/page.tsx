@@ -3,13 +3,14 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { useEditorStore, useStyleStore, useUIStore, usePrintStore } from '@/stores';
+import { useEditorStore, useStyleStore, useUIStore, usePrintStore, useDocumentsStore } from '@/stores';
 import { Header } from '@/components/layout/Header';
 import { SplitPane } from '@/components/layout/SplitPane';
 import { EditorPanel } from '@/components/editor/EditorPanel';
 import { PreviewPanel } from '@/components/preview/PreviewPanel';
 import { StylePanel } from '@/components/style/StylePanel';
 import { PrintPreview } from '@/components/print/PrintPreview';
+import { SaveDialog, LoadDialog } from '@/components/save';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { AdMobile } from '@/components/adsense/AdMobile';
 import { createDragDropHandler, type FileInfo } from '@/lib/file';
@@ -104,6 +105,8 @@ export default function Home() {
   const locale = (params.locale as string) || 'ko';
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [isLoadDialogOpen, setIsLoadDialogOpen] = useState(false);
 
   // Extension receiver (handles ?src= URL param)
   useExtensionReceiver();
@@ -115,6 +118,11 @@ export default function Home() {
   const content = useEditorStore((state) => state.content);
   const sourceUrl = useEditorStore((state) => state.sourceUrl);
   const setContent = useEditorStore((state) => state.setContent);
+  const currentDocumentId = useEditorStore((state) => state.currentDocumentId);
+  const setCurrentDocumentId = useEditorStore((state) => state.setCurrentDocumentId);
+
+  // Documents store
+  const updateDocument = useDocumentsStore((state) => state.updateDocument);
 
   // Style store
   const globalStyles = useStyleStore((state) => state.globalStyles);
@@ -154,9 +162,24 @@ export default function Home() {
   }, [openPrintPreview]);
 
   const handleSave = useCallback(() => {
-    localStorage.setItem(STORAGE_KEY, displayContent);
+    if (currentDocumentId) {
+      // Update existing document
+      updateDocument(currentDocumentId, displayContent);
+      toast.success('저장되었습니다');
+    } else {
+      // No current document, open Save As dialog
+      setIsSaveDialogOpen(true);
+    }
+  }, [currentDocumentId, displayContent, updateDocument]);
+
+  const handleSaveAs = useCallback(() => {
+    setIsSaveDialogOpen(true);
+  }, []);
+
+  const handleSaveComplete = useCallback((id: string) => {
+    setCurrentDocumentId(id);
     toast.success('저장되었습니다');
-  }, [displayContent]);
+  }, [setCurrentDocumentId]);
 
   const handleDownloadMd = useCallback(() => {
     const blob = new Blob([displayContent], { type: 'text/markdown' });
@@ -173,6 +196,16 @@ export default function Home() {
   }, [openPrintPreview]);
 
   const handleLoad = useCallback(() => {
+    setIsLoadDialogOpen(true);
+  }, []);
+
+  const handleLoadFromDialog = useCallback((id: string, content: string) => {
+    setContent(content);
+    setCurrentDocumentId(id);
+    toast.success('문서를 불러왔습니다');
+  }, [setContent, setCurrentDocumentId]);
+
+  const handleOpenFile = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
 
@@ -185,13 +218,14 @@ export default function Home() {
       const text = event.target?.result;
       if (typeof text === 'string') {
         setContent(text);
+        setCurrentDocumentId(null); // Reset current document when loading from file
       }
     };
     reader.readAsText(file);
 
     // Reset input
     e.target.value = '';
-  }, [setContent]);
+  }, [setContent, setCurrentDocumentId]);
 
   // Drag and drop handlers
   const handleFileDrop = useCallback((file: FileInfo) => {
@@ -207,12 +241,16 @@ export default function Home() {
 
   // Keyboard shortcuts
   const handleEscape = useCallback(() => {
-    if (isPrintPreviewOpen) {
+    if (isSaveDialogOpen) {
+      setIsSaveDialogOpen(false);
+    } else if (isLoadDialogOpen) {
+      setIsLoadDialogOpen(false);
+    } else if (isPrintPreviewOpen) {
       closePrintPreview();
     } else if (isStylePanelOpen) {
       closeStylePanel();
     }
-  }, [isPrintPreviewOpen, isStylePanelOpen, closePrintPreview, closeStylePanel]);
+  }, [isSaveDialogOpen, isLoadDialogOpen, isPrintPreviewOpen, isStylePanelOpen, closePrintPreview, closeStylePanel]);
 
   useKeyboardShortcuts({
     onSave: handleSave,
@@ -309,9 +347,12 @@ export default function Home() {
         onStylePanelToggle={toggleStylePanel}
         onPrintClick={handlePrint}
         onSaveClick={handleSave}
+        onSaveAsClick={handleSaveAs}
         onLoadClick={handleLoad}
+        onOpenFileClick={handleOpenFile}
         onDownloadMd={handleDownloadMd}
         onDownloadPdf={handleDownloadPdf}
+        hasCurrentDocument={!!currentDocumentId}
       />
 
       {/* Ad Banner - Desktop only */}
@@ -332,6 +373,21 @@ export default function Home() {
 
       {/* Print Preview */}
       <PrintPreview isOpen={isPrintPreviewOpen} onClose={closePrintPreview} />
+
+      {/* Save Dialog */}
+      <SaveDialog
+        isOpen={isSaveDialogOpen}
+        content={displayContent}
+        onClose={() => setIsSaveDialogOpen(false)}
+        onSave={handleSaveComplete}
+      />
+
+      {/* Load Dialog */}
+      <LoadDialog
+        isOpen={isLoadDialogOpen}
+        onClose={() => setIsLoadDialogOpen(false)}
+        onLoad={handleLoadFromDialog}
+      />
 
       {/* Mobile Ad - Fixed bottom */}
       <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white border-t border-[var(--ui-border)]">

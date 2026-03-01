@@ -3,11 +3,13 @@ export interface EditorState {
   sourceUrl: string | null;
   isFromExtension: boolean;
   isDirty: boolean;
+  currentDocumentId: string | null;
 }
 
 export interface EditorActions {
   setContent: (content: string) => void;
   setSourceUrl: (url: string | null) => void;
+  setCurrentDocumentId: (id: string | null) => void;
   loadFromExtension: (content: string, sourceUrl?: string) => void;
   markClean: () => void;
   reset: () => void;

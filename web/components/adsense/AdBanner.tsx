@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface AdBannerProps {
   className?: string;
@@ -14,13 +14,21 @@ declare global {
 }
 
 export function AdBanner({ className = '', slot = '' }: AdBannerProps) {
+  const adRef = useRef<HTMLModElement>(null);
+
   useEffect(() => {
+    const adElement = adRef.current;
+    if (!adElement) return;
+
+    // Check if ad is already loaded
+    if (adElement.dataset.adsbygoogleStatus) return;
+
     try {
       if (typeof window !== 'undefined' && window.adsbygoogle) {
         window.adsbygoogle.push({});
       }
-    } catch (error) {
-      console.error('AdSense error:', error);
+    } catch {
+      // Ignore - ad already loaded
     }
   }, []);
 
@@ -36,6 +44,7 @@ export function AdBanner({ className = '', slot = '' }: AdBannerProps) {
   return (
     <div className={className}>
       <ins
+        ref={adRef}
         className="adsbygoogle"
         style={{ display: 'block' }}
         data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
