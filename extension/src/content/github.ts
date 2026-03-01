@@ -27,9 +27,13 @@ function isMarkdownFileView(): boolean {
  * Check if current page has a README section
  */
 function isReadmePage(): boolean {
-  // Check for README article element
+  // Check for README article element (new GitHub UI)
   const readmeArticle = document.querySelector('article[data-testid="readme"]');
   if (readmeArticle) return true;
+
+  // Check for markdown-body article (current GitHub UI)
+  const markdownArticle = document.querySelector('article.markdown-body.entry-content');
+  if (markdownArticle) return true;
 
   // Check for readme-toc anchor (older GitHub UI)
   const readmeAnchor = document.querySelector('#readme');
@@ -135,7 +139,19 @@ export function findButtonInsertionPoint(): Element | null {
   }
 
   if (pageInfo.type === 'readme') {
-    // For README, look for the header
+    // For README, look for the header (new GitHub UI)
+    const markdownHeading = document.querySelector('article.markdown-body .markdown-heading');
+    if (markdownHeading) {
+      return markdownHeading;
+    }
+
+    // Look for the first h1 in markdown-body
+    const h1Heading = document.querySelector('article.markdown-body h1');
+    if (h1Heading?.parentElement) {
+      return h1Heading.parentElement;
+    }
+
+    // Fallback: look for the header (old GitHub UI)
     const readmeHeader = document.querySelector('#readme h2');
     if (readmeHeader?.parentElement) {
       return readmeHeader.parentElement;
