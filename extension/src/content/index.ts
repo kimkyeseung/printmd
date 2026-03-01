@@ -91,15 +91,30 @@ function setupPopstateHandler(): void {
   });
 }
 
+/**
+ * Handle messages from popup
+ */
+function setupMessageHandler(): void {
+  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message.type === 'GET_PAGE_INFO') {
+      const pageInfo = detectPage();
+      sendResponse(pageInfo);
+    }
+    return true; // Keep the message channel open for async response
+  });
+}
+
 // Run on load
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     init();
     setupObserver();
     setupPopstateHandler();
+    setupMessageHandler();
   });
 } else {
   init();
   setupObserver();
   setupPopstateHandler();
+  setupMessageHandler();
 }

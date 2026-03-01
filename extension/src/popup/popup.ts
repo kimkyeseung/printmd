@@ -13,8 +13,30 @@ interface TabInfo {
   fileName: string | null;
 }
 
+interface GitHubPageInfo {
+  type: 'markdown-file' | 'readme' | 'none';
+  url: string;
+  rawUrl: string | null;
+  fileName: string | null;
+}
+
 /**
- * Detect if URL is a markdown file
+ * Get page info from content script
+ */
+async function getPageInfoFromContentScript(tabId: number): Promise<GitHubPageInfo | null> {
+  return new Promise((resolve) => {
+    chrome.tabs.sendMessage(tabId, { type: 'GET_PAGE_INFO' }, (response) => {
+      if (chrome.runtime.lastError) {
+        resolve(null);
+      } else {
+        resolve(response as GitHubPageInfo);
+      }
+    });
+  });
+}
+
+/**
+ * Detect if URL is a markdown file (fallback)
  */
 function detectMarkdownFromUrl(url: string): TabInfo {
   const markdownExtensions = ['.md', '.markdown', '.mdown', '.mkd', '.mkdn'];
@@ -118,9 +140,27 @@ async function init(): Promise<void> {
   // Get current tab info
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  if (tab?.url) {
-    const info = detectMarkdownFromUrl(tab.url);
-    info.title = tab.title || '';
+  if (tab?.url && tab.id) {
+    let info: TabInfo;
+
+    // Try to get page info from content script first
+    const pageInfo = await getPageInfoFromContentScript(tab.id);
+
+    if (pageInfo && pageInfo.type !== 'none') {
+      // Content script detected markdown
+      info = {
+        url: pageInfo.url,
+        title: tab.title || '',
+        isMarkdown: true,
+        rawUrl: pageInfo.rawUrl,
+        fileName: pageInfo.fileName,
+      };
+    } else {
+      // Fallback to URL detection
+      info = detectMarkdownFromUrl(tab.url);
+      info.title = tab.title || '';
+    }
+
     updatePageInfo(info);
   }
 

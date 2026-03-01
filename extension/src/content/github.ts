@@ -77,9 +77,30 @@ function getReadmeRawUrl(): string | null {
 
   const [, owner, repo] = match;
 
-  // Try to find the default branch from the page
-  const branchElement = document.querySelector('[data-hotkey="w"] span.Text-sc-17v1xeu-0');
-  const branch = branchElement?.textContent?.trim() || 'main';
+  // Try multiple selectors to find the default branch
+  let branch = 'main';
+
+  // Method 1: Branch switcher button text (e.g., "master branch")
+  const branchButton = document.querySelector('[data-hotkey="w"]');
+  if (branchButton) {
+    const buttonText = branchButton.textContent?.trim();
+    const branchMatch = buttonText?.match(/^(\S+)/);
+    if (branchMatch) {
+      branch = branchMatch[1];
+    }
+  }
+
+  // Method 2: Look for branch name in the URL if we're in a tree/blob view
+  const treeMatch = url.match(/github\.com\/[^/]+\/[^/]+\/tree\/([^/]+)/);
+  if (treeMatch) {
+    branch = treeMatch[1];
+  }
+
+  // Method 3: Meta tag or other data attributes
+  const defaultBranchMeta = document.querySelector('meta[name="default-branch"]');
+  if (defaultBranchMeta) {
+    branch = defaultBranchMeta.getAttribute('content') || branch;
+  }
 
   return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/README.md`;
 }
