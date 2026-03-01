@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { usePrintStore, useStyleStore, useEditorStore } from '@/stores';
 import { PrintSettings } from './PrintSettings';
 import { HeaderFooter } from './HeaderFooter';
@@ -13,6 +13,9 @@ interface PrintPreviewProps {
 }
 
 export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
   const settings = usePrintStore((state) => state.settings);
   const updateSettings = usePrintStore((state) => state.updateSettings);
   const updateHeader = usePrintStore((state) => state.updateHeader);
@@ -34,6 +37,41 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
   const handlePrint = () => {
     window.print();
     onClose();
+  };
+
+  const handleSavePdf = async () => {
+    if (!contentRef.current || isGeneratingPdf) return;
+
+    setIsGeneratingPdf(true);
+
+    try {
+      const html2pdf = (await import('html2pdf.js')).default;
+
+      const { width, height } = getPaperDimensions(settings.paperSize, settings.orientation);
+
+      const opt = {
+        margin: [
+          settings.margins.top,
+          settings.margins.right,
+          settings.margins.bottom,
+          settings.margins.left,
+        ] as [number, number, number, number],
+        filename: 'document.pdf',
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: {
+          unit: 'mm' as const,
+          format: [width, height] as [number, number],
+          orientation: settings.orientation,
+        },
+      };
+
+      await html2pdf().set(opt).from(contentRef.current).save();
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -175,12 +213,34 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
             Cancel
           </button>
           <button
+            onClick={handleSavePdf}
+            disabled={isGeneratingPdf}
+            className="rounded border border-blue-600 bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            {isGeneratingPdf ? 'Generating...' : 'Save PDF'}
+          </button>
+          <button
             onClick={handlePrint}
             className="rounded bg-[var(--foreground)] px-4 py-2 text-sm text-[var(--background)] hover:opacity-90"
           >
             Print
           </button>
         </div>
+      </div>
+
+      {/* Hidden container for PDF generation */}
+      <div
+        ref={contentRef}
+        className="fixed -left-[9999px] top-0 bg-white"
+        style={{
+          width: paperDimensions.width,
+          padding: `${settings.margins.top}mm ${settings.margins.right}mm ${settings.margins.bottom}mm ${settings.margins.left}mm`,
+        }}
+      >
+        <Preview
+          markdown={content || '# Preview\n\nYour content will appear here.'}
+          styles={globalStyles}
+        />
       </div>
     </>
   );
