@@ -35,10 +35,15 @@ export function useExtensionReceiver() {
           setContent(content);
 
           // Convert raw URL back to GitHub URL for display
-          const githubUrl = decodedUrl
-            .replace('raw.githubusercontent.com', 'github.com')
-            .replace(/\/([^/]+)\/([^/]+)\//, '/$1/$2/blob/');
-          setSourceUrl(githubUrl);
+          // raw.githubusercontent.com/owner/repo/branch/path -> github.com/owner/repo/blob/branch/path
+          const rawMatch = decodedUrl.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+)/);
+          if (rawMatch) {
+            const [, owner, repo, branch, path] = rawMatch;
+            const githubUrl = `https://github.com/${owner}/${repo}/blob/${branch}/${path}`;
+            setSourceUrl(githubUrl);
+          } else {
+            setSourceUrl(decodedUrl);
+          }
 
           // Clean URL without reload
           const cleanUrl = window.location.pathname;
