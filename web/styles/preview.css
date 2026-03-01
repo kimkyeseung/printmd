@@ -156,6 +156,44 @@
   border-radius: 4px;
 }
 
+/* Badges - inline display for shield.io and similar badge images */
+.preview-content p > a > img[src*="shields.io"],
+.preview-content p > a > img[src*="badge"],
+.preview-content p > a > img[src*="github.com"][src*="workflows"],
+.preview-content p > a > img[src*="img.shields"],
+.preview-content p > img[src*="shields.io"],
+.preview-content p > img[src*="badge"] {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* Badge container paragraphs - display inline */
+.preview-content h1 + p:has(img[src*="shields.io"]),
+.preview-content h1 + p:has(img[src*="badge"]),
+.preview-content h1 + p:has(img[src*="workflows"]),
+.preview-content p:has(> a > img[src*="shields.io"]):has(+ p > a > img[src*="shields.io"]),
+.preview-content p:has(> a > img[src*="badge"]):has(+ p > a > img[src*="badge"]) {
+  display: inline;
+}
+
+/* Make consecutive badge paragraphs inline */
+.preview-content p > a:only-child > img,
+.preview-content p > img:only-child {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.preview-content p:has(> a:only-child > img):has(+ p > a:only-child > img) {
+  display: inline;
+  margin-right: 4px;
+}
+
+.preview-content p:has(> a:only-child > img) + p:has(> a:only-child > img) {
+  display: inline;
+  margin-right: 4px;
+}
+
 /* Strong and emphasis */
 .preview-content strong {
   font-weight: 600;
