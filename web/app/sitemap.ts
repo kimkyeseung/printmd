@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/markdown-editor', priority: 0.9, changeFrequency: 'monthly' as const },
     { path: '/guide', priority: 0.8, changeFrequency: 'monthly' as const },
     { path: '/github', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' as const },
   ];
 
   const sitemapEntries: MetadataRoute.Sitemap = [];

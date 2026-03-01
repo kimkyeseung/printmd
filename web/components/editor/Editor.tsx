@@ -149,4 +149,3 @@ export const Editor = forwardRef<EditorRef, EditorProps>(function Editor({ value
 });
 
 export default Editor;
-export type { EditorRef };
