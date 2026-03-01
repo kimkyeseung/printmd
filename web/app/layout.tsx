@@ -35,6 +35,9 @@ export const metadata: Metadata = {
     "마크다운 PDF 변환",
     "GitHub 마크다운",
     "무료 마크다운 도구",
+    "md to pdf",
+    "markdown converter",
+    "free markdown tool",
   ],
   authors: [{ name: "printmd" }],
   creator: "printmd",
@@ -42,6 +45,14 @@ export const metadata: Metadata = {
   formatDetection: {
     email: false,
     telephone: false,
+  },
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
   openGraph: {
     title: "printmd - Markdown to PDF",

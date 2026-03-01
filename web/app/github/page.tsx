@@ -25,11 +25,56 @@ export const metadata: Metadata = {
   },
 };
 
+const howToJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'GitHub README를 PDF로 변환하는 방법',
+  description: 'GitHub README.md 파일을 printmd로 예쁘게 PDF로 변환하는 방법',
+  totalTime: 'PT2M',
+  tool: [
+    {
+      '@type': 'HowToTool',
+      name: 'printmd Chrome 확장프로그램',
+    },
+  ],
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Chrome 확장프로그램 설치',
+      text: 'Chrome 웹스토어에서 printmd 확장프로그램을 설치하세요.',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'GitHub에서 README 열기',
+      text: '변환하고 싶은 README.md 파일이 있는 GitHub 저장소를 방문하세요.',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Open in printmd 클릭',
+      text: 'README 옆에 나타나는 버튼을 클릭하면 printmd에서 열립니다.',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: '스타일 선택 후 PDF 저장',
+      text: '원하는 테마를 선택하고 PDF로 저장하거나 바로 인쇄하세요.',
+    },
+  ],
+};
+
 export default function GitHubPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero Section */}
-      <header className="px-4 py-16 text-center sm:px-6 lg:px-8">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+      />
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        {/* Hero Section */}
+        <header className="px-4 py-16 text-center sm:px-6 lg:px-8">
         <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
           GitHub README를
           <br />
@@ -143,11 +188,12 @@ export default function GitHubPage() {
         </Link>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 px-4 py-8 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} printmd. All rights reserved.</p>
-      </footer>
-    </div>
+        {/* Footer */}
+        <footer className="border-t border-gray-200 px-4 py-8 text-center text-sm text-gray-500">
+          <p>&copy; {new Date().getFullYear()} printmd. All rights reserved.</p>
+        </footer>
+      </div>
+    </>
   );
 }
 

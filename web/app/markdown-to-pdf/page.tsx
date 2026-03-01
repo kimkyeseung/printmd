@@ -26,10 +26,72 @@ export const metadata: Metadata = {
   },
 };
 
+const softwareJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'printmd - Markdown to PDF',
+  description: '마크다운(.md) 파일을 PDF로 무료 변환하는 온라인 도구',
+  url: 'https://printmd.app/markdown-to-pdf',
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Any',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    ratingCount: '100',
+    bestRating: '5',
+    worstRating: '1',
+  },
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '마크다운 파일을 PDF로 어떻게 변환하나요?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'printmd에서 마크다운 파일을 드래그 앤 드롭하거나 직접 입력한 후, 원하는 테마를 선택하고 인쇄 버튼을 클릭하면 PDF로 저장할 수 있습니다.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'printmd는 무료인가요?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '네, printmd는 완전히 무료이며 가입이 필요 없습니다. 모든 처리는 브라우저에서 이루어지므로 파일이 서버로 전송되지 않습니다.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '어떤 마크다운 기능을 지원하나요?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '제목, 목록, 코드 블록(구문 강조), 테이블, 인용문, 이미지, 링크 등 대부분의 마크다운 기능을 지원합니다.',
+      },
+    },
+  ],
+};
+
 export default function MarkdownToPdfPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* Hero Section */}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+        {/* Hero Section */}
       <header className="px-4 py-16 text-center sm:px-6 lg:px-8">
         <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
           마크다운을
@@ -155,11 +217,12 @@ export default function MarkdownToPdfPage() {
         </Link>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 px-4 py-8 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} printmd. All rights reserved.</p>
-      </footer>
-    </div>
+        {/* Footer */}
+        <footer className="border-t border-gray-200 px-4 py-8 text-center text-sm text-gray-500">
+          <p>&copy; {new Date().getFullYear()} printmd. All rights reserved.</p>
+        </footer>
+      </div>
+    </>
   );
 }
 

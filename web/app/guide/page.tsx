@@ -25,10 +25,61 @@ export const metadata: Metadata = {
   },
 };
 
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '마크다운 가이드 - 문법 총정리',
+  description: '마크다운(Markdown) 문법 완벽 가이드. 제목, 목록, 링크, 이미지, 코드 블록, 테이블 등 모든 문법을 예제와 함께 설명합니다.',
+  author: {
+    '@type': 'Organization',
+    name: 'printmd',
+    url: 'https://printmd.app',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'printmd',
+    url: 'https://printmd.app',
+  },
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': 'https://printmd.app/guide',
+  },
+  articleSection: 'Tutorial',
+  inLanguage: 'ko-KR',
+};
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'printmd',
+      item: 'https://printmd.app',
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: '마크다운 가이드',
+      item: 'https://printmd.app/guide',
+    },
+  ],
+};
+
 export default function GuidePage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <div className="min-h-screen bg-white">
+        {/* Header */}
       <header className="border-b border-gray-200 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <Link
@@ -197,11 +248,12 @@ ___`}
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 px-4 py-8 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} printmd. All rights reserved.</p>
-      </footer>
-    </div>
+        {/* Footer */}
+        <footer className="border-t border-gray-200 px-4 py-8 text-center text-sm text-gray-500">
+          <p>&copy; {new Date().getFullYear()} printmd. All rights reserved.</p>
+        </footer>
+      </div>
+    </>
   );
 }
 
