@@ -1,4 +1,7 @@
 {
+  "editor": {
+    "defaultContent": "# Hello printmd\n\nA free web tool to **style and print** your Markdown as PDF instantly.\n\n## Features\n\n- Real-time preview\n- 5 theme presets\n- Custom styling\n- PDF export\n\n## Code Block\n\n```javascript\nconst hello = 'world';\nconsole.log(hello);\n```\n\n## Table\n\n| Feature | Description |\n|---------|-------------|\n| Editor | CodeMirror 6 based |\n| Preview | markdown-it rendering |\n| Theme | 5 presets available |\n\n## Blockquote\n\n> Print your Markdown beautifully!\n\n---\n\n*Made with printmd.*"
+  },
   "meta": {
     "title": "printmd - Markdown to PDF",
     "description": "Free online tool to convert Markdown to PDF. Pick your style and print instantly.",

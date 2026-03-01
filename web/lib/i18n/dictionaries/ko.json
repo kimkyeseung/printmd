@@ -1,4 +1,7 @@
 {
+  "editor": {
+    "defaultContent": "# Hello printmd\n\n마크다운을 어디서든 가져와서 **스타일을 골라** 바로 PDF/인쇄로 뽑는 무료 웹 도구입니다.\n\n## 기능\n\n- 실시간 미리보기\n- 5가지 테마 프리셋\n- 커스텀 스타일링\n- PDF 출력\n\n## 코드 블록\n\n```javascript\nconst hello = 'world';\nconsole.log(hello);\n```\n\n## 테이블\n\n| 기능 | 설명 |\n|------|------|\n| Editor | CodeMirror 6 기반 |\n| Preview | markdown-it 렌더링 |\n| Theme | 5가지 프리셋 |\n\n## 인용\n\n> 마크다운을 예쁘게 인쇄하세요!\n\n---\n\n*printmd로 만들었습니다.*"
+  },
   "meta": {
     "title": "printmd - Markdown to PDF",
     "description": "마크다운을 어디서든 가져와서 스타일을 골라 바로 PDF/인쇄로 뽑는 무료 웹 도구",

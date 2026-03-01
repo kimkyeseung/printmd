@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useRef, useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { useEditorStore, useStyleStore, useUIStore, usePrintStore } from '@/stores';
 import { Header } from '@/components/layout/Header';
 import { SplitPane } from '@/components/layout/SplitPane';
@@ -16,7 +17,8 @@ import '@/styles/editor.css';
 import '@/styles/preview.css';
 import '@/styles/print.css';
 
-const DEFAULT_CONTENT = `# Hello printmd
+const DEFAULT_CONTENT: Record<string, string> = {
+  ko: `# Hello printmd
 
 마크다운을 어디서든 가져와서 **스타일을 골라** 바로 PDF/인쇄로 뽑는 무료 웹 도구입니다.
 
@@ -49,9 +51,54 @@ console.log(hello);
 ---
 
 *printmd로 만들었습니다.*
-`;
+
+---
+
+**Made by** [kimkyeseung](mailto:kimkyeseung@gmail.com)
+`,
+  en: `# Hello printmd
+
+A free web tool to **style and print** your Markdown as PDF instantly.
+
+## Features
+
+- Real-time preview
+- 5 theme presets
+- Custom styling
+- PDF export
+
+## Code Block
+
+\`\`\`javascript
+const hello = 'world';
+console.log(hello);
+\`\`\`
+
+## Table
+
+| Feature | Description |
+|---------|-------------|
+| Editor | CodeMirror 6 based |
+| Preview | markdown-it rendering |
+| Theme | 5 presets available |
+
+## Blockquote
+
+> Print your Markdown beautifully!
+
+---
+
+*Made with printmd.*
+
+---
+
+**Made by** [kimkyeseung](mailto:kimkyeseung@gmail.com)
+`,
+};
 
 export default function Home() {
+  const params = useParams();
+  const locale = (params.locale as string) || 'ko';
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -84,7 +131,7 @@ export default function Home() {
   const closePrintPreview = usePrintStore((state) => state.closePreview);
 
   // Initialize content if empty
-  const displayContent = content || DEFAULT_CONTENT;
+  const displayContent = content || DEFAULT_CONTENT[locale] || DEFAULT_CONTENT['ko'];
 
   // Handlers
   const handleContentChange = useCallback((newContent: string) => {
