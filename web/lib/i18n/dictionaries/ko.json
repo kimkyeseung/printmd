@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "title": "printmd - Markdown to PDF",
+    "description": "마크다운을 어디서든 가져와서 스타일을 골라 바로 PDF/인쇄로 뽑는 무료 웹 도구",
+    "keywords": "마크다운,markdown,PDF,변환,편집기,마크다운 프린트,마크다운 인쇄,마크다운 편집기"
+  },
+  "common": {
+    "startFree": "무료로 시작하기",
+    "tryNow": "지금 시작하기",
+    "learnMore": "자세히 보기",
+    "features": "기능",
+    "copyright": "All rights reserved."
+  },
+  "home": {
+    "hero": {
+      "title": "마크다운을 PDF로",
+      "subtitle": "마크다운을 어디서든 가져와서 스타일을 골라 바로 PDF/인쇄로 뽑는 무료 웹 도구입니다.",
+      "cta": "시작하기"
+    },
+    "dropzone": {
+      "title": "마크다운 파일을 여기에 놓으세요",
+      "subtitle": ".md, .markdown, .txt 파일 지원"
+    }
+  },
+  "markdownToPdf": {
+    "title": "마크다운 PDF 변환",
+    "subtitle": "무료 온라인 도구",
+    "hero": {
+      "title1": "마크다운을",
+      "title2": "PDF로 변환",
+      "description": ".md 파일을 드래그 앤 드롭으로 업로드하고, 원하는 스타일로 예쁘게 PDF로 저장하세요. 무료이며 가입이 필요 없습니다.",
+      "cta": "무료로 변환하기"
+    },
+    "why": {
+      "title": "왜 printmd인가요?",
+      "fast": "빠른 변환",
+      "fastDesc": "클라이언트 사이드 처리로 즉시 변환",
+      "privacy": "개인정보 보호",
+      "privacyDesc": "파일이 서버로 전송되지 않음",
+      "themes": "다양한 테마",
+      "themesDesc": "5가지 프리셋 + 커스텀 스타일",
+      "responsive": "반응형 디자인",
+      "responsiveDesc": "모바일에서도 사용 가능"
+    },
+    "supported": {
+      "title": "지원하는 마크다운 기능",
+      "headings": "제목 (H1-H6)",
+      "formatting": "굵게, 기울임, 취소선",
+      "lists": "순서 있는/없는 목록",
+      "code": "코드 블록 (구문 강조)",
+      "blockquote": "인용문",
+      "table": "테이블",
+      "links": "링크 & 이미지",
+      "hr": "수평선",
+      "inlineCode": "인라인 코드"
+    },
+    "cta": {
+      "title": "지금 바로 변환해보세요",
+      "subtitle": "무료 · 가입 불필요 · 파일 업로드 없음"
+    }
+  },
+  "markdownPrint": {
+    "title": "마크다운 프린트",
+    "subtitle": "무료 인쇄 도구",
+    "hero": {
+      "title1": "마크다운",
+      "title2": "예쁘게 프린트",
+      "description": "README, 기술 문서, 노트를 깔끔하게 인쇄하세요. 코드 구문 강조, 테이블, 이미지까지 완벽 지원.",
+      "cta": "무료로 프린트하기"
+    },
+    "steps": {
+      "title": "3단계로 간단하게",
+      "step1": "파일 열기",
+      "step1Desc": "드래그 앤 드롭 또는 파일 선택",
+      "step2": "테마 선택",
+      "step2Desc": "5가지 프리셋 중 선택",
+      "step3": "프린트",
+      "step3Desc": "Ctrl+P로 바로 인쇄"
+    },
+    "why": {
+      "title": "왜 printmd로 프린트해야 할까요?",
+      "syntax": "코드 구문 강조",
+      "syntaxDesc": "50+ 언어 지원. 코드가 컬러로 예쁘게 출력됩니다.",
+      "table": "테이블 완벽 지원",
+      "tableDesc": "마크다운 테이블이 깔끔한 표로 인쇄됩니다.",
+      "image": "이미지 포함",
+      "imageDesc": "문서 내 이미지도 함께 인쇄됩니다.",
+      "pageBreak": "페이지 나눔",
+      "pageBreakDesc": "자동 페이지 나눔으로 깔끔한 출력.",
+      "pageNumber": "페이지 번호",
+      "pageNumberDesc": "머리글/바닥글에 페이지 번호 추가 가능.",
+      "optimized": "인쇄 최적화",
+      "optimizedDesc": "인쇄용 CSS로 깔끔한 출력 보장."
+    },
+    "useCases": {
+      "title": "이런 분들이 사용해요",
+      "developer": "개발자",
+      "developerDesc": "README, API 문서, 기술 스펙을 인쇄해서 리뷰할 때",
+      "student": "학생",
+      "studentDesc": "마크다운으로 작성한 노트, 과제물을 제출할 때",
+      "writer": "작가/블로거",
+      "writerDesc": "마크다운 원고를 인쇄해서 교정할 때",
+      "worker": "직장인",
+      "workerDesc": "회의록, 보고서를 깔끔하게 인쇄할 때"
+    },
+    "cta": {
+      "title": "지금 바로 인쇄해보세요",
+      "subtitle": "무료 · 가입 불필요 · 브라우저에서 바로"
+    }
+  },
+  "markdownEditor": {
+    "title": "마크다운 편집기",
+    "subtitle": "무료 온라인 에디터",
+    "hero": {
+      "title1": "마크다운 편집기",
+      "title2": "실시간 미리보기",
+      "description": "설치 없이 브라우저에서 바로 시작하세요. 코드 구문 강조, 테마 선택, PDF 내보내기까지.",
+      "cta": "에디터 열기"
+    },
+    "features": {
+      "title": "편집기 기능",
+      "preview": "실시간 미리보기",
+      "previewDesc": "타이핑하는 즉시 렌더링 결과 확인",
+      "themes": "5가지 테마",
+      "themesDesc": "GitHub, 노션, 학술, 미니멀, 다크 스타일",
+      "syntax": "구문 강조",
+      "syntaxDesc": "50+ 프로그래밍 언어 코드 하이라이팅",
+      "responsive": "반응형 레이아웃",
+      "responsiveDesc": "에디터만 / 미리보기만 / 분할 뷰",
+      "shortcuts": "키보드 단축키",
+      "shortcutsDesc": "Ctrl+S 저장, Ctrl+P 인쇄 등",
+      "dragDrop": "드래그 앤 드롭",
+      "dragDropDesc": "파일을 끌어다 놓으면 바로 열기"
+    },
+    "shortcuts": {
+      "title": "키보드 단축키",
+      "save": "마크다운 파일 저장",
+      "print": "PDF로 인쇄/저장",
+      "style": "스타일 패널 열기",
+      "fullscreen": "전체화면 전환",
+      "close": "패널 닫기",
+      "macNote": "Mac에서는 Ctrl 대신 Cmd 사용"
+    },
+    "syntax": {
+      "title": "지원하는 마크다운 문법",
+      "guideLink": "마크다운 문법 가이드 보기 →"
+    },
+    "compare": {
+      "title": "printmd vs 다른 편집기",
+      "feature": "기능",
+      "install": "설치 필요",
+      "signup": "회원가입",
+      "preview": "실시간 미리보기",
+      "pdf": "PDF 내보내기",
+      "customTheme": "커스텀 테마",
+      "offline": "오프라인 사용",
+      "privacy": "개인정보 보호"
+    },
+    "cta": {
+      "title": "지금 바로 편집해보세요",
+      "subtitle": "무료 · 설치 불필요 · 회원가입 없음"
+    }
+  },
+  "guide": {
+    "title": "마크다운 가이드",
+    "subtitle": "문법 총정리",
+    "description": "마크다운(Markdown) 문법 완벽 가이드. 제목, 목록, 링크, 이미지, 코드 블록, 테이블 등 모든 문법을 예제와 함께 설명합니다."
+  }
+}

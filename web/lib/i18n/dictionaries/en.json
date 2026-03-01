@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "title": "printmd - Markdown to PDF",
+    "description": "Free online tool to convert Markdown to PDF. Pick your style and print instantly.",
+    "keywords": "markdown,PDF,converter,editor,markdown to pdf,print markdown,online markdown editor"
+  },
+  "common": {
+    "startFree": "Start for Free",
+    "tryNow": "Try Now",
+    "learnMore": "Learn More",
+    "features": "Features",
+    "copyright": "All rights reserved."
+  },
+  "home": {
+    "hero": {
+      "title": "Markdown to PDF",
+      "subtitle": "Free online tool to convert Markdown to beautifully styled PDFs. Pick your theme and print instantly.",
+      "cta": "Get Started"
+    },
+    "dropzone": {
+      "title": "Drop your markdown file here",
+      "subtitle": "Supports .md, .markdown, .txt files"
+    }
+  },
+  "markdownToPdf": {
+    "title": "Markdown to PDF Converter",
+    "subtitle": "Free Online Tool",
+    "hero": {
+      "title1": "Convert Markdown",
+      "title2": "to PDF",
+      "description": "Drag and drop your .md file, choose a style, and save as a beautiful PDF. Free and no signup required.",
+      "cta": "Convert for Free"
+    },
+    "why": {
+      "title": "Why printmd?",
+      "fast": "Fast Conversion",
+      "fastDesc": "Client-side processing for instant results",
+      "privacy": "Privacy First",
+      "privacyDesc": "Files never leave your browser",
+      "themes": "Multiple Themes",
+      "themesDesc": "5 presets + custom styling",
+      "responsive": "Responsive Design",
+      "responsiveDesc": "Works on mobile too"
+    },
+    "supported": {
+      "title": "Supported Markdown Features",
+      "headings": "Headings (H1-H6)",
+      "formatting": "Bold, Italic, Strikethrough",
+      "lists": "Ordered/Unordered Lists",
+      "code": "Code Blocks (Syntax Highlighting)",
+      "blockquote": "Blockquotes",
+      "table": "Tables",
+      "links": "Links & Images",
+      "hr": "Horizontal Rules",
+      "inlineCode": "Inline Code"
+    },
+    "cta": {
+      "title": "Start Converting Now",
+      "subtitle": "Free · No Signup · No File Upload"
+    }
+  },
+  "markdownPrint": {
+    "title": "Print Markdown",
+    "subtitle": "Free Print Tool",
+    "hero": {
+      "title1": "Print Markdown",
+      "title2": "Beautifully",
+      "description": "Print your README, docs, and notes with perfect formatting. Full support for code highlighting, tables, and images.",
+      "cta": "Print for Free"
+    },
+    "steps": {
+      "title": "3 Simple Steps",
+      "step1": "Open File",
+      "step1Desc": "Drag & drop or select file",
+      "step2": "Choose Theme",
+      "step2Desc": "Pick from 5 presets",
+      "step3": "Print",
+      "step3Desc": "Press Ctrl+P to print"
+    },
+    "why": {
+      "title": "Why Print with printmd?",
+      "syntax": "Syntax Highlighting",
+      "syntaxDesc": "50+ languages. Code prints in color beautifully.",
+      "table": "Perfect Tables",
+      "tableDesc": "Markdown tables print as clean formatted tables.",
+      "image": "Images Included",
+      "imageDesc": "Images in your document print along.",
+      "pageBreak": "Page Breaks",
+      "pageBreakDesc": "Automatic page breaks for clean output.",
+      "pageNumber": "Page Numbers",
+      "pageNumberDesc": "Add page numbers in header/footer.",
+      "optimized": "Print Optimized",
+      "optimizedDesc": "Print CSS ensures clean output."
+    },
+    "useCases": {
+      "title": "Who Uses printmd?",
+      "developer": "Developers",
+      "developerDesc": "Print README, API docs, specs for review",
+      "student": "Students",
+      "studentDesc": "Submit markdown notes and assignments",
+      "writer": "Writers/Bloggers",
+      "writerDesc": "Print markdown drafts for proofreading",
+      "worker": "Professionals",
+      "workerDesc": "Print meeting notes and reports cleanly"
+    },
+    "cta": {
+      "title": "Start Printing Now",
+      "subtitle": "Free · No Signup · Works in Browser"
+    }
+  },
+  "markdownEditor": {
+    "title": "Markdown Editor",
+    "subtitle": "Free Online Editor",
+    "hero": {
+      "title1": "Markdown Editor",
+      "title2": "Live Preview",
+      "description": "Start right in your browser. Syntax highlighting, themes, and PDF export included.",
+      "cta": "Open Editor"
+    },
+    "features": {
+      "title": "Editor Features",
+      "preview": "Live Preview",
+      "previewDesc": "See rendered output as you type",
+      "themes": "5 Themes",
+      "themesDesc": "GitHub, Notion, Academic, Minimal, Dark",
+      "syntax": "Syntax Highlighting",
+      "syntaxDesc": "50+ programming languages supported",
+      "responsive": "Responsive Layout",
+      "responsiveDesc": "Editor only / Preview only / Split view",
+      "shortcuts": "Keyboard Shortcuts",
+      "shortcutsDesc": "Ctrl+S save, Ctrl+P print, and more",
+      "dragDrop": "Drag & Drop",
+      "dragDropDesc": "Drop files to open instantly"
+    },
+    "shortcuts": {
+      "title": "Keyboard Shortcuts",
+      "save": "Save markdown file",
+      "print": "Print/Save as PDF",
+      "style": "Open style panel",
+      "fullscreen": "Toggle fullscreen",
+      "close": "Close panel",
+      "macNote": "Use Cmd instead of Ctrl on Mac"
+    },
+    "syntax": {
+      "title": "Supported Markdown Syntax",
+      "guideLink": "View Markdown Syntax Guide →"
+    },
+    "compare": {
+      "title": "printmd vs Others",
+      "feature": "Feature",
+      "install": "Install Required",
+      "signup": "Signup Required",
+      "preview": "Live Preview",
+      "pdf": "PDF Export",
+      "customTheme": "Custom Themes",
+      "offline": "Offline Use",
+      "privacy": "Privacy"
+    },
+    "cta": {
+      "title": "Start Editing Now",
+      "subtitle": "Free · No Install · No Signup"
+    }
+  },
+  "guide": {
+    "title": "Markdown Guide",
+    "subtitle": "Complete Syntax Reference",
+    "description": "Complete Markdown syntax guide. Learn headings, lists, links, images, code blocks, tables, and more with examples."
+  }
+}
