@@ -10,6 +10,8 @@ interface HeaderProps {
   onPrintClick: () => void;
   onSaveClick: () => void;
   onLoadClick: () => void;
+  onDownloadMd: () => void;
+  onDownloadPdf: () => void;
 }
 
 export function Header({
@@ -19,8 +21,11 @@ export function Header({
   onPrintClick,
   onSaveClick,
   onLoadClick,
+  onDownloadMd,
+  onDownloadPdf,
 }: HeaderProps) {
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showDownload, setShowDownload] = useState(false);
 
   return (
     <header
@@ -126,12 +131,64 @@ export function Header({
         <button
           onClick={onSaveClick}
           className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm"
-          aria-label="Save as markdown file (Ctrl+S)"
-          title="Save as .md (⌘S)"
+          aria-label="Save to browser (Ctrl+S)"
+          title="Save to browser (⌘S)"
         >
           <span className="hidden sm:inline">Save</span>
           <span className="sm:hidden">💾</span>
         </button>
+
+        {/* Download dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowDownload(!showDownload)}
+            onBlur={() => setTimeout(() => setShowDownload(false), 200)}
+            className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
+            aria-label="Download options"
+            aria-expanded={showDownload}
+            aria-haspopup="true"
+          >
+            <span className="hidden sm:inline">Download</span>
+            <span className="sm:hidden">⬇️</span>
+            <svg className="h-3 w-3 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {showDownload && (
+            <div
+              className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg border border-[var(--ui-border)] bg-white py-1 shadow-lg"
+              role="menu"
+            >
+              <button
+                onClick={() => {
+                  onDownloadPdf();
+                  setShowDownload(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2"
+                role="menuitem"
+              >
+                <svg className="h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                PDF (.pdf)
+              </button>
+              <button
+                onClick={() => {
+                  onDownloadMd();
+                  setShowDownload(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2"
+                role="menuitem"
+              >
+                <svg className="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Markdown (.md)
+              </button>
+            </div>
+          )}
+        </div>
+
         <div className="mx-0.5 h-5 w-px bg-[var(--ui-border)] sm:mx-1" aria-hidden="true" />
         <button
           onClick={onStylePanelToggle}

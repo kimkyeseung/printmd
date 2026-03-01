@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { useEditorStore, useStyleStore, useUIStore, usePrintStore } from '@/stores';
 import { Header } from '@/components/layout/Header';
 import { SplitPane } from '@/components/layout/SplitPane';
@@ -16,6 +17,8 @@ import { useExtensionReceiver, useKeyboardShortcuts, useFullscreen } from '@/hoo
 import '@/styles/editor.css';
 import '@/styles/preview.css';
 import '@/styles/print.css';
+
+const STORAGE_KEY = 'printmd-content';
 
 const DEFAULT_CONTENT: Record<string, string> = {
   ko: `# Hello printmd
@@ -133,6 +136,14 @@ export default function Home() {
   // Initialize content if empty
   const displayContent = content || DEFAULT_CONTENT[locale] || DEFAULT_CONTENT['ko'];
 
+  // Load saved content from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved && !content) {
+      setContent(saved);
+    }
+  }, [content, setContent]);
+
   // Handlers
   const handleContentChange = useCallback((newContent: string) => {
     setContent(newContent);
@@ -143,6 +154,11 @@ export default function Home() {
   }, [openPrintPreview]);
 
   const handleSave = useCallback(() => {
+    localStorage.setItem(STORAGE_KEY, displayContent);
+    toast.success('저장되었습니다');
+  }, [displayContent]);
+
+  const handleDownloadMd = useCallback(() => {
     const blob = new Blob([displayContent], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -151,6 +167,10 @@ export default function Home() {
     a.click();
     URL.revokeObjectURL(url);
   }, [displayContent]);
+
+  const handleDownloadPdf = useCallback(() => {
+    openPrintPreview();
+  }, [openPrintPreview]);
 
   const handleLoad = useCallback(() => {
     fileInputRef.current?.click();
@@ -290,6 +310,8 @@ export default function Home() {
         onPrintClick={handlePrint}
         onSaveClick={handleSave}
         onLoadClick={handleLoad}
+        onDownloadMd={handleDownloadMd}
+        onDownloadPdf={handleDownloadPdf}
       />
 
       {/* Ad Banner - Desktop only */}
