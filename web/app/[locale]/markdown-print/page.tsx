@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
+import { AdBanner } from '@/components/adsense/AdBanner';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -89,6 +90,14 @@ export default async function MarkdownPrintPage({
             </Link>
           </div>
         </header>
+
+        {/* Ad Banner */}
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <AdBanner
+            className="h-[90px] w-full rounded-lg overflow-hidden"
+            slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER}
+          />
+        </div>
 
         {/* Steps */}
         <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">

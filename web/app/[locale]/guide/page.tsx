@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { AdBanner } from '@/components/adsense/AdBanner';
+import { AdSidebar } from '@/components/adsense/AdSidebar';
 
 export const metadata: Metadata = {
   title: '마크다운 가이드 - 문법 총정리',
@@ -97,10 +99,21 @@ export default function GuidePage() {
         </div>
       </header>
 
-      {/* Content */}
-      <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        {/* Table of Contents */}
-        <nav className="mb-12 rounded-xl bg-gray-50 p-6">
+      {/* Ad Banner - Top */}
+      <div className="mx-auto max-w-4xl px-4 pt-6 sm:px-6 lg:px-8">
+        <AdBanner
+          className="h-[90px] w-full rounded-lg overflow-hidden"
+          slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER}
+        />
+      </div>
+
+      {/* Content with Sidebar */}
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="flex gap-8">
+          {/* Main Content */}
+          <main className="flex-1 max-w-4xl">
+            {/* Table of Contents */}
+            <nav className="mb-12 rounded-xl bg-gray-50 p-6">
           <h2 className="font-semibold text-gray-900">목차</h2>
           <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             <TocItem href="#headings">제목</TocItem>
@@ -167,6 +180,14 @@ URL 자동 링크:
 https://example.com`}
           />
 
+          {/* In-article Ad */}
+          <div className="lg:hidden">
+            <AdBanner
+              className="h-[90px] w-full rounded-lg overflow-hidden"
+              slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE}
+            />
+          </div>
+
           <SyntaxSection
             id="images"
             title="이미지 (Images)"
@@ -231,22 +252,40 @@ ___`}
           />
         </div>
 
-        {/* CTA */}
-        <div className="mt-16 rounded-xl bg-blue-50 p-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">
-            마크다운을 PDF로 변환해보세요
-          </h2>
-          <p className="mt-2 text-gray-600">
-            배운 마크다운 문법을 printmd에서 바로 사용해보세요
-          </p>
-          <Link
-            href="/"
-            className="mt-6 inline-block rounded-lg bg-blue-600 px-8 py-3 font-semibold text-white transition hover:bg-blue-700"
-          >
-            printmd 시작하기
-          </Link>
+            {/* CTA */}
+            <div className="mt-16 rounded-xl bg-blue-50 p-8 text-center">
+              <h2 className="text-2xl font-bold text-gray-900">
+                마크다운을 PDF로 변환해보세요
+              </h2>
+              <p className="mt-2 text-gray-600">
+                배운 마크다운 문법을 printmd에서 바로 사용해보세요
+              </p>
+              <Link
+                href="/"
+                className="mt-6 inline-block rounded-lg bg-blue-600 px-8 py-3 font-semibold text-white transition hover:bg-blue-700"
+              >
+                printmd 시작하기
+              </Link>
+            </div>
+          </main>
+
+          {/* Sidebar - Desktop only */}
+          <aside className="hidden lg:block w-[300px] flex-shrink-0">
+            <div className="sticky top-8">
+              <AdSidebar
+                className="h-[250px] w-[300px] rounded-lg overflow-hidden"
+                slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR}
+              />
+              <div className="mt-6">
+                <AdSidebar
+                  className="h-[250px] w-[300px] rounded-lg overflow-hidden"
+                  slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR}
+                />
+              </div>
+            </div>
+          </aside>
         </div>
-      </main>
+      </div>
 
         {/* Footer */}
         <footer className="border-t border-gray-200 px-4 py-8 text-center text-sm text-gray-500">

@@ -8,6 +8,8 @@ import { EditorPanel } from '@/components/editor/EditorPanel';
 import { PreviewPanel } from '@/components/preview/PreviewPanel';
 import { StylePanel } from '@/components/style/StylePanel';
 import { PrintPreview } from '@/components/print/PrintPreview';
+import { AdBanner } from '@/components/adsense/AdBanner';
+import { AdMobile } from '@/components/adsense/AdMobile';
 import { createDragDropHandler, type FileInfo } from '@/lib/file';
 import { useExtensionReceiver, useKeyboardShortcuts, useFullscreen } from '@/hooks';
 import '@/styles/editor.css';
@@ -217,7 +219,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-screen flex-col pb-[50px] md:pb-0">
       {/* Skip link for accessibility */}
       <a href="#main-content" className="skip-link">
         본문으로 건너뛰기
@@ -243,6 +245,14 @@ export default function Home() {
         onLoadClick={handleLoad}
       />
 
+      {/* Ad Banner - Desktop only */}
+      <div className="hidden md:block border-b border-[var(--ui-border)]">
+        <AdBanner
+          className="h-[90px] max-w-[728px] mx-auto"
+          slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER}
+        />
+      </div>
+
       {/* Main content */}
       <main id="main-content" className="flex-1 overflow-hidden" role="main">
         {renderContent()}
@@ -253,6 +263,14 @@ export default function Home() {
 
       {/* Print Preview */}
       <PrintPreview isOpen={isPrintPreviewOpen} onClose={closePrintPreview} />
+
+      {/* Mobile Ad - Fixed bottom */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white border-t border-[var(--ui-border)]">
+        <AdMobile
+          className="h-[50px]"
+          slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_MOBILE}
+        />
+      </div>
 
       {/* Drag and Drop Overlay */}
       {isDragging && (
