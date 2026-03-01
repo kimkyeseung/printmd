@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Screenshot - 1280x800</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1280px;
+      height: 800px;
+      background: #0d1117;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+    }
+    .browser {
+      background: #161b22;
+      border-radius: 12px;
+      margin: 40px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .browser-header {
+      background: #21262d;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .dots {
+      display: flex;
+      gap: 8px;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot.red { background: #ff5f56; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #27ca40; }
+    .url-bar {
+      flex: 1;
+      background: #0d1117;
+      border-radius: 6px;
+      padding: 8px 16px;
+      color: #8b949e;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .url-bar svg {
+      width: 14px;
+      height: 14px;
+      fill: #3fb950;
+    }
+    .github-page {
+      padding: 24px 32px;
+    }
+    .repo-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      color: #58a6ff;
+      font-size: 20px;
+    }
+    .repo-header svg {
+      width: 20px;
+      height: 20px;
+      fill: #8b949e;
+    }
+    .file-header {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 6px 6px 0 0;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .file-name {
+      color: #c9d1d9;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .file-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .gh-btn {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 5px 12px;
+      color: #c9d1d9;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .printmd-btn {
+      background: #238636;
+      border: 1px solid #238636;
+      border-radius: 6px;
+      padding: 5px 12px;
+      color: white;
+      font-size: 12px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .printmd-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: white;
+    }
+    .file-content {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      padding: 24px;
+      color: #c9d1d9;
+      line-height: 1.6;
+    }
+    .md-h1 {
+      font-size: 32px;
+      font-weight: 600;
+      border-bottom: 1px solid #21262d;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .md-h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 20px 0 12px;
+    }
+    .md-p {
+      color: #8b949e;
+      margin-bottom: 12px;
+    }
+    .md-code {
+      background: #161b22;
+      border-radius: 6px;
+      padding: 16px;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 13px;
+      color: #c9d1d9;
+    }
+    .callout {
+      position: absolute;
+      top: 180px;
+      right: 80px;
+      background: #238636;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 4px 20px rgba(35, 134, 54, 0.4);
+    }
+    .callout::before {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      right: 60px;
+      border: 8px solid transparent;
+      border-top-color: #238636;
+      border-bottom: none;
+    }
+    .arrow {
+      position: absolute;
+      top: 225px;
+      right: 180px;
+      color: #238636;
+      font-size: 24px;
+      transform: rotate(45deg);
+    }
+  </style>
+</head>
+<body>
+  <div class="browser">
+    <div class="browser-header">
+      <div class="dots">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+      </div>
+      <div class="url-bar">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        github.com/printmd/printmd
+      </div>
+    </div>
+    <div class="github-page">
+      <div class="repo-header">
+        <svg viewBox="0 0 16 16"><path d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8z"/></svg>
+        printmd / printmd
+      </div>
+      <div class="file-header">
+        <span class="file-name">README.md</span>
+        <div class="file-actions">
+          <button class="printmd-btn">
+            <svg viewBox="0 0 16 16"><path d="M4 1.75C4 .784 4.784 0 5.75 0h5.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 14.25 16h-8.5A1.75 1.75 0 0 1 4 14.25V1.75z"/></svg>
+            Open in printmd
+          </button>
+          <button class="gh-btn">Raw</button>
+          <button class="gh-btn">Blame</button>
+        </div>
+      </div>
+      <div class="file-content">
+        <div class="md-h1">printmd</div>
+        <p class="md-p">Markdown to PDF, beautifully styled. Open any GitHub markdown file in printmd for instant styling and PDF export.</p>
+        <div class="md-h2">Installation</div>
+        <div class="md-code">npm install -g printmd</div>
+        <div class="md-h2">Features</div>
+        <p class="md-p">- One-click export from GitHub<br/>- Beautiful preset themes<br/>- Custom styling options<br/>- Print-optimized output</p>
+      </div>
+    </div>
+  </div>
+  <div class="callout">Click to open in printmd!</div>
+</body>
+</html>
