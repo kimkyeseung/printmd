@@ -102,10 +102,10 @@ export function Header({
           </button>
           {showShortcuts && (
             <div
-              className="absolute right-0 top-full z-50 mt-1 w-56 rounded-lg border border-[var(--ui-border)] bg-white p-3 shadow-lg"
+              className="absolute right-0 top-full z-50 mt-1 w-56 rounded-lg border border-[var(--ui-border)] bg-[var(--background)] p-3 shadow-lg"
               role="menu"
             >
-              <div className="text-xs font-semibold text-gray-500 mb-2">
+              <div className="text-xs font-semibold text-[var(--ui-text-muted)] mb-2">
                 키보드 단축키
               </div>
               <div className="space-y-1.5 text-sm">
@@ -156,7 +156,7 @@ export function Header({
           </button>
           {showDownload && (
             <div
-              className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg border border-[var(--ui-border)] bg-white py-1 shadow-lg"
+              className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg border border-[var(--ui-border)] bg-[var(--background)] py-1 shadow-lg"
               role="menu"
             >
               <button
@@ -164,7 +164,7 @@ export function Header({
                   onDownloadPdf();
                   setShowDownload(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2 text-[var(--foreground)]"
                 role="menuitem"
               >
                 <svg className="h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -177,7 +177,7 @@ export function Header({
                   onDownloadMd();
                   setShowDownload(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2 text-[var(--foreground)]"
                 role="menuitem"
               >
                 <svg className="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,9 +214,9 @@ export function Header({
 
 function ShortcutItem({ keys, description }: { keys: string; description: string }) {
   return (
-    <div className="flex items-center justify-between text-gray-600">
+    <div className="flex items-center justify-between text-[var(--foreground)]">
       <span>{description}</span>
-      <kbd className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">
+      <kbd className="rounded bg-[var(--ui-bg-hover)] px-1.5 py-0.5 text-xs font-mono">
         {keys}
       </kbd>
     </div>
