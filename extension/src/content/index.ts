@@ -9,7 +9,9 @@ import { injectButton, removeButton, isButtonInjected } from './injector';
  * Initialize the content script
  */
 function init(): void {
+  console.log('[printmd] init called');
   const pageInfo = detectPage();
+  console.log('[printmd] pageInfo:', pageInfo);
 
   // Only proceed if we're on a markdown page
   if (pageInfo.type === 'none') {
@@ -19,8 +21,10 @@ function init(): void {
 
   // Find insertion point and inject button
   const container = findButtonInsertionPoint();
+  console.log('[printmd] container:', container);
   if (container && !isButtonInjected()) {
     injectButton(container, pageInfo);
+    console.log('[printmd] button injected');
   }
 }
 
@@ -48,7 +52,9 @@ function setupObserver(): void {
             if (
               node.id === 'repo-content-turbo-frame' ||
               node.classList.contains('repository-content') ||
+              node.classList.contains('markdown-body') ||
               node.querySelector('article') ||
+              node.querySelector('article.markdown-body') ||
               node.querySelector('.file-header')
             ) {
               return true;

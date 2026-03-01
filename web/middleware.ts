@@ -45,6 +45,9 @@ export function middleware(request: NextRequest) {
   const locale = getLocale(request);
   const newUrl = new URL(`/${locale}${pathname}`, request.url);
 
+  // Preserve query parameters
+  newUrl.search = request.nextUrl.search;
+
   return NextResponse.redirect(newUrl);
 }
 

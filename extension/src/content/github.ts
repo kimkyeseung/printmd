@@ -27,12 +27,21 @@ function isMarkdownFileView(): boolean {
  * Check if current page has a README section
  */
 function isReadmePage(): boolean {
+  const url = window.location.href;
+
+  // Must be a repo root page (not /blob/, /tree/, /issues/, etc.)
+  // Allow: /owner/repo or /owner/repo/ or /owner/repo?tab=readme
+  const repoRootPattern = /^https:\/\/github\.com\/[^/]+\/[^/]+\/?(\?.*)?$/;
+  const isRepoRoot = repoRootPattern.test(url) || url.includes('?tab=readme');
+
+  if (!isRepoRoot) return false;
+
   // Check for README article element (new GitHub UI)
   const readmeArticle = document.querySelector('article[data-testid="readme"]');
   if (readmeArticle) return true;
 
   // Check for markdown-body article (current GitHub UI)
-  const markdownArticle = document.querySelector('article.markdown-body.entry-content');
+  const markdownArticle = document.querySelector('article.markdown-body');
   if (markdownArticle) return true;
 
   // Check for readme-toc anchor (older GitHub UI)
