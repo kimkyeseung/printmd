@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { EditorState } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, highlightActiveLine } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
@@ -8,7 +8,11 @@ import { markdown } from '@codemirror/lang-markdown';
 import { syntaxHighlighting, defaultHighlightStyle, indentOnInput, bracketMatching } from '@codemirror/language';
 import type { EditorProps } from '@/types/editor';
 
-export function Editor({ value, onChange }: EditorProps) {
+export interface EditorRef {
+  insertText: (before: string, after?: string) => void;
+}
+
+export const Editor = forwardRef<EditorRef, EditorProps>(function Editor({ value, onChange }, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
@@ -132,13 +136,17 @@ export function Editor({ value, onChange }: EditorProps) {
     view.focus();
   }, []);
 
+  useImperativeHandle(ref, () => ({
+    insertText,
+  }), [insertText]);
+
   return (
     <div
       ref={containerRef}
       className="h-full w-full overflow-hidden"
-      data-insert-text={insertText}
     />
   );
-}
+});
 
 export default Editor;
+export type { EditorRef };
