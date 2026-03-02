@@ -1,28 +1,54 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { locales, type Locale } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy - printmd',
-  description:
-    'Privacy Policy for printmd web service and Chrome extension. Learn how we handle your data.',
-  openGraph: {
-    title: 'Privacy Policy | printmd',
-    description: 'Privacy Policy for printmd web service and Chrome extension.',
-    url: 'https://printmd.app/privacy',
-  },
-  alternates: {
-    canonical: 'https://printmd.app/privacy',
-  },
-};
+function isValidLocale(locale: string): locale is Locale {
+  return locales.includes(locale as Locale);
+}
 
-export default function PrivacyPage() {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isValidLocale(locale)) return {};
+  const dict = await getDictionary(locale);
+  const t = dict.privacy;
+
+  return {
+    title: `${t.title} - printmd`,
+    description: t.description,
+    openGraph: {
+      title: `${t.title} | printmd`,
+      description: t.description,
+      url: `https://printmd.app/${locale}/privacy`,
+    },
+    alternates: {
+      canonical: `https://printmd.app/${locale}/privacy`,
+      languages: {
+        'ko': 'https://printmd.app/ko/privacy',
+        'en': 'https://printmd.app/en/privacy',
+      },
+    },
+  };
+}
+
+export default async function PrivacyPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: localeParam } = await params;
+  const locale = isValidLocale(localeParam) ? localeParam : 'ko';
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b border-gray-200 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <Link
-            href="/"
+            href={`/${locale}`}
             className="text-sm text-blue-600 hover:text-blue-700"
           >
             ← Back to printmd

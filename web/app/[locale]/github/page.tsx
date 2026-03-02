@@ -1,71 +1,100 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { locales, type Locale } from '@/lib/i18n/config';
+import { getDictionary } from '@/lib/i18n/dictionaries';
 
-export const metadata: Metadata = {
-  title: 'GitHub README PDF 변환',
-  description:
-    'GitHub README.md 파일을 예쁘게 PDF로 변환하세요. Chrome 확장프로그램으로 원클릭 변환, 5가지 테마 프리셋, 커스텀 스타일링 지원.',
-  keywords: [
-    'GitHub README',
-    'GitHub markdown',
-    'README PDF',
-    'GitHub PDF 변환',
-    'README 인쇄',
-    'GitHub 문서 PDF',
-    'markdown to pdf github',
-  ],
-  openGraph: {
-    title: 'GitHub README PDF 변환 | printmd',
-    description:
-      'GitHub README.md 파일을 예쁘게 PDF로 변환하세요. Chrome 확장프로그램으로 원클릭 변환.',
-    url: 'https://printmd.app/github',
-  },
-  alternates: {
-    canonical: 'https://printmd.app/github',
-  },
-};
+function isValidLocale(locale: string): locale is Locale {
+  return locales.includes(locale as Locale);
+}
 
-const howToJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'HowTo',
-  name: 'GitHub README를 PDF로 변환하는 방법',
-  description: 'GitHub README.md 파일을 printmd로 예쁘게 PDF로 변환하는 방법',
-  totalTime: 'PT2M',
-  tool: [
-    {
-      '@type': 'HowToTool',
-      name: 'printmd Chrome 확장프로그램',
-    },
-  ],
-  step: [
-    {
-      '@type': 'HowToStep',
-      position: 1,
-      name: 'Chrome 확장프로그램 설치',
-      text: 'Chrome 웹스토어에서 printmd 확장프로그램을 설치하세요.',
-    },
-    {
-      '@type': 'HowToStep',
-      position: 2,
-      name: 'GitHub에서 README 열기',
-      text: '변환하고 싶은 README.md 파일이 있는 GitHub 저장소를 방문하세요.',
-    },
-    {
-      '@type': 'HowToStep',
-      position: 3,
-      name: 'Open in printmd 클릭',
-      text: 'README 옆에 나타나는 버튼을 클릭하면 printmd에서 열립니다.',
-    },
-    {
-      '@type': 'HowToStep',
-      position: 4,
-      name: '스타일 선택 후 PDF 저장',
-      text: '원하는 테마를 선택하고 PDF로 저장하거나 바로 인쇄하세요.',
-    },
-  ],
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isValidLocale(locale)) return {};
+  const dict = await getDictionary(locale);
+  const t = dict.github;
 
-export default function GitHubPage() {
+  return {
+    title: t.title,
+    description: t.description,
+    keywords: t.keywords.split(','),
+    openGraph: {
+      title: `${t.title} | printmd`,
+      description: t.description,
+      url: `https://printmd.app/${locale}/github`,
+    },
+    alternates: {
+      canonical: `https://printmd.app/${locale}/github`,
+      languages: {
+        'ko': 'https://printmd.app/ko/github',
+        'en': 'https://printmd.app/en/github',
+      },
+    },
+  };
+}
+
+export default async function GitHubPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: localeParam } = await params;
+  const locale = isValidLocale(localeParam) ? localeParam : 'ko';
+
+  const howToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: locale === 'ko' ? 'GitHub README를 PDF로 변환하는 방법' : 'How to convert GitHub README to PDF',
+    description: locale === 'ko'
+      ? 'GitHub README.md 파일을 printmd로 예쁘게 PDF로 변환하는 방법'
+      : 'How to convert GitHub README.md files to beautiful PDFs with printmd',
+    totalTime: 'PT2M',
+    inLanguage: locale === 'ko' ? 'ko-KR' : 'en-US',
+    tool: [
+      {
+        '@type': 'HowToTool',
+        name: 'printmd Chrome Extension',
+      },
+    ],
+    step: [
+      {
+        '@type': 'HowToStep',
+        position: 1,
+        name: locale === 'ko' ? 'Chrome 확장프로그램 설치' : 'Install Chrome Extension',
+        text: locale === 'ko'
+          ? 'Chrome 웹스토어에서 printmd 확장프로그램을 설치하세요.'
+          : 'Install the printmd extension from the Chrome Web Store.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 2,
+        name: locale === 'ko' ? 'GitHub에서 README 열기' : 'Open README on GitHub',
+        text: locale === 'ko'
+          ? '변환하고 싶은 README.md 파일이 있는 GitHub 저장소를 방문하세요.'
+          : 'Visit the GitHub repository with the README.md file you want to convert.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 3,
+        name: locale === 'ko' ? 'Open in printmd 클릭' : 'Click Open in printmd',
+        text: locale === 'ko'
+          ? 'README 옆에 나타나는 버튼을 클릭하면 printmd에서 열립니다.'
+          : 'Click the button next to the README to open it in printmd.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 4,
+        name: locale === 'ko' ? '스타일 선택 후 PDF 저장' : 'Choose style and save as PDF',
+        text: locale === 'ko'
+          ? '원하는 테마를 선택하고 PDF로 저장하거나 바로 인쇄하세요.'
+          : 'Select your preferred theme and save as PDF or print directly.',
+      },
+    ],
+  };
+
   return (
     <>
       <script
@@ -86,7 +115,7 @@ export default function GitHubPage() {
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
-            href="/"
+            href={`/${locale}`}
             className="rounded-lg bg-blue-600 px-8 py-3 text-lg font-semibold text-white shadow-lg transition hover:bg-blue-700"
           >
             지금 시작하기

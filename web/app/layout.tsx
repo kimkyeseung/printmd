@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import "./globals.css";
@@ -71,21 +72,12 @@ export const metadata: Metadata = {
     alternateLocale: "en_US",
     siteName: "printmd",
     url: "https://printmd.app",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "printmd - Markdown to PDF",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "printmd - Markdown to PDF",
     description:
       "마크다운 편집, PDF 변환, 인쇄를 한 곳에서. 설치 없이 브라우저에서 마크다운을 편집하고 스타일을 골라 바로 PDF로 뽑는 무료 웹 도구.",
-    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -110,38 +102,16 @@ export const metadata: Metadata = {
   },
 };
 
-// JSON-LD structured data
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: "printmd",
-  description:
-    "마크다운 편집, PDF 변환, 인쇄를 한 곳에서. 설치 없이 브라우저에서 마크다운을 편집하고 스타일을 골라 바로 PDF로 뽑는 무료 웹 도구.",
-  url: "https://printmd.app",
-  applicationCategory: "UtilitiesApplication",
-  operatingSystem: "Any",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-  },
-  featureList: [
-    "Markdown to PDF conversion",
-    "Real-time preview",
-    "5 theme presets",
-    "Custom styling",
-    "GitHub integration",
-    "Chrome extension",
-  ],
-};
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerList = await headers();
+  const locale = headerList.get("x-locale") || "ko";
+
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         {/* Google AdSense - must be in head for site verification */}
         {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
@@ -155,11 +125,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* JSON-LD Structured Data - placed in body to avoid hydration issues */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
         <Providers>{children}</Providers>
       </body>
     </html>

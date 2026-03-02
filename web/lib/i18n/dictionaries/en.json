@@ -191,6 +191,24 @@
   "guide": {
     "title": "Markdown Guide",
     "subtitle": "Complete Syntax Reference",
-    "description": "Complete Markdown syntax guide. Learn headings, lists, links, images, code blocks, tables, and more with examples."
+    "description": "Complete Markdown syntax guide. Learn headings, lists, links, images, code blocks, tables, and more with examples.",
+    "keywords": "markdown syntax,markdown guide,markdown tutorial,markdown reference,how to use markdown,markdown cheatsheet",
+    "backLink": "← Back to printmd",
+    "heading": "Markdown Guide",
+    "subheading": "Learn Markdown syntax quickly",
+    "toc": "Table of Contents",
+    "ctaTitle": "Convert your Markdown to PDF",
+    "ctaSubtitle": "Try the Markdown syntax you learned right here on printmd",
+    "ctaButton": "Start printmd",
+    "syntaxLabel": "Markdown syntax"
+  },
+  "github": {
+    "title": "GitHub README to PDF",
+    "description": "Convert your GitHub README.md to a beautiful PDF. One-click conversion with Chrome extension, 5 theme presets, and custom styling.",
+    "keywords": "GitHub README,GitHub markdown,README PDF,GitHub PDF converter,README print,GitHub docs PDF,markdown to pdf github"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "description": "Privacy Policy for printmd web service and Chrome extension. Learn how we handle your data."
   }
 }

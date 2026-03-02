@@ -191,6 +191,24 @@
   "guide": {
     "title": "마크다운 가이드",
     "subtitle": "문법 총정리",
-    "description": "마크다운(Markdown) 문법 완벽 가이드. 제목, 목록, 링크, 이미지, 코드 블록, 테이블 등 모든 문법을 예제와 함께 설명합니다."
+    "description": "마크다운(Markdown) 문법 완벽 가이드. 제목, 목록, 링크, 이미지, 코드 블록, 테이블 등 모든 문법을 예제와 함께 설명합니다.",
+    "keywords": "마크다운 문법,markdown guide,마크다운 가이드,markdown syntax,마크다운 사용법,마크다운 튜토리얼,markdown tutorial",
+    "backLink": "← printmd로 돌아가기",
+    "heading": "마크다운 가이드",
+    "subheading": "마크다운 문법을 빠르게 익혀보세요",
+    "toc": "목차",
+    "ctaTitle": "마크다운을 PDF로 변환해보세요",
+    "ctaSubtitle": "배운 마크다운 문법을 printmd에서 바로 사용해보세요",
+    "ctaButton": "printmd 시작하기",
+    "syntaxLabel": "마크다운 문법"
+  },
+  "github": {
+    "title": "GitHub README PDF 변환",
+    "description": "GitHub README.md 파일을 예쁘게 PDF로 변환하세요. Chrome 확장프로그램으로 원클릭 변환, 5가지 테마 프리셋, 커스텀 스타일링 지원.",
+    "keywords": "GitHub README,GitHub markdown,README PDF,GitHub PDF 변환,README 인쇄,GitHub 문서 PDF,markdown to pdf github"
+  },
+  "privacy": {
+    "title": "개인정보처리방침",
+    "description": "printmd 웹 서비스 및 Chrome 확장프로그램의 개인정보처리방침입니다. 데이터 처리 방식을 알아보세요."
   }
 }
