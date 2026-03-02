@@ -31,31 +31,10 @@ export async function readFile(file: File): Promise<FileInfo> {
   });
 }
 
-export function saveFile(content: string, filename: string = 'document.md'): void {
-  const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.style.display = 'none';
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  URL.revokeObjectURL(url);
-}
-
 export function isMarkdownFile(file: File): boolean {
   const validExtensions = ['.md', '.markdown', '.mdown', '.mkd', '.mkdn', '.txt'];
   const fileName = file.name.toLowerCase();
   return validExtensions.some((ext) => fileName.endsWith(ext));
-}
-
-export function getFileExtension(filename: string): string {
-  const lastDot = filename.lastIndexOf('.');
-  return lastDot === -1 ? '' : filename.slice(lastDot);
 }
 
 export function sanitizeFilename(filename: string): string {

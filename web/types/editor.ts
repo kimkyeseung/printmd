@@ -1,8 +1,6 @@
 export interface EditorState {
   content: string;
   sourceUrl: string | null;
-  isFromExtension: boolean;
-  isDirty: boolean;
   currentDocumentId: string | null;
 }
 
@@ -10,8 +8,6 @@ export interface EditorActions {
   setContent: (content: string) => void;
   setSourceUrl: (url: string | null) => void;
   setCurrentDocumentId: (id: string | null) => void;
-  loadFromExtension: (content: string, sourceUrl?: string) => void;
-  markClean: () => void;
   reset: () => void;
 }
 
@@ -35,7 +31,6 @@ export type ToolbarAction =
 export interface EditorProps {
   value: string;
   onChange: (value: string) => void;
-  onSave?: () => void;
 }
 
 export interface ToolbarProps {

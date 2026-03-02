@@ -30,8 +30,6 @@ interface DocumentsActions {
   getDocumentsInFolder: (folderId: string) => Document[];
   getFoldersInFolder: (parentId: string | null) => Folder[];
   getDocument: (id: string) => Document | undefined;
-  renameDocument: (id: string, name: string) => void;
-  renameFolder: (id: string, name: string) => void;
 }
 
 type DocumentsStore = DocumentsState & DocumentsActions;
@@ -115,21 +113,6 @@ export const useDocumentsStore = create<DocumentsStore>()(
         return get().documents.find((doc) => doc.id === id);
       },
 
-      renameDocument: (id: string, name: string) => {
-        set((state) => ({
-          documents: state.documents.map((doc) =>
-            doc.id === id ? { ...doc, name, updatedAt: Date.now() } : doc
-          ),
-        }));
-      },
-
-      renameFolder: (id: string, name: string) => {
-        set((state) => ({
-          folders: state.folders.map((folder) =>
-            folder.id === id ? { ...folder, name } : folder
-          ),
-        }));
-      },
     }),
     {
       name: 'printmd-documents',

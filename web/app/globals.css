@@ -99,20 +99,8 @@ body {
     color: black !important;
   }
 
-  .no-print,
-  header,
-  .sidebar,
-  .style-panel,
-  .toolbar,
-  .adsense {
+  header {
     display: none !important;
-  }
-
-  .print-content {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
   }
 }
 

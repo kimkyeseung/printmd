@@ -1,8 +1,6 @@
 export {
   readFile,
-  saveFile,
   isMarkdownFile,
-  getFileExtension,
   sanitizeFilename,
   type FileInfo,
 } from './fileHandler';
