@@ -4,8 +4,8 @@
   },
   "meta": {
     "title": "printmd - Markdown to PDF",
-    "description": "Free online tool to convert Markdown to PDF. Pick your style and print instantly.",
-    "keywords": "markdown,PDF,converter,editor,markdown to pdf,print markdown,online markdown editor"
+    "description": "Edit, convert, and print Markdown in one place. Free online markdown editor with live preview, themes, and instant PDF export.",
+    "keywords": "markdown,PDF,converter,editor,markdown to pdf,print markdown,online markdown editor,markdown editing,free markdown editor,web markdown editor,edit markdown online,markdown writing tool"
   },
   "common": {
     "startFree": "Start for Free",
@@ -158,6 +158,30 @@
       "customTheme": "Custom Themes",
       "offline": "Offline Use",
       "privacy": "Privacy"
+    },
+    "useCases": {
+      "title": "Who Uses printmd?",
+      "developer": "Developers",
+      "developerDesc": "Edit README, API docs, and tech specs then save as PDF",
+      "student": "Students",
+      "studentDesc": "Write assignments and notes in Markdown, export as PDF for submission",
+      "writer": "Writers/Bloggers",
+      "writerDesc": "Edit Markdown drafts and format for printing",
+      "worker": "Professionals",
+      "workerDesc": "Edit meeting notes and reports in Markdown, print cleanly"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "What is a Markdown editor?",
+      "a1": "A Markdown editor lets you write documents using Markdown syntax and see the rendered result in real time. printmd is a free online Markdown editor you can use right in your browser.",
+      "q2": "Is printmd really free?",
+      "a2": "Yes, all features of printmd are completely free. No signup required and no usage limits.",
+      "q3": "Can I use it offline?",
+      "a3": "Yes, printmd supports PWA so once you visit, you can use it without an internet connection.",
+      "q4": "Which browsers are supported?",
+      "a4": "You can use it on all modern browsers including Chrome, Firefox, Safari, and Edge.",
+      "q5": "Where is my data stored?",
+      "a5": "All data is stored in your browser's local storage. Nothing is sent to a server, keeping your data private."
     },
     "cta": {
       "title": "Start Editing Now",

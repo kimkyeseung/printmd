@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | printmd",
   },
   description:
-    "마크다운을 어디서든 가져와서 스타일을 골라 바로 PDF/인쇄로 뽑는 무료 웹 도구. GitHub README, 문서를 예쁘게 인쇄하세요.",
+    "마크다운 편집, PDF 변환, 인쇄를 한 곳에서. 설치 없이 브라우저에서 마크다운을 편집하고 스타일을 골라 바로 PDF로 뽑는 무료 웹 도구.",
   keywords: [
     "마크다운",
     "markdown",
@@ -42,6 +42,10 @@ export const metadata: Metadata = {
     "마크다운 인쇄",
     "마크다운 편집",
     "온라인 마크다운",
+    "마크다운 웹 편집기",
+    "온라인 마크다운 편집",
+    "무료 마크다운 편집기",
+    "마크다운 작성",
   ],
   authors: [{ name: "printmd" }],
   creator: "printmd",
@@ -61,7 +65,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "printmd - Markdown to PDF",
     description:
-      "마크다운을 어디서든 가져와서 스타일을 골라 바로 PDF/인쇄로 뽑는 무료 웹 도구",
+      "마크다운 편집, PDF 변환, 인쇄를 한 곳에서. 설치 없이 브라우저에서 마크다운을 편집하고 스타일을 골라 바로 PDF로 뽑는 무료 웹 도구.",
     type: "website",
     locale: "ko_KR",
     alternateLocale: "en_US",
@@ -80,7 +84,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "printmd - Markdown to PDF",
     description:
-      "마크다운을 어디서든 가져와서 스타일을 골라 바로 PDF/인쇄로 뽑는 무료 웹 도구",
+      "마크다운 편집, PDF 변환, 인쇄를 한 곳에서. 설치 없이 브라우저에서 마크다운을 편집하고 스타일을 골라 바로 PDF로 뽑는 무료 웹 도구.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -112,7 +116,7 @@ const jsonLd = {
   "@type": "WebApplication",
   name: "printmd",
   description:
-    "마크다운을 어디서든 가져와서 스타일을 골라 바로 PDF/인쇄로 뽑는 무료 웹 도구",
+    "마크다운 편집, PDF 변환, 인쇄를 한 곳에서. 설치 없이 브라우저에서 마크다운을 편집하고 스타일을 골라 바로 PDF로 뽑는 무료 웹 도구.",
   url: "https://printmd.app",
   applicationCategory: "UtilitiesApplication",
   operatingSystem: "Any",

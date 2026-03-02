@@ -22,8 +22,8 @@ export async function generateMetadata({
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
     keywords: locale === 'ko'
-      ? ['마크다운 편집기', '마크다운 에디터', 'markdown editor', '온라인 마크다운']
-      : ['markdown editor', 'online markdown editor', 'md editor', 'free markdown editor'],
+      ? ['마크다운 편집기', '마크다운 에디터', 'markdown editor', '온라인 마크다운', '마크다운 편집', '마크다운 편집 도구', '온라인 마크다운 편집', '무료 마크다운 편집기', '웹 마크다운 편집기', '마크다운 작성']
+      : ['markdown editor', 'online markdown editor', 'md editor', 'free markdown editor', 'markdown editing', 'edit markdown online', 'free markdown writing tool', 'web markdown editor'],
     openGraph: {
       title: `${t.title} - ${t.subtitle} | printmd`,
       description: t.hero.description,
@@ -64,11 +64,27 @@ export default async function MarkdownEditorPage({
     },
   };
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      { '@type': 'Question', name: t.faq.q1, acceptedAnswer: { '@type': 'Answer', text: t.faq.a1 } },
+      { '@type': 'Question', name: t.faq.q2, acceptedAnswer: { '@type': 'Answer', text: t.faq.a2 } },
+      { '@type': 'Question', name: t.faq.q3, acceptedAnswer: { '@type': 'Answer', text: t.faq.a3 } },
+      { '@type': 'Question', name: t.faq.q4, acceptedAnswer: { '@type': 'Answer', text: t.faq.a4 } },
+      { '@type': 'Question', name: t.faq.q5, acceptedAnswer: { '@type': 'Answer', text: t.faq.a5 } },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
         {/* Hero Section */}
@@ -146,6 +162,21 @@ export default async function MarkdownEditorPage({
           </div>
         </section>
 
+        {/* Use Cases */}
+        <section className="bg-purple-50 px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="text-center text-3xl font-bold text-gray-900">
+              {t.useCases.title}
+            </h2>
+            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <UseCase icon="💻" title={t.useCases.developer} description={t.useCases.developerDesc} />
+              <UseCase icon="🎓" title={t.useCases.student} description={t.useCases.studentDesc} />
+              <UseCase icon="✍️" title={t.useCases.writer} description={t.useCases.writerDesc} />
+              <UseCase icon="💼" title={t.useCases.worker} description={t.useCases.workerDesc} />
+            </div>
+          </div>
+        </section>
+
         {/* Keyboard Shortcuts */}
         <section className="bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl">
@@ -202,6 +233,22 @@ export default async function MarkdownEditorPage({
           </div>
         </section>
 
+        {/* FAQ */}
+        <section className="bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl">
+            <h2 className="text-center text-3xl font-bold text-gray-900">
+              {t.faq.title}
+            </h2>
+            <div className="mt-12 space-y-4">
+              <FaqItem question={t.faq.q1} answer={t.faq.a1} />
+              <FaqItem question={t.faq.q2} answer={t.faq.a2} />
+              <FaqItem question={t.faq.q3} answer={t.faq.a3} />
+              <FaqItem question={t.faq.q4} answer={t.faq.a4} />
+              <FaqItem question={t.faq.q5} answer={t.faq.a5} />
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="px-4 py-16 text-center sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900">{t.cta.title}</h2>
@@ -241,6 +288,24 @@ function Feature({
   );
 }
 
+function UseCase({
+  icon,
+  title,
+  description,
+}: {
+  icon: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-xl bg-white p-6 shadow-sm text-center">
+      <div className="text-4xl">{icon}</div>
+      <h3 className="mt-3 font-semibold text-gray-900">{title}</h3>
+      <p className="mt-2 text-sm text-gray-600">{description}</p>
+    </div>
+  );
+}
+
 function Shortcut({ keys, action }: { keys: string; action: string }) {
   return (
     <tr>
@@ -269,5 +334,19 @@ function CompareRow({
       <td className="px-4 py-3 text-center">{printmd}</td>
       <td className="px-4 py-3 text-center">{others}</td>
     </tr>
+  );
+}
+
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  return (
+    <details className="group rounded-xl bg-white shadow-sm">
+      <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-semibold text-gray-900">
+        {question}
+        <span className="ml-2 text-purple-500 transition-transform group-open:rotate-45">+</span>
+      </summary>
+      <div className="px-6 pb-4 text-sm text-gray-600">
+        {answer}
+      </div>
+    </details>
   );
 }
