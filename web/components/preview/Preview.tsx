@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import type { GlobalStyles } from '@/types/style';
@@ -11,10 +11,20 @@ interface PreviewProps {
 }
 
 export function Preview({ markdown, styles }: PreviewProps) {
-  const html = useMemo(() => {
-    const parsed = parseMarkdown(markdown);
-    return sanitizeHtml(parsed);
+  const [debouncedMarkdown, setDebouncedMarkdown] = useState(markdown);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    timerRef.current = setTimeout(() => {
+      setDebouncedMarkdown(markdown);
+    }, 150);
+    return () => clearTimeout(timerRef.current);
   }, [markdown]);
+
+  const html = useMemo(() => {
+    const parsed = parseMarkdown(debouncedMarkdown);
+    return sanitizeHtml(parsed);
+  }, [debouncedMarkdown]);
 
   const cssVariables = useMemo(() => ({
     '--preview-font-size': `${styles.fontSize}px`,
@@ -29,7 +39,7 @@ export function Preview({ markdown, styles }: PreviewProps) {
     '--preview-padding-right': `${styles.padding.right}px`,
     '--preview-padding-bottom': `${styles.padding.bottom}px`,
     '--preview-padding-left': `${styles.padding.left}px`,
-  } as React.CSSProperties), [styles]);
+  } as React.CSSProperties), [styles.fontSize, styles.fontFamily, styles.textColor, styles.backgroundColor, styles.lineHeight, styles.linkColor, styles.codeBackground, styles.maxWidth, styles.padding.top, styles.padding.right, styles.padding.bottom, styles.padding.left]);
 
   return (
     <div

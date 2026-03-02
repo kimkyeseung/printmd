@@ -16,6 +16,7 @@ export const Editor = forwardRef<EditorRef, EditorProps>(function Editor({ value
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
+  const lastExternalValueRef = useRef(value);
 
   // Keep onChange ref updated
   useEffect(() => {
@@ -28,6 +29,7 @@ export const Editor = forwardRef<EditorRef, EditorProps>(function Editor({ value
     const updateListener = EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         const newValue = update.state.doc.toString();
+        lastExternalValueRef.current = newValue;
         onChangeRef.current(newValue);
       }
     });
@@ -105,6 +107,9 @@ export const Editor = forwardRef<EditorRef, EditorProps>(function Editor({ value
   useEffect(() => {
     const view = viewRef.current;
     if (!view) return;
+    // Skip if value came from user typing (avoids O(n) doc.toString())
+    if (lastExternalValueRef.current === value) return;
+    lastExternalValueRef.current = value;
 
     const currentValue = view.state.doc.toString();
     if (currentValue !== value) {

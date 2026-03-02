@@ -25,7 +25,20 @@ export function useExtensionReceiver() {
         try {
           const decodedUrl = decodeURIComponent(srcUrl);
 
-          // Fetch raw content from the URL
+          // Validate URL against allowed hosts to prevent arbitrary fetch
+          const ALLOWED_HOSTS = ['raw.githubusercontent.com'];
+          try {
+            const url = new URL(decodedUrl);
+            if (!ALLOWED_HOSTS.includes(url.hostname)) {
+              console.warn('Blocked fetch from untrusted host:', url.hostname);
+              return;
+            }
+          } catch {
+            console.warn('Invalid URL:', decodedUrl);
+            return;
+          }
+
+          // Fetch raw content from the validated URL
           const response = await fetch(decodedUrl);
           if (!response.ok) {
             throw new Error(`Failed to fetch: ${response.status}`);
@@ -56,8 +69,8 @@ export function useExtensionReceiver() {
 
     // Handle postMessage method (for large content)
     const handleMessage = (event: MessageEvent) => {
-      // Verify origin in production
-      // if (event.origin !== 'chrome-extension://...') return;
+      // Only accept messages from trusted origins
+      if (event.origin !== window.location.origin) return;
 
       const data = event.data as ExtensionMessage;
       if (data?.type === 'PRINTMD_CONTENT' && data.content) {

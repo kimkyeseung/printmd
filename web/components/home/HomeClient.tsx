@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useEditorStore, useStyleStore, useUIStore, usePrintStore, useDocumentsStore } from '@/stores';
@@ -144,13 +144,16 @@ export default function HomeClient() {
   // Initialize content if empty
   const displayContent = content || DEFAULT_CONTENT[locale] || DEFAULT_CONTENT['ko'];
 
-  // Load saved content from localStorage on mount
+  // Load saved content from localStorage on mount only
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('src')) return; // Let extension receiver handle URL content
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && !content) {
+    if (saved) {
       setContent(saved);
     }
-  }, [content, setContent]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handlers
   const handleContentChange = useCallback((newContent: string) => {
@@ -232,12 +235,12 @@ export default function HomeClient() {
     setContent(file.content);
   }, [setContent]);
 
-  const dragDropHandlers = createDragDropHandler({
+  const dragDropHandlers = useMemo(() => createDragDropHandler({
     onDragEnter: () => setIsDragging(true),
     onDragLeave: () => setIsDragging(false),
     onDrop: handleFileDrop,
     onError: (error) => console.error('Drop error:', error),
-  });
+  }), [handleFileDrop]);
 
   // Keyboard shortcuts
   const handleEscape = useCallback(() => {

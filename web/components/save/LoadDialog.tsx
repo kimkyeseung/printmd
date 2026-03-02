@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { FolderTree } from './FolderTree';
 import { ConfirmDialog } from './ConfirmDialog';
 import { useDocumentsStore, type Document, type Folder } from '@/stores/documentsStore';
@@ -81,10 +81,6 @@ export function LoadDialog({ isOpen, onClose, onLoad }: LoadDialogProps) {
     setConfirmDelete(null);
   }, [confirmDelete, deleteDocument, deleteFolder]);
 
-  // Memoize lists
-  const folderList = useMemo(() => folders, [folders]);
-  const documentList = useMemo(() => documents, [documents]);
-
   const isEmpty = documents.length === 0 && folders.length === 0;
 
   if (!isOpen) return null;
@@ -155,8 +151,8 @@ export function LoadDialog({ isOpen, onClose, onLoad }: LoadDialogProps) {
           ) : (
             <div className="border border-[var(--ui-border)] rounded-md max-h-72 overflow-y-auto">
               <FolderTree
-                folders={folderList}
-                documents={documentList}
+                folders={folders}
+                documents={documents}
                 selectedFolderId={selectedFolderId}
                 onFolderSelect={setSelectedFolderId}
                 onDocumentSelect={handleDocumentSelect}

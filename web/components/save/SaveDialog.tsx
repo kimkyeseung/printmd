@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { FolderTree } from './FolderTree';
 import { useDocumentsStore } from '@/stores/documentsStore';
 
@@ -93,9 +93,6 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
     [handleCreateFolder]
   );
 
-  // Memoize folder list to avoid unnecessary re-renders
-  const folderList = useMemo(() => folders, [folders]);
-
   if (!isOpen) return null;
 
   return (
@@ -148,7 +145,7 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
             <label className="block text-sm font-medium mb-2">Location</label>
             <div className="border border-[var(--ui-border)] rounded-md max-h-48 overflow-y-auto">
               <FolderTree
-                folders={folderList}
+                folders={folders}
                 selectedFolderId={selectedFolderId}
                 onFolderSelect={setSelectedFolderId}
               />
