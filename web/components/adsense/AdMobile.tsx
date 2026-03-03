@@ -24,9 +24,7 @@ export function AdMobile({ className = '', slot = '' }: AdMobileProps) {
     if (adElement.dataset.adsbygoogleStatus) return;
 
     try {
-      if (typeof window !== 'undefined' && window.adsbygoogle) {
-        window.adsbygoogle.push({});
-      }
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
       // Ignore - ad already loaded
     }

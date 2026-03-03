@@ -13,6 +13,7 @@ import { PrintPreview } from '@/components/print/PrintPreview';
 import { SaveDialog, LoadDialog } from '@/components/save';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { AdMobile } from '@/components/adsense/AdMobile';
+import { AdSidebar } from '@/components/adsense/AdSidebar';
 import { createDragDropHandler, type FileInfo } from '@/lib/file';
 import { useExtensionReceiver, useKeyboardShortcuts, useFullscreen } from '@/hooks';
 import '@/styles/editor.css';
@@ -366,10 +367,18 @@ export default function HomeClient() {
         />
       </div>
 
-      {/* Main content */}
-      <main id="main-content" className="flex-1 overflow-hidden" role="main">
-        {renderContent()}
-      </main>
+      {/* Main content with sidebar */}
+      <div className="flex flex-1 overflow-hidden">
+        <main id="main-content" className="flex-1 overflow-hidden" role="main">
+          {renderContent()}
+        </main>
+        <aside className="hidden xl:flex flex-col w-[160px] flex-shrink-0 border-l border-[var(--ui-border)]">
+          <AdSidebar
+            className="sticky top-0 w-[160px] h-[600px]"
+            slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR}
+          />
+        </aside>
+      </div>
 
       {/* Style Panel */}
       <StylePanel isOpen={isStylePanelOpen} onClose={closeStylePanel} />
