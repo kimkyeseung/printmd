@@ -25,7 +25,7 @@ export function PreviewPanel({ markdown, styles, sourceUrl }: PreviewPanelProps)
           </a>
         )}
       </div>
-      <div className="flex-1 overflow-hidden">
+      <div className="min-h-0 flex-1 overflow-hidden">
         <Preview markdown={markdown} styles={styles} />
       </div>
     </div>

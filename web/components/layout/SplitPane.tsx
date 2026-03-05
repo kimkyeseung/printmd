@@ -61,7 +61,7 @@ export function SplitPane({
     <div ref={containerRef} className="flex h-full w-full">
       {/* Left panel */}
       <div
-        className="h-full overflow-hidden"
+        className="h-full min-h-0 overflow-hidden"
         style={{ width: `${leftWidth}%` }}
       >
         {left}
@@ -77,7 +77,7 @@ export function SplitPane({
 
       {/* Right panel */}
       <div
-        className="h-full flex-1 overflow-hidden"
+        className="h-full min-h-0 flex-1 overflow-hidden"
         style={{ width: `${100 - leftWidth}%` }}
       >
         {right}
