@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import type { ViewMode } from '@/stores/uiStore';
 
 interface HeaderProps {
@@ -42,7 +43,10 @@ export function Header({
     >
       {/* Logo */}
       <div className="flex items-center gap-2 sm:gap-4">
-        <span className="text-base font-semibold sm:text-lg">printmd</span>
+        <div className="flex items-center gap-1.5">
+          <Image src="/icon.svg" alt="printmd logo" width={24} height={24} className="rounded" />
+          <span className="text-base font-semibold sm:text-lg">printmd</span>
+        </div>
 
         {/* View mode toggle */}
         <nav
