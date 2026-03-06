@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useTheme } from 'next-themes';
 import type { ViewMode } from '@/stores/uiStore';
 
 interface HeaderProps {
@@ -16,6 +17,28 @@ interface HeaderProps {
   onDownloadMd: () => void;
   onDownloadPdf: () => void;
   hasCurrentDocument?: boolean;
+}
+
+function ThemeIcon({ theme }: { theme: string | undefined }) {
+  if (theme === 'light') {
+    return (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+    );
+  }
+  if (theme === 'dark') {
+    return (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+    );
+  }
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  );
 }
 
 export function Header({
@@ -35,6 +58,13 @@ export function Header({
   const [showDownload, setShowDownload] = useState(false);
   const [showOpen, setShowOpen] = useState(false);
   const [showSave, setShowSave] = useState(false);
+  const [showTheme, setShowTheme] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header
@@ -290,13 +320,84 @@ export function Header({
         </div>
 
         <div className="mx-0.5 h-5 w-px bg-[var(--ui-border)] sm:mx-1" aria-hidden="true" />
+
+        {/* Theme dropdown (app UI theme) */}
+        <div className="relative">
+          <button
+            onClick={() => setShowTheme(!showTheme)}
+            onBlur={() => setTimeout(() => setShowTheme(false), 200)}
+            className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
+            aria-label="Theme"
+            aria-expanded={showTheme}
+            aria-haspopup="true"
+          >
+            {mounted && <ThemeIcon theme={resolvedTheme} />}
+            <svg className="h-3 w-3 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {showTheme && (
+            <div
+              className="dropdown-menu absolute right-0 top-full z-50 mt-1 w-36 rounded-lg border border-[var(--ui-border)] py-1 shadow-lg"
+              role="menu"
+            >
+              <button
+                onClick={() => {
+                  setTheme('light');
+                  setShowTheme(false);
+                }}
+                className={`w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2 ${
+                  theme === 'light' ? 'font-semibold' : ''
+                }`}
+                role="menuitem"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                Light
+              </button>
+              <button
+                onClick={() => {
+                  setTheme('dark');
+                  setShowTheme(false);
+                }}
+                className={`w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2 ${
+                  theme === 'dark' ? 'font-semibold' : ''
+                }`}
+                role="menuitem"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+                Dark
+              </button>
+              <button
+                onClick={() => {
+                  setTheme('system');
+                  setShowTheme(false);
+                }}
+                className={`w-full px-4 py-2 text-left text-sm hover:bg-[var(--ui-bg-hover)] flex items-center gap-2 ${
+                  theme === 'system' ? 'font-semibold' : ''
+                }`}
+                role="menuitem"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                System
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Style button (preview document styling) */}
         <button
           onClick={onStylePanelToggle}
           className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm"
           aria-label="Open style settings (Ctrl+Shift+S)"
           title="Style settings (⌘⇧S)"
         >
-          <span className="hidden sm:inline">Theme</span>
+          <span className="hidden sm:inline">Style</span>
           <span className="sm:hidden">🎨</span>
         </button>
         <button

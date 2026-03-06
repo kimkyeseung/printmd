@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   /* Base colors */
   --background: #ffffff;
@@ -35,16 +37,14 @@
 }
 
 /* Dark mode */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --ui-border: #333333;
-    --ui-border-hover: #444444;
-    --ui-bg-secondary: #1a1a1a;
-    --ui-bg-hover: #252525;
-    --ui-text-muted: #999999;
-  }
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --ui-border: #333333;
+  --ui-border-hover: #444444;
+  --ui-bg-secondary: #1a1a1a;
+  --ui-bg-hover: #252525;
+  --ui-text-muted: #999999;
 }
 
 /* Base styles */
@@ -115,11 +115,9 @@ body {
   color: #171717 !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  .dropdown-menu {
-    background-color: #0a0a0a !important;
-    color: #ededed !important;
-  }
+.dark .dropdown-menu {
+  background-color: #0a0a0a !important;
+  color: #ededed !important;
 }
 
 /* Utility classes */
@@ -184,10 +182,8 @@ body {
     --printmd-link-color: #0000ee;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --ui-border: #ffffff;
-      --printmd-link-color: #9999ff;
-    }
+  &:where(.dark, .dark *) {
+    --ui-border: #ffffff;
+    --printmd-link-color: #9999ff;
   }
 }
