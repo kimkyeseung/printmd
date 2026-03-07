@@ -418,7 +418,7 @@ export default function HomeClient() {
       />
 
       {/* Mobile Ad - Fixed bottom */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[var(--background)] border-t border-[var(--ui-border)]">
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[var(--background)] border-t border-[var(--ui-border)] h-[50px] overflow-hidden">
         <AdMobile
           className="h-[50px]"
           slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_MOBILE}

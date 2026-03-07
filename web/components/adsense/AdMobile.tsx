@@ -44,11 +44,10 @@ export function AdMobile({ className = '', slot = '' }: AdMobileProps) {
       <ins
         ref={adRef}
         className="adsbygoogle"
-        style={{ display: 'block' }}
+        style={{ display: 'inline-block', width: '100%', height: '50px' }}
         data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
         data-ad-slot={slot}
-        data-ad-format="auto"
-        data-full-width-responsive="true"
+        data-ad-format="horizontal"
       />
     </div>
   );
