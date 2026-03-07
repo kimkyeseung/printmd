@@ -100,7 +100,7 @@ export function Header({
           </button>
           <button
             onClick={() => onViewModeChange('split')}
-            className={`rounded px-1.5 py-1 text-xs sm:px-2 ${
+            className={`hidden md:block rounded px-1.5 py-1 text-xs sm:px-2 ${
               viewMode === 'split'
                 ? 'bg-[var(--ui-bg-hover)]'
                 : 'hover:bg-[var(--ui-bg-hover)]'

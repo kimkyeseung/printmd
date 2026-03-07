@@ -94,10 +94,10 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
       />
 
       {/* Modal */}
-      <div className="fixed inset-4 z-50 flex flex-col rounded-lg bg-[var(--background)] shadow-2xl md:inset-8 lg:inset-16">
+      <div className="fixed inset-0 z-50 flex flex-col bg-[var(--background)] shadow-2xl md:inset-4 md:rounded-lg lg:inset-8 xl:inset-16">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[var(--ui-border)] px-6 py-4">
-          <h2 className="text-lg font-semibold">Print Preview</h2>
+        <div className="flex items-center justify-between border-b border-[var(--ui-border)] px-4 py-3 md:px-6 md:py-4">
+          <h2 className="text-base font-semibold md:text-lg">Print Preview</h2>
           <button
             onClick={onClose}
             className="rounded p-1 hover:bg-[var(--ui-bg-hover)]"
@@ -110,9 +110,9 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
         </div>
 
         {/* Content */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
           {/* Preview area */}
-          <div className="flex-1 overflow-auto bg-[var(--ui-bg-secondary)] p-8">
+          <div className="flex-1 overflow-auto bg-[var(--ui-bg-secondary)] p-4 md:p-8">
             <div
               style={{
                 transform: `scale(${scale})`,
@@ -134,8 +134,8 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
             </div>
           </div>
 
-          {/* Settings panel */}
-          <div className="w-80 border-l border-[var(--ui-border)] overflow-y-auto">
+          {/* Settings panel - horizontal on mobile, sidebar on desktop */}
+          <div className="border-t border-[var(--ui-border)] overflow-y-auto md:w-80 md:border-l md:border-t-0">
             <div className="p-4 space-y-6">
               <PrintSettings
                 settings={settings}
@@ -155,23 +155,23 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 border-t border-[var(--ui-border)] px-6 py-4">
+        <div className="flex items-center justify-end gap-2 border-t border-[var(--ui-border)] px-4 py-3 md:gap-3 md:px-6 md:py-4">
           <button
             onClick={onClose}
-            className="rounded border border-[var(--ui-border)] px-4 py-2 text-sm hover:bg-[var(--ui-bg-hover)]"
+            className="rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)] md:px-4"
           >
             Cancel
           </button>
           <button
             onClick={handleSavePdf}
             disabled={isGeneratingPdf}
-            className="rounded border border-blue-600 bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+            className="rounded border border-blue-600 bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50 md:px-4"
           >
             {isGeneratingPdf ? 'Generating...' : 'Save PDF'}
           </button>
           <button
             onClick={handlePrint}
-            className="rounded bg-[var(--foreground)] px-4 py-2 text-sm text-[var(--background)] hover:opacity-90"
+            className="rounded bg-[var(--foreground)] px-3 py-2 text-sm text-[var(--background)] hover:opacity-90 md:px-4"
           >
             Print
           </button>

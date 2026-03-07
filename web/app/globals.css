@@ -163,13 +163,18 @@ body {
   }
 }
 
-/* Mobile touch improvements */
+/* Mobile touch improvements - exclude compact UI areas like header and toolbar */
 @media (hover: none) and (pointer: coarse) {
-  button,
-  a,
-  input,
-  select,
-  textarea {
+  main button,
+  main a,
+  main input,
+  main select,
+  main textarea,
+  [role="dialog"] button,
+  [role="dialog"] a,
+  [role="dialog"] input,
+  [role="dialog"] select,
+  [role="dialog"] textarea {
     min-height: 44px;
     min-width: 44px;
   }
