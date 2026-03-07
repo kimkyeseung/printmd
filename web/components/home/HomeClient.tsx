@@ -145,6 +145,22 @@ export default function HomeClient() {
   // Initialize content if empty
   const displayContent = content || DEFAULT_CONTENT[locale] || DEFAULT_CONTENT['en'];
 
+  // On mobile, switch from split to editor view
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 768px)');
+    if (mql.matches && viewMode === 'split') {
+      setViewMode('editor');
+    }
+    const handler = (e: MediaQueryListEvent) => {
+      if (e.matches && viewMode === 'split') {
+        setViewMode('editor');
+      }
+    };
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Load saved content from localStorage on mount only
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -402,7 +418,7 @@ export default function HomeClient() {
       />
 
       {/* Mobile Ad - Fixed bottom */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white border-t border-[var(--ui-border)]">
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[var(--background)] border-t border-[var(--ui-border)]">
         <AdMobile
           className="h-[50px]"
           slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_MOBILE}

@@ -31,13 +31,13 @@ const toolbarButtons: (ToolbarButton | 'separator')[] = [
 
 export function Toolbar({ onAction }: ToolbarProps) {
   return (
-    <div className="flex items-center gap-0.5 px-2">
+    <div className="flex items-center gap-0.5 px-2 overflow-x-auto">
       {toolbarButtons.map((item, index) => {
         if (item === 'separator') {
           return (
             <div
               key={`sep-${index}`}
-              className="mx-1 h-5 w-px bg-[var(--ui-border)]"
+              className="mx-1 h-5 w-px flex-shrink-0 bg-[var(--ui-border)]"
             />
           );
         }
@@ -46,7 +46,7 @@ export function Toolbar({ onAction }: ToolbarProps) {
           <button
             key={item.action}
             onClick={() => onAction(item.action)}
-            className="flex h-7 min-w-7 items-center justify-center rounded px-1.5 text-sm font-medium hover:bg-[var(--ui-bg-hover)] active:bg-[var(--ui-border)]"
+            className="flex h-7 min-w-7 flex-shrink-0 items-center justify-center rounded px-1.5 text-sm font-medium hover:bg-[var(--ui-bg-hover)] active:bg-[var(--ui-border)]"
             title={item.shortcut ? `${item.label} (${item.shortcut})` : item.label}
             type="button"
           >
