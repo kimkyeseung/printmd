@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { locales, defaultLocale, type Locale } from './lib/i18n/config';
 
+// Known page paths (without locale prefix)
+const knownPaths = [
+  '/',
+  '/markdown-to-pdf',
+  '/markdown-print',
+  '/markdown-editor',
+  '/guide',
+  '/github',
+  '/privacy',
+];
+
 function getLocale(request: NextRequest): Locale {
   // Check Accept-Language header
   const acceptLanguage = request.headers.get('accept-language');
@@ -44,6 +55,11 @@ export function middleware(request: NextRequest) {
     const response = NextResponse.next();
     response.headers.set('x-locale', currentLocale || defaultLocale);
     return response;
+  }
+
+  // Only redirect known paths to avoid redirect → 404 chains
+  if (!knownPaths.includes(pathname)) {
+    return NextResponse.next();
   }
 
   // Redirect to locale-prefixed path
