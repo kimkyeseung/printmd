@@ -45,7 +45,7 @@ export default async function MarkdownToPdfPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale: localeParam } = await params;
-  const locale = isValidLocale(localeParam) ? localeParam : 'ko';
+  const locale = isValidLocale(localeParam) ? localeParam : 'en';
   const dict = await getDictionary(locale);
   const t = dict.markdownToPdf;
 

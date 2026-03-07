@@ -103,7 +103,7 @@ console.log(hello);
 
 export default function HomeClient() {
   const params = useParams();
-  const locale = (params.locale as string) || 'ko';
+  const locale = (params.locale as string) || 'en';
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
@@ -143,7 +143,7 @@ export default function HomeClient() {
   const closePrintPreview = usePrintStore((state) => state.closePreview);
 
   // Initialize content if empty
-  const displayContent = content || DEFAULT_CONTENT[locale] || DEFAULT_CONTENT['ko'];
+  const displayContent = content || DEFAULT_CONTENT[locale] || DEFAULT_CONTENT['en'];
 
   // Load saved content from localStorage on mount only
   useEffect(() => {

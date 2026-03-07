@@ -30,9 +30,9 @@ export async function generateMetadata({
       type: 'website',
     },
     alternates: {
-      canonical: `https://printmd.app/${locale === 'ko' ? '' : locale}`,
+      canonical: `https://printmd.app/${locale}`,
       languages: {
-        'ko': 'https://printmd.app',
+        'ko': 'https://printmd.app/ko',
         'en': 'https://printmd.app/en',
       },
     },
@@ -45,7 +45,7 @@ export default async function Home({
   params: Promise<{ locale: string }>;
 }) {
   const { locale: localeParam } = await params;
-  const locale = isValidLocale(localeParam) ? localeParam : 'ko';
+  const locale = isValidLocale(localeParam) ? localeParam : 'en';
   const dict = await getDictionary(locale);
 
   const jsonLd = {
@@ -53,7 +53,7 @@ export default async function Home({
     '@type': 'WebApplication',
     name: 'printmd',
     description: dict.meta.description,
-    url: `https://printmd.app/${locale === 'ko' ? '' : locale}`,
+    url: `https://printmd.app/${locale}`,
     applicationCategory: 'UtilitiesApplication',
     operatingSystem: 'Any',
     offers: {

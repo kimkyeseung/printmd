@@ -41,7 +41,7 @@ export default async function PrivacyPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale: localeParam } = await params;
-  const locale = isValidLocale(localeParam) ? localeParam : 'ko';
+  const locale = isValidLocale(localeParam) ? localeParam : 'en';
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}

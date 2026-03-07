@@ -21,32 +21,23 @@ export const metadata: Metadata = {
     template: "%s | printmd",
   },
   description:
-    "마크다운 편집, PDF 변환, 인쇄를 한 곳에서. 설치 없이 브라우저에서 마크다운을 편집하고 스타일을 골라 바로 PDF로 뽑는 무료 웹 도구.",
+    "Edit, convert, and print Markdown in one place. Free online markdown editor with live preview, themes, and instant PDF export.",
   keywords: [
-    "마크다운",
     "markdown",
     "PDF",
-    "변환",
-    "편집기",
-    "markdown editor",
+    "converter",
+    "editor",
     "markdown to pdf",
-    "github readme",
     "print markdown",
-    "마크다운 편집기",
-    "마크다운 PDF 변환",
-    "GitHub 마크다운",
-    "무료 마크다운 도구",
+    "online markdown editor",
+    "markdown editing",
+    "free markdown editor",
+    "web markdown editor",
+    "markdown writing tool",
     "md to pdf",
     "markdown converter",
     "free markdown tool",
-    "마크다운 프린트",
-    "마크다운 인쇄",
-    "마크다운 편집",
-    "온라인 마크다운",
-    "마크다운 웹 편집기",
-    "온라인 마크다운 편집",
-    "무료 마크다운 편집기",
-    "마크다운 작성",
+    "github readme",
   ],
   authors: [{ name: "printmd" }],
   creator: "printmd",
@@ -66,18 +57,18 @@ export const metadata: Metadata = {
   openGraph: {
     title: "printmd - Markdown to PDF",
     description:
-      "마크다운 편집, PDF 변환, 인쇄를 한 곳에서. 설치 없이 브라우저에서 마크다운을 편집하고 스타일을 골라 바로 PDF로 뽑는 무료 웹 도구.",
+      "Edit, convert, and print Markdown in one place. Free online markdown editor with live preview, themes, and instant PDF export.",
     type: "website",
-    locale: "ko_KR",
-    alternateLocale: "en_US",
+    locale: "en_US",
+    alternateLocale: "ko_KR",
     siteName: "printmd",
-    url: "https://printmd.app",
+    url: "https://printmd.app/en",
   },
   twitter: {
     card: "summary_large_image",
     title: "printmd - Markdown to PDF",
     description:
-      "마크다운 편집, PDF 변환, 인쇄를 한 곳에서. 설치 없이 브라우저에서 마크다운을 편집하고 스타일을 골라 바로 PDF로 뽑는 무료 웹 도구.",
+      "Edit, convert, and print Markdown in one place. Free online markdown editor with live preview, themes, and instant PDF export.",
   },
   robots: {
     index: true,
@@ -94,10 +85,10 @@ export const metadata: Metadata = {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
   alternates: {
-    canonical: "https://printmd.app",
+    canonical: "https://printmd.app/en",
     languages: {
-      "ko-KR": "https://printmd.app",
       "en-US": "https://printmd.app/en",
+      "ko-KR": "https://printmd.app/ko",
     },
   },
 };
@@ -108,7 +99,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const headerList = await headers();
-  const locale = headerList.get("x-locale") || "ko";
+  const locale = headerList.get("x-locale") || "en";
 
   return (
     <html lang={locale} suppressHydrationWarning>

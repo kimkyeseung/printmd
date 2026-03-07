@@ -1,7 +1,7 @@
 {
   "name": "printmd - Markdown to PDF",
   "short_name": "printmd",
-  "description": "마크다운을 어디서든 가져와서 스타일을 골라 바로 PDF/인쇄로 뽑는 무료 웹 도구",
+  "description": "Edit, convert, and print Markdown in one place. Free online tool with live preview, themes, and instant PDF export.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -22,6 +22,6 @@
     }
   ],
   "categories": ["utilities", "productivity"],
-  "lang": "ko-KR",
+  "lang": "en-US",
   "dir": "ltr"
 }

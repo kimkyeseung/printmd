@@ -42,7 +42,7 @@ export default async function GitHubPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale: localeParam } = await params;
-  const locale = isValidLocale(localeParam) ? localeParam : 'ko';
+  const locale = isValidLocale(localeParam) ? localeParam : 'en';
 
   const howToJsonLd = {
     '@context': 'https://schema.org',
