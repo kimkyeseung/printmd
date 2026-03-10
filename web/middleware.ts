@@ -10,6 +10,9 @@ const knownPaths = [
   '/guide',
   '/github',
   '/privacy',
+  '/blog',
+  '/about',
+  '/terms',
 ];
 
 function getLocale(request: NextRequest): Locale {

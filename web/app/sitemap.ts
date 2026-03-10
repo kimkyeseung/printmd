@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { locales } from '@/lib/i18n/config';
+import { getPostSlugs } from '@/lib/blog';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://printmd.app';
@@ -10,8 +11,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/markdown-to-pdf', priority: 0.9, changeFrequency: 'monthly' as const },
     { path: '/markdown-print', priority: 0.9, changeFrequency: 'monthly' as const },
     { path: '/markdown-editor', priority: 0.9, changeFrequency: 'monthly' as const },
+    { path: '/blog', priority: 0.8, changeFrequency: 'weekly' as const },
     { path: '/guide', priority: 0.8, changeFrequency: 'monthly' as const },
+    { path: '/about', priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/github', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/terms', priority: 0.3, changeFrequency: 'yearly' as const },
     { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' as const },
   ];
 
@@ -28,6 +32,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
           languages: {
             ko: `${baseUrl}/ko${page.path}`,
             en: `${baseUrl}/en${page.path}`,
+          },
+        },
+      });
+    }
+  }
+
+  // Add blog post pages
+  for (const locale of locales) {
+    const slugs = getPostSlugs(locale);
+    for (const slug of slugs) {
+      sitemapEntries.push({
+        url: `${baseUrl}/${locale}/blog/${slug}`,
+        lastModified,
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+        alternates: {
+          languages: {
+            ko: `${baseUrl}/ko/blog/${slug}`,
+            en: `${baseUrl}/en/blog/${slug}`,
           },
         },
       });
