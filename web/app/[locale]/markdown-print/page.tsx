@@ -22,8 +22,8 @@ export async function generateMetadata({
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
     keywords: locale === 'ko'
-      ? ['마크다운 프린트', '마크다운 인쇄', 'markdown print', 'md 인쇄']
-      : ['print markdown', 'markdown print', 'print md file', 'markdown printer'],
+      ? ['마크다운 프린트', '마크다운 인쇄', 'markdown print', 'md 인쇄', '마크다운 출력', '마크다운 프린터', '마크다운 인쇄 도구', 'README 인쇄', '마크다운 문서 인쇄', '마크다운 깔끔하게 인쇄', 'md 파일 인쇄', '무료 마크다운 인쇄']
+      : ['print markdown', 'markdown print', 'print md file', 'markdown printer', 'print markdown online', 'markdown print tool', 'print md document', 'print readme', 'markdown to printer', 'print markdown free', 'markdown print format', 'print markdown beautifully'],
     openGraph: {
       title: `${t.title} - ${t.subtitle} | printmd`,
       description: t.hero.description,

@@ -22,8 +22,8 @@ export async function generateMetadata({
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
     keywords: locale === 'ko'
-      ? ['마크다운 PDF', 'markdown to pdf', 'md to pdf', '마크다운 변환기']
-      : ['markdown to pdf', 'md to pdf', 'markdown converter', 'pdf converter'],
+      ? ['마크다운 PDF 변환', '마크다운 to PDF', 'markdown to pdf', 'md to pdf', '마크다운 변환기', '마크다운 PDF 변환기', '마크다운 PDF 저장', 'md 변환', 'md 파일 PDF', '마크다운 PDF 출력', '마크다운 PDF 내보내기', '무료 마크다운 변환', '온라인 마크다운 변환', '마크다운 PDF 무료', 'README PDF 변환']
+      : ['markdown to pdf', 'md to pdf', 'markdown converter', 'pdf converter', 'convert markdown to pdf', 'markdown to pdf online', 'markdown to pdf free', 'markdown pdf converter', 'markdown export pdf', 'md to pdf converter', 'md to pdf online', 'markdown file to pdf', 'markdown save as pdf', 'free markdown converter', 'markdown to pdf converter online', 'readme to pdf', 'text to pdf'],
     openGraph: {
       title: `${t.title} - ${t.subtitle} | printmd`,
       description: t.hero.description,

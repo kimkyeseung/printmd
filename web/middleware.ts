@@ -56,7 +56,9 @@ export function middleware(request: NextRequest) {
       (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
     );
     const response = NextResponse.next();
-    response.headers.set('x-locale', currentLocale || defaultLocale);
+    const lang = currentLocale || defaultLocale;
+    response.headers.set('x-locale', lang);
+    response.headers.set('Content-Language', lang);
     return response;
   }
 
