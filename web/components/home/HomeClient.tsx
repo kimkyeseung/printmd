@@ -11,7 +11,13 @@ import { PreviewPanel } from '@/components/preview/PreviewPanel';
 import { StylePanel } from '@/components/style/StylePanel';
 import { PrintPreview } from '@/components/print/PrintPreview';
 import { SaveDialog, LoadDialog } from '@/components/save';
+import dynamic from 'next/dynamic';
 import { AdBanner } from '@/components/adsense/AdBanner';
+
+const ExtensionBanner = dynamic(
+  () => import('@/components/extension/ExtensionBanner').then((m) => m.ExtensionBanner),
+  { ssr: false },
+);
 import { AdMobile } from '@/components/adsense/AdMobile';
 import { AdSidebar } from '@/components/adsense/AdSidebar';
 import { createDragDropHandler, type FileInfo } from '@/lib/file';
@@ -375,6 +381,9 @@ export default function HomeClient() {
         onDownloadPdf={handleDownloadPdf}
         hasCurrentDocument={!!currentDocumentId}
       />
+
+      {/* Extension install banner - Chrome only */}
+      <ExtensionBanner />
 
       {/* Ad Banner - Desktop only */}
       <div className="hidden md:block border-b border-[var(--ui-border)] h-[90px] flex-shrink-0 overflow-hidden">

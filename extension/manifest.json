@@ -23,6 +23,11 @@
       "js": ["src/content/index.ts"],
       "css": ["src/content/styles.css"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://printmd.app/*", "http://localhost:3000/*"],
+      "js": ["src/content/marker.ts"],
+      "run_at": "document_start"
     }
   ],
   "action": {

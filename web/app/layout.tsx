@@ -154,7 +154,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <head>
+      <head suppressHydrationWarning>
         {/* Google AdSense - must be in head for site verification */}
         {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
           <script
