@@ -377,7 +377,7 @@ export default function HomeClient() {
       />
 
       {/* Ad Banner - Desktop only */}
-      <div className="hidden md:block border-b border-[var(--ui-border)]">
+      <div className="hidden md:block border-b border-[var(--ui-border)] h-[90px] flex-shrink-0 overflow-hidden">
         <AdBanner
           className="h-[90px] max-w-[728px] mx-auto"
           slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER}
