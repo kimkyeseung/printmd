@@ -345,7 +345,7 @@ export default function HomeClient() {
   };
 
   return (
-    <div className="flex h-screen flex-col pb-[50px] md:pb-0">
+    <div className="flex h-screen max-h-screen flex-col overflow-hidden pb-[50px] md:pb-0">
       {/* Skip link for accessibility */}
       <a href="#main-content" className="skip-link">
         본문으로 건너뛰기
