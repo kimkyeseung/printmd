@@ -65,4 +65,20 @@ describe('parseMarkdown', () => {
     expect(result).toContain('<blockquote>');
     expect(result).toContain('quote text');
   });
+
+  it('renders bold when ** is adjacent to CJK characters', () => {
+    const result = parseMarkdown("분야에서 **'원전+수소 융합'**이 중요하다");
+    expect(result).toContain('<strong>');
+    expect(result).toContain('원전+수소 융합');
+  });
+
+  it('renders bold when CJK text wraps ** on both sides', () => {
+    const result = parseMarkdown('한국어**굵게**처리');
+    expect(result).toContain('<strong>굵게</strong>');
+  });
+
+  it('renders italic when _ is adjacent to CJK characters', () => {
+    const result = parseMarkdown('한국의_이탤릭_처리');
+    expect(result).toContain('<em>이탤릭</em>');
+  });
 });
