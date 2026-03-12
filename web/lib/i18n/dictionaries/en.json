@@ -60,6 +60,19 @@
     "cta": {
       "title": "Start Converting Now",
       "subtitle": "Free · No Signup · No File Upload"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "How do I convert Markdown to PDF?",
+      "a1": "Simply drag and drop your .md file into printmd, choose a theme, and click print or save as PDF. The entire conversion happens in your browser — no upload required.",
+      "q2": "Is printmd free to use?",
+      "a2": "Yes, printmd is completely free. No signup, no usage limits, and no hidden costs.",
+      "q3": "Does printmd upload my files to a server?",
+      "a3": "No. All processing happens client-side in your browser. Your documents never leave your device, ensuring complete privacy.",
+      "q4": "What Markdown features are supported for PDF conversion?",
+      "a4": "printmd supports headings, bold/italic/strikethrough, ordered and unordered lists, code blocks with syntax highlighting, tables, blockquotes, images, links, and horizontal rules.",
+      "q5": "Can I customize the PDF output style?",
+      "a5": "Yes. Choose from 5 built-in themes (GitHub, Notion, Academic, Minimal, Dark) or apply custom CSS for full control over the PDF output."
     }
   },
   "markdownPrint": {
@@ -109,6 +122,19 @@
     "cta": {
       "title": "Start Printing Now",
       "subtitle": "Free · No Signup · Works in Browser"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "How do I print a Markdown file?",
+      "a1": "Open your .md file in printmd by dragging and dropping it, choose a theme, and press Ctrl+P (or Cmd+P on Mac) to print. The output is optimized for clean printing.",
+      "q2": "Does the printed output include syntax highlighting?",
+      "a2": "Yes. Code blocks are printed with full syntax highlighting for 50+ programming languages, preserving colors on your printed pages.",
+      "q3": "Can I print tables from Markdown?",
+      "a3": "Yes. Markdown tables are rendered as clean, formatted tables in the print output with proper borders and alignment.",
+      "q4": "Does printmd support page breaks?",
+      "a4": "Yes. printmd automatically handles page breaks so your content flows cleanly across printed pages without cutting through code blocks or tables.",
+      "q5": "Do I need to install anything?",
+      "a5": "No. printmd works entirely in your browser. Just visit the site, drop your file, and print. No installation or signup required."
     }
   },
   "markdownEditor": {

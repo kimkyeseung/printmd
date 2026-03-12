@@ -64,11 +64,27 @@ export default async function MarkdownToPdfPage({
     },
   };
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      { '@type': 'Question', name: t.faq.q1, acceptedAnswer: { '@type': 'Answer', text: t.faq.a1 } },
+      { '@type': 'Question', name: t.faq.q2, acceptedAnswer: { '@type': 'Answer', text: t.faq.a2 } },
+      { '@type': 'Question', name: t.faq.q3, acceptedAnswer: { '@type': 'Answer', text: t.faq.a3 } },
+      { '@type': 'Question', name: t.faq.q4, acceptedAnswer: { '@type': 'Answer', text: t.faq.a4 } },
+      { '@type': 'Question', name: t.faq.q5, acceptedAnswer: { '@type': 'Answer', text: t.faq.a5 } },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
         {/* Hero Section */}
@@ -132,6 +148,22 @@ export default async function MarkdownToPdfPage({
           </div>
         </section>
 
+        {/* FAQ */}
+        <section className="bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl">
+            <h2 className="text-center text-3xl font-bold text-gray-900">
+              {t.faq.title}
+            </h2>
+            <div className="mt-12 space-y-4">
+              <FaqItem question={t.faq.q1} answer={t.faq.a1} />
+              <FaqItem question={t.faq.q2} answer={t.faq.a2} />
+              <FaqItem question={t.faq.q3} answer={t.faq.a3} />
+              <FaqItem question={t.faq.q4} answer={t.faq.a4} />
+              <FaqItem question={t.faq.q5} answer={t.faq.a5} />
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="px-4 py-16 text-center sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900">{t.cta.title}</h2>
@@ -177,5 +209,19 @@ function SupportedFeature({ children }: { children: React.ReactNode }) {
       <span className="text-green-500">✓</span>
       <span className="text-gray-700">{children}</span>
     </div>
+  );
+}
+
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  return (
+    <details className="group rounded-xl bg-white shadow-sm">
+      <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-semibold text-gray-900">
+        {question}
+        <span className="ml-2 text-blue-500 transition-transform group-open:rotate-45">+</span>
+      </summary>
+      <div className="px-6 pb-4 text-sm text-gray-600">
+        {answer}
+      </div>
+    </details>
   );
 }

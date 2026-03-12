@@ -70,7 +70,7 @@ export default async function GuidePage({
     articleSection: 'Tutorial',
     inLanguage: locale === 'ko' ? 'ko-KR' : 'en-US',
     datePublished: '2025-03-01',
-    dateModified: '2025-03-01',
+    dateModified: '2026-03-13',
   };
 
   const breadcrumbJsonLd = {

@@ -124,6 +124,26 @@ export const metadata: Metadata = {
   },
 };
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "printmd",
+  url: "https://printmd.app",
+  sameAs: ["https://github.com/kimkyeseung/printmd"],
+};
+
+const webSiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "printmd",
+  url: "https://printmd.app",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://printmd.app/en?q={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -143,6 +163,18 @@ export default async function RootLayout({
             crossOrigin="anonymous"
           />
         )}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webSiteJsonLd),
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

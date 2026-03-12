@@ -69,6 +69,11 @@ export default async function Home({
       'GitHub integration',
       'Chrome extension',
     ],
+    softwareHelp: {
+      '@type': 'CreativeWork',
+      url: `https://printmd.app/${locale}/guide`,
+    },
+    keywords: 'markdown to pdf, md to pdf, markdown converter, markdown editor, print markdown, markdown pdf converter',
   };
 
   return (

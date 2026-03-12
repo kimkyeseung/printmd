@@ -1,0 +1,35 @@
+# printmd
+
+> Free online Markdown to PDF converter. Edit, style, and print Markdown instantly in your browser.
+
+## What is printmd?
+
+printmd is a free, browser-based tool that converts Markdown files to beautifully styled PDFs. No signup, no file upload to servers — everything runs client-side.
+
+## Key Features
+
+- Real-time Markdown editor with live preview
+- 5 theme presets (GitHub, Notion, Academic, Minimal, Dark)
+- Instant PDF export and print
+- Custom CSS styling
+- Drag & drop file import
+- PWA support (works offline)
+- Chrome extension for GitHub README conversion
+- Multilingual (English, Korean)
+
+## URLs
+
+- Homepage: https://printmd.app
+- Markdown to PDF: https://printmd.app/en/markdown-to-pdf
+- Print Markdown: https://printmd.app/en/markdown-print
+- Markdown Editor: https://printmd.app/en/markdown-editor
+- Markdown Guide: https://printmd.app/en/guide
+- Full documentation for LLMs: https://printmd.app/llms-full.txt
+
+## Technical Details
+
+- Built with Next.js 15, React 19, TypeScript
+- Editor: CodeMirror 6
+- Renderer: markdown-it
+- All processing happens client-side in the browser
+- No server-side data storage

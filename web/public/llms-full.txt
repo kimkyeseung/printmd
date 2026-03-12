@@ -1,0 +1,116 @@
+# printmd — Full Documentation for LLMs
+
+> Free online Markdown to PDF converter and editor. Edit, style, and print Markdown instantly in your browser.
+
+## Overview
+
+printmd is a free, open web tool that lets users convert Markdown documents into professionally styled PDFs. It runs entirely in the browser — no files are uploaded to any server, ensuring complete privacy. No account or signup is required.
+
+Website: https://printmd.app
+GitHub: https://github.com/kimkyeseung/printmd
+
+## Core Features
+
+### Markdown Editor
+- CodeMirror 6-based editor with syntax highlighting
+- Real-time split-pane preview (editor + rendered output)
+- Responsive layout: editor-only, preview-only, or split view
+- Keyboard shortcuts: Ctrl+S (save), Ctrl+P (print), Ctrl+, (style panel), F11 (fullscreen)
+- Drag & drop to open .md, .markdown, .txt files
+- Auto-save to browser localStorage
+
+### PDF Conversion
+- One-click PDF export via browser print dialog
+- Print-optimized CSS for clean output
+- Automatic page breaks
+- Page number support in header/footer
+- All processing is client-side — files never leave the browser
+
+### Themes
+- 5 built-in theme presets:
+  1. GitHub — clean developer documentation style
+  2. Notion — modern note-taking style
+  3. Academic — formal paper/thesis style
+  4. Minimal — simple, distraction-free style
+  5. Dark — dark background for screen reading
+- Custom CSS styling support for full control
+
+### Markdown Syntax Support
+- Headings (H1-H6)
+- Bold, Italic, Strikethrough
+- Ordered and Unordered Lists
+- Links and Images
+- Code Blocks with syntax highlighting (50+ languages)
+- Inline Code
+- Blockquotes
+- Tables with alignment
+- Horizontal Rules
+- Task Lists
+
+### Chrome Extension
+- Convert GitHub README.md files to PDF directly from GitHub pages
+- Apply printmd themes to GitHub READMEs
+- One-click conversion without leaving GitHub
+
+### PWA Support
+- Install as a Progressive Web App
+- Works offline after first visit
+- Full functionality without internet connection
+
+## Pages and URLs
+
+| Page | English | Korean |
+|------|---------|--------|
+| Homepage (Editor) | https://printmd.app/en | https://printmd.app/ko |
+| Markdown to PDF | https://printmd.app/en/markdown-to-pdf | https://printmd.app/ko/markdown-to-pdf |
+| Print Markdown | https://printmd.app/en/markdown-print | https://printmd.app/ko/markdown-print |
+| Markdown Editor | https://printmd.app/en/markdown-editor | https://printmd.app/ko/markdown-editor |
+| Markdown Guide | https://printmd.app/en/guide | https://printmd.app/ko/guide |
+| About | https://printmd.app/en/about | https://printmd.app/ko/about |
+
+## Frequently Asked Questions
+
+### What is printmd?
+printmd is a free online tool for editing Markdown and converting it to beautifully styled PDFs. It works entirely in your browser with no signup required.
+
+### Is printmd free?
+Yes, all features are completely free. No signup, no usage limits.
+
+### Do my files get uploaded to a server?
+No. All processing happens client-side in your browser. Your documents never leave your device.
+
+### Can I use printmd offline?
+Yes. printmd supports PWA (Progressive Web App), so after your first visit, you can use it without an internet connection.
+
+### Which browsers are supported?
+All modern browsers: Chrome, Firefox, Safari, Edge.
+
+### What Markdown features are supported?
+Headings, bold/italic/strikethrough, lists, links, images, code blocks with syntax highlighting (50+ languages), tables, blockquotes, horizontal rules, and task lists.
+
+### Can I customize the PDF style?
+Yes. Choose from 5 built-in themes or write your own custom CSS for full control over the output.
+
+### Where is my data stored?
+All data is stored in your browser's localStorage. Nothing is sent to any server.
+
+## Technology Stack
+
+- Framework: Next.js 15 (App Router)
+- UI: React 19, TypeScript
+- Editor: CodeMirror 6
+- Markdown Renderer: markdown-it
+- Styling: Tailwind CSS
+- Deployment: Vercel
+- Internationalization: Custom i18n (English, Korean)
+
+## Use Cases
+
+- **Developers**: Convert README files, API docs, and technical specs to PDF
+- **Students**: Write assignments in Markdown and export as formatted PDFs
+- **Writers/Bloggers**: Draft in Markdown, print or export for review
+- **Professionals**: Format meeting notes and reports for clean printing
+
+## Privacy
+
+printmd processes everything client-side. No documents are stored on or transmitted to any server. The service uses Google Analytics for usage statistics and Google AdSense for monetization — no personal data beyond standard analytics is collected.
