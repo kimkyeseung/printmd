@@ -400,7 +400,7 @@ export default function HomeClient() {
       <StylePanel isOpen={isStylePanelOpen} onClose={closeStylePanel} />
 
       {/* Print Preview */}
-      <PrintPreview isOpen={isPrintPreviewOpen} onClose={closePrintPreview} />
+      <PrintPreview isOpen={isPrintPreviewOpen} onClose={closePrintPreview} content={displayContent} />
 
       {/* Save Dialog */}
       <SaveDialog

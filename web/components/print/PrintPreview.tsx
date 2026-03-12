@@ -1,20 +1,22 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
-import { usePrintStore, useStyleStore, useEditorStore } from '@/stores';
+import { useMemo, useState } from 'react';
+import { usePrintStore, useStyleStore } from '@/stores';
 import { PrintSettings } from './PrintSettings';
 import { HeaderFooter } from './HeaderFooter';
 import { PagedPreview } from './PagedPreview';
-import { Preview } from '@/components/preview/Preview';
 import { getPaperDimensions, mmToPx } from '@/lib/print/paperSizes';
+import { parseMarkdown } from '@/lib/markdown/parser';
+import { sanitizeHtml } from '@/lib/markdown/sanitizer';
+import { getPdfStyles } from '@/lib/print/pdfStyles';
 
 interface PrintPreviewProps {
   isOpen: boolean;
   onClose: () => void;
+  content: string;
 }
 
-export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
-  const contentRef = useRef<HTMLDivElement>(null);
+export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const settings = usePrintStore((state) => state.settings);
@@ -23,7 +25,6 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
   const updateFooter = usePrintStore((state) => state.updateFooter);
 
   const globalStyles = useStyleStore((state) => state.globalStyles);
-  const content = useEditorStore((state) => state.content);
 
   const paperDimensions = useMemo(() => {
     const { width, height } = getPaperDimensions(settings.paperSize, settings.orientation);
@@ -41,33 +42,109 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
   };
 
   const handleSavePdf = async () => {
-    if (!contentRef.current || isGeneratingPdf) return;
+    if (isGeneratingPdf) return;
 
     setIsGeneratingPdf(true);
 
     try {
-      const html2pdf = (await import('html2pdf.js')).default;
+      const html2canvasModule = await import('html2canvas');
+      const html2canvas = html2canvasModule.default;
+      const { jsPDF } = await import('jspdf');
 
       const { width, height } = getPaperDimensions(settings.paperSize, settings.orientation);
+      const marginTop = settings.margins.top;
+      const marginRight = settings.margins.right;
+      const marginBottom = settings.margins.bottom;
+      const marginLeft = settings.margins.left;
+      const contentWidthMm = width - marginLeft - marginRight;
 
-      const opt = {
-        margin: [
-          settings.margins.top,
-          settings.margins.right,
-          settings.margins.bottom,
-          settings.margins.left,
-        ] as [number, number, number, number],
-        filename: 'document.pdf',
-        image: { type: 'jpeg' as const, quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: {
-          unit: 'mm' as const,
-          format: [width, height] as [number, number],
-          orientation: settings.orientation,
-        },
-      };
+      const htmlContent = sanitizeHtml(parseMarkdown(content));
 
-      await html2pdf().set(opt).from(contentRef.current).save();
+      // Build a self-contained HTML container with inline <style>
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '0px';
+      container.style.top = '0px';
+      container.style.zIndex = '-1';
+      container.style.pointerEvents = 'none';
+      container.style.width = `${mmToPx(contentWidthMm)}px`;
+      container.style.backgroundColor = '#ffffff';
+      container.style.color = '#1a1a1a';
+      container.style.fontFamily = globalStyles.fontFamily;
+      container.style.fontSize = `${globalStyles.fontSize}px`;
+      container.style.lineHeight = String(globalStyles.lineHeight);
+      container.style.padding = '0';
+
+      // Embed styles directly so html2canvas can apply them
+      container.innerHTML = `<style>${getPdfStyles()}</style><div class="preview-content">${htmlContent}</div>`;
+
+      document.body.appendChild(container);
+
+      // Wait for fonts/images to load
+      await new Promise((r) => setTimeout(r, 300));
+
+      // Render to canvas
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        width: container.scrollWidth,
+        height: container.scrollHeight,
+      });
+
+      document.body.removeChild(container);
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: settings.orientation,
+        unit: 'mm',
+        format: [width, height],
+      });
+
+      const pageContentHeight = height - marginTop - marginBottom;
+      const imgWidthMm = contentWidthMm;
+      const imgHeightMm = (canvas.height / canvas.width) * imgWidthMm;
+
+      // Add image, handling multiple pages
+      let yOffset = 0;
+      let page = 0;
+
+      while (yOffset < imgHeightMm) {
+        if (page > 0) {
+          pdf.addPage();
+        }
+
+        // Calculate source crop for this page
+        const sourceY = (yOffset / imgHeightMm) * canvas.height;
+        const sourceH = Math.min(
+          (pageContentHeight / imgHeightMm) * canvas.height,
+          canvas.height - sourceY
+        );
+        const drawHeight = Math.min(pageContentHeight, imgHeightMm - yOffset);
+
+        // Create a cropped canvas for this page
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sourceH;
+        const ctx = pageCanvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+          ctx.drawImage(
+            canvas,
+            0, sourceY, canvas.width, sourceH,
+            0, 0, pageCanvas.width, sourceH
+          );
+        }
+
+        const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.98);
+        pdf.addImage(pageImgData, 'JPEG', marginLeft, marginTop, imgWidthMm, drawHeight);
+
+        yOffset += pageContentHeight;
+        page++;
+      }
+
+      pdf.save('document.pdf');
     } catch (error) {
       console.error('Failed to generate PDF:', error);
     } finally {
@@ -120,7 +197,7 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
               }}
             >
               <PagedPreview
-                markdown={content || '# Preview\n\nYour content will appear here.'}
+                markdown={content}
                 styles={globalStyles}
                 settings={settings}
                 paperWidth={paperDimensions.width}
@@ -178,20 +255,6 @@ export function PrintPreview({ isOpen, onClose }: PrintPreviewProps) {
         </div>
       </div>
 
-      {/* Hidden container for PDF generation */}
-      <div
-        ref={contentRef}
-        className="fixed -left-[9999px] top-0 bg-white"
-        style={{
-          width: paperDimensions.width,
-          padding: `${settings.margins.top}mm ${settings.margins.right}mm ${settings.margins.bottom}mm ${settings.margins.left}mm`,
-        }}
-      >
-        <Preview
-          markdown={content || '# Preview\n\nYour content will appear here.'}
-          styles={globalStyles}
-        />
-      </div>
     </>
   );
 }
