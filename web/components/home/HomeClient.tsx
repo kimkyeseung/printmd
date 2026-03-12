@@ -175,6 +175,7 @@ export default function HomeClient() {
   // Handlers
   const handleContentChange = useCallback((newContent: string) => {
     setContent(newContent);
+    localStorage.setItem(STORAGE_KEY, newContent);
   }, [setContent]);
 
   const handlePrint = useCallback(() => {
