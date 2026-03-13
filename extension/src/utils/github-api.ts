@@ -41,6 +41,7 @@ export function toRawUrl(blobUrl: string): string | null {
 /**
  * Convert GitHub repository URL to README raw URL
  * Example: https://github.com/owner/repo -> raw URL for README.md
+ * Tries 'main' first, then 'master' if not found
  */
 export function getReadmeRawUrl(repoUrl: string, branch = 'main'): string | null {
   const match = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
@@ -53,16 +54,73 @@ export function getReadmeRawUrl(repoUrl: string, branch = 'main'): string | null
 }
 
 /**
+ * Try to fetch README with fallback branch detection
+ */
+export async function fetchReadmeWithFallback(repoUrl: string): Promise<{ content: string; branch: string } | null> {
+  const match = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
+  if (!match) return null;
+
+  const [, owner, repo] = match;
+  const branches = ['main', 'master', 'develop'];
+
+  for (const branch of branches) {
+    const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/README.md`;
+    try {
+      const content = await fetchRawContent(rawUrl);
+      return { content, branch };
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Fetch raw markdown content from GitHub
  */
 export async function fetchRawContent(rawUrl: string): Promise<string> {
-  const response = await fetch(rawUrl);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+  try {
+    const response = await fetch(rawUrl, { signal: controller.signal });
+
+    if (response.status === 404) {
+      throw new GitHubFetchError(
+        'File not found. This may be a private repository.',
+        'NOT_FOUND'
+      );
+    }
+
+    if (response.status === 403) {
+      throw new GitHubFetchError(
+        'Access denied. Private repositories require authentication.',
+        'FORBIDDEN'
+      );
+    }
+
+    if (!response.ok) {
+      throw new GitHubFetchError(
+        `Failed to fetch: ${response.status} ${response.statusText}`,
+        'FETCH_ERROR'
+      );
+    }
+
+    return response.text();
+  } finally {
+    clearTimeout(timeoutId);
   }
+}
 
-  return response.text();
+export class GitHubFetchError extends Error {
+  constructor(
+    message: string,
+    public readonly code: 'NOT_FOUND' | 'FORBIDDEN' | 'FETCH_ERROR' | 'TIMEOUT'
+  ) {
+    super(message);
+    this.name = 'GitHubFetchError';
+  }
 }
 
 /**

@@ -3,7 +3,7 @@
  */
 
 export interface GitHubPageInfo {
-  type: 'markdown-file' | 'readme' | 'none';
+  type: 'markdown-file' | 'readme' | 'gist' | 'issue-pr' | 'none';
   url: string;
   rawUrl: string | null;
   fileName: string | null;
@@ -66,6 +66,48 @@ function getRawUrl(): string | null {
 }
 
 /**
+ * Detect the default branch of the repository
+ */
+function detectDefaultBranch(): string {
+  // Method 1: Meta tag (most reliable when available)
+  const defaultBranchMeta = document.querySelector('meta[name="default-branch"]');
+  if (defaultBranchMeta) {
+    const content = defaultBranchMeta.getAttribute('content');
+    if (content) return content;
+  }
+
+  // Method 2: data-default-branch attribute on repo-root element
+  const repoRoot = document.querySelector('[data-default-branch]');
+  if (repoRoot) {
+    const branch = repoRoot.getAttribute('data-default-branch');
+    if (branch) return branch;
+  }
+
+  // Method 3: Branch switcher button text
+  const branchButton = document.querySelector('[data-hotkey="w"]');
+  if (branchButton) {
+    const buttonText = branchButton.textContent?.trim();
+    const branchMatch = buttonText?.match(/^(\S+)/);
+    if (branchMatch?.[1]) return branchMatch[1];
+  }
+
+  // Method 4: Look for branch name in the URL (tree view)
+  const url = window.location.href;
+  const treeMatch = url.match(/github\.com\/[^/]+\/[^/]+\/tree\/([^/]+)/);
+  if (treeMatch) return treeMatch[1];
+
+  // Method 5: Check the ref selector in new GitHub UI
+  const refSelector = document.querySelector<HTMLElement>('#branch-picker-repos-header-ref-selector');
+  if (refSelector) {
+    const selectedText = refSelector.textContent?.trim();
+    if (selectedText) return selectedText;
+  }
+
+  // Default fallback
+  return 'main';
+}
+
+/**
  * Get raw URL for README
  */
 function getReadmeRawUrl(): string | null {
@@ -76,31 +118,7 @@ function getReadmeRawUrl(): string | null {
   if (!match) return null;
 
   const [, owner, repo] = match;
-
-  // Try multiple selectors to find the default branch
-  let branch = 'main';
-
-  // Method 1: Branch switcher button text (e.g., "master branch")
-  const branchButton = document.querySelector('[data-hotkey="w"]');
-  if (branchButton) {
-    const buttonText = branchButton.textContent?.trim();
-    const branchMatch = buttonText?.match(/^(\S+)/);
-    if (branchMatch) {
-      branch = branchMatch[1];
-    }
-  }
-
-  // Method 2: Look for branch name in the URL if we're in a tree/blob view
-  const treeMatch = url.match(/github\.com\/[^/]+\/[^/]+\/tree\/([^/]+)/);
-  if (treeMatch) {
-    branch = treeMatch[1];
-  }
-
-  // Method 3: Meta tag or other data attributes
-  const defaultBranchMeta = document.querySelector('meta[name="default-branch"]');
-  if (defaultBranchMeta) {
-    branch = defaultBranchMeta.getAttribute('content') || branch;
-  }
+  const branch = detectDefaultBranch();
 
   return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/README.md`;
 }
@@ -115,10 +133,99 @@ function getFileName(): string | null {
 }
 
 /**
+ * Check if current page is a GitHub Issue or Pull Request
+ */
+function isIssuePrPage(): boolean {
+  const url = window.location.href;
+  return /github\.com\/[^/]+\/[^/]+\/(issues|pull)\/\d+/.test(url);
+}
+
+/**
+ * Get title for Issue/PR page
+ */
+function getIssuePrTitle(): string | null {
+  const titleEl = document.querySelector<HTMLElement>('.gh-header-title .js-issue-title');
+  return titleEl?.textContent?.trim() || document.title.split('·')[0]?.trim() || null;
+}
+
+/**
+ * Check if current page is a GitHub Gist with markdown content
+ */
+function isGistPage(): boolean {
+  return window.location.hostname === 'gist.github.com';
+}
+
+/**
+ * Get raw URL for a Gist markdown file
+ */
+function getGistRawUrl(): string | null {
+  // Look for the "Raw" button link in the Gist file header
+  const rawLinks = document.querySelectorAll<HTMLAnchorElement>('a[href*="gist.githubusercontent.com"]');
+  for (const link of rawLinks) {
+    const href = link.href;
+    const markdownExtensions = ['.md', '.markdown', '.mdown', '.mkd', '.mkdn'];
+    if (markdownExtensions.some((ext) => href.toLowerCase().includes(ext))) {
+      return href;
+    }
+  }
+
+  // Fallback: any raw link from gist (first markdown file)
+  const fileHeaders = document.querySelectorAll('.file-header');
+  for (const header of fileHeaders) {
+    const fileInfo = header.querySelector('.file-info a');
+    const fileName = fileInfo?.textContent?.trim() || '';
+    const markdownExtensions = ['.md', '.markdown', '.mdown', '.mkd', '.mkdn'];
+    if (markdownExtensions.some((ext) => fileName.toLowerCase().endsWith(ext))) {
+      const rawLink = header.querySelector<HTMLAnchorElement>('a[href*="/raw/"]');
+      if (rawLink) return rawLink.href;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Get filename from a Gist page
+ */
+function getGistFileName(): string | null {
+  const fileHeaders = document.querySelectorAll('.file-header');
+  for (const header of fileHeaders) {
+    const fileInfo = header.querySelector('.file-info a');
+    const fileName = fileInfo?.textContent?.trim() || '';
+    const markdownExtensions = ['.md', '.markdown', '.mdown', '.mkd', '.mkdn'];
+    if (markdownExtensions.some((ext) => fileName.toLowerCase().endsWith(ext))) {
+      return fileName;
+    }
+  }
+  return null;
+}
+
+/**
  * Detect the type of GitHub page
  */
 export function detectPage(): GitHubPageInfo {
   const url = window.location.href;
+
+  if (isGistPage()) {
+    const gistRawUrl = getGistRawUrl();
+    if (gistRawUrl) {
+      return {
+        type: 'gist',
+        url,
+        rawUrl: gistRawUrl,
+        fileName: getGistFileName(),
+      };
+    }
+  }
+
+  if (isIssuePrPage()) {
+    return {
+      type: 'issue-pr',
+      url,
+      rawUrl: null, // Issue/PR has no raw URL, content is extracted from DOM
+      fileName: getIssuePrTitle(),
+    };
+  }
 
   if (isMarkdownFileView()) {
     return {
@@ -166,6 +273,26 @@ export function findButtonInsertionPoint(): Element | null {
     // Another fallback: file actions container
     const fileActions = document.querySelector('[data-view-component="true"].file-actions');
     if (fileActions) return fileActions;
+  }
+
+  if (pageInfo.type === 'issue-pr') {
+    // For Issue/PR, look for the header actions area
+    const headerActions = document.querySelector('.gh-header-actions');
+    if (headerActions) return headerActions;
+
+    // Fallback: issue header
+    const header = document.querySelector('.gh-header-show');
+    if (header) return header;
+  }
+
+  if (pageInfo.type === 'gist') {
+    // For Gist, look for the file actions area
+    const fileActions = document.querySelector('.file-header .file-actions');
+    if (fileActions) return fileActions;
+
+    // Fallback: first file header
+    const fileHeader = document.querySelector('.file-header');
+    if (fileHeader) return fileHeader;
   }
 
   if (pageInfo.type === 'readme') {

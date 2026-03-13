@@ -4,7 +4,7 @@
 
 import { type GitHubPageInfo } from './github';
 import { toRawUrl, fetchRawContent } from '../utils/github-api';
-import { transferViaUrl } from '../utils/transfer';
+import { transferViaUrl, transferViaStorage, TransferError } from '../utils/transfer';
 import { addRecentFile } from '../utils/storage';
 
 const BUTTON_ID = 'printmd-open-button';
@@ -38,18 +38,30 @@ function createButton(pageInfo: GitHubPageInfo): HTMLButtonElement {
     button.classList.add('loading');
 
     try {
-      if (pageInfo.rawUrl) {
-        // Add to recent files
-        await addRecentFile({
-          url: pageInfo.url,
-          title: pageInfo.fileName || 'Markdown file',
-        });
+      // Add to recent files
+      await addRecentFile({
+        url: pageInfo.url,
+        title: pageInfo.fileName || 'Markdown file',
+      });
 
-        // Transfer via URL
+      if (pageInfo.type === 'issue-pr') {
+        // Extract markdown content from Issue/PR body
+        const content = extractIssuePrContent();
+        if (content) {
+          transferViaStorage(content, pageInfo.url);
+        } else {
+          showToast('마크다운 본문을 찾을 수 없습니다.', 'error');
+        }
+      } else if (pageInfo.rawUrl) {
         transferViaUrl(pageInfo.rawUrl);
       }
     } catch (error) {
       console.error('printmd: Failed to open file', error);
+      if (error instanceof TransferError && error.code === 'POPUP_BLOCKED') {
+        showToast('팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.', 'error');
+      } else {
+        showToast('파일을 열 수 없습니다. 다시 시도해주세요.', 'error');
+      }
     } finally {
       button.disabled = false;
       button.classList.remove('loading');
@@ -69,8 +81,8 @@ export function injectButton(container: Element, pageInfo: GitHubPageInfo): void
   // Create and insert new button
   const button = createButton(pageInfo);
 
-  // For file view, prepend to button group
-  if (pageInfo.type === 'markdown-file') {
+  // For file view, gist, or issue/PR, prepend to button group
+  if (pageInfo.type === 'markdown-file' || pageInfo.type === 'gist' || pageInfo.type === 'issue-pr') {
     // Create a wrapper to match GitHub's button style
     const wrapper = document.createElement('div');
     wrapper.className = 'printmd-button-wrapper';
@@ -100,4 +112,72 @@ export function removeButton(): void {
  */
 export function isButtonInjected(): boolean {
   return document.getElementById(BUTTON_ID) !== null;
+}
+
+/**
+ * Extract markdown content from GitHub Issue/PR page
+ * Uses the rendered HTML and converts to a simple markdown representation
+ */
+function extractIssuePrContent(): string | null {
+  // Get the issue/PR title
+  const titleEl = document.querySelector<HTMLElement>('.gh-header-title .js-issue-title');
+  const title = titleEl?.textContent?.trim() || '';
+
+  // Get the issue/PR body (first comment)
+  const bodyEl = document.querySelector<HTMLElement>('.comment-body .markdown-body');
+  if (!bodyEl) return null;
+
+  // Get inner HTML and do a basic HTML-to-markdown conversion
+  const bodyHtml = bodyEl.innerHTML;
+
+  // Build markdown content with title
+  let markdown = '';
+  if (title) {
+    markdown += `# ${title}\n\n`;
+  }
+
+  // Use the rendered HTML as-is (printmd can handle HTML in markdown)
+  markdown += bodyHtml;
+
+  return markdown || null;
+}
+
+/**
+ * Show a toast notification on the page
+ */
+function showToast(message: string, type: 'success' | 'error' = 'success'): void {
+  // Remove existing toast
+  document.getElementById('printmd-toast')?.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'printmd-toast';
+  toast.textContent = message;
+  Object.assign(toast.style, {
+    position: 'fixed',
+    bottom: '24px',
+    right: '24px',
+    padding: '12px 20px',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: '500',
+    zIndex: '99999',
+    color: '#fff',
+    background: type === 'error' ? '#d1242f' : '#2da44e',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    transition: 'opacity 0.3s',
+    opacity: '0',
+  });
+
+  document.body.appendChild(toast);
+
+  // Fade in
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+  });
+
+  // Fade out and remove
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }

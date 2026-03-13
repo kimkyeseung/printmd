@@ -5,10 +5,15 @@
 const PRINTMD_URL = 'https://printmd.app';
 // For development, you can use: const PRINTMD_URL = 'http://localhost:3000';
 
-const STORAGE_KEYS = {
-  CONTENT: 'printmd_content',
-  SOURCE: 'printmd_source',
-};
+export class TransferError extends Error {
+  constructor(
+    message: string,
+    public readonly code: 'POPUP_BLOCKED' | 'TRANSFER_FAILED' | 'TIMEOUT'
+  ) {
+    super(message);
+    this.name = 'TransferError';
+  }
+}
 
 /**
  * Transfer content via URL parameter (for raw URL reference)
@@ -18,7 +23,13 @@ export function transferViaUrl(rawUrl: string): void {
   const encodedUrl = encodeURIComponent(rawUrl);
   const targetUrl = `${PRINTMD_URL}/?src=${encodedUrl}`;
 
-  window.open(targetUrl, '_blank');
+  const newWindow = window.open(targetUrl, '_blank');
+  if (!newWindow) {
+    throw new TransferError(
+      'Popup blocked. Please allow popups for this site and try again.',
+      'POPUP_BLOCKED'
+    );
+  }
 }
 
 /**
@@ -26,17 +37,21 @@ export function transferViaUrl(rawUrl: string): void {
  * Best for: content > 2KB or when raw URL is not available
  */
 export function transferViaStorage(content: string, sourceUrl?: string): void {
-  // Open the printmd app first
   const newWindow = window.open(PRINTMD_URL, '_blank');
 
   if (!newWindow) {
-    console.error('Failed to open printmd window');
-    return;
+    throw new TransferError(
+      'Popup blocked. Please allow popups for this site and try again.',
+      'POPUP_BLOCKED'
+    );
   }
 
   // Wait for the new window to be ready, then post message
-  // We use postMessage since SessionStorage doesn't work cross-origin
+  let attempts = 0;
+  const maxAttempts = 50; // 5 seconds max (50 * 100ms)
+
   const checkReady = setInterval(() => {
+    attempts++;
     try {
       newWindow.postMessage(
         {
@@ -49,23 +64,20 @@ export function transferViaStorage(content: string, sourceUrl?: string): void {
     } catch {
       // Window not ready yet, keep trying
     }
-  }, 100);
 
-  // Stop trying after 10 seconds
-  setTimeout(() => {
-    clearInterval(checkReady);
-  }, 10000);
+    if (attempts >= maxAttempts) {
+      clearInterval(checkReady);
+    }
+  }, 100);
 }
 
 /**
  * Smart transfer - chooses the best method based on content
  */
 export function transferContent(rawUrl: string | null, content: string, sourceUrl: string): void {
-  // If we have a raw URL and content is reasonable size, use URL method
   if (rawUrl && content.length <= 50000) {
     transferViaUrl(rawUrl);
   } else {
-    // For large files or when raw URL is not available, use storage method
     transferViaStorage(content, sourceUrl);
   }
 }

@@ -2,7 +2,7 @@
  * Popup script for printmd extension
  */
 
-import { getRecentFiles, type RecentFile } from '../utils/storage';
+import { getRecentFiles, removeRecentFile, clearRecentFiles, type RecentFile } from '../utils/storage';
 import { toRawUrl } from '../utils/github-api';
 
 interface TabInfo {
@@ -14,7 +14,7 @@ interface TabInfo {
 }
 
 interface GitHubPageInfo {
-  type: 'markdown-file' | 'readme' | 'none';
+  type: 'markdown-file' | 'readme' | 'gist' | 'issue-pr' | 'none';
   url: string;
   rawUrl: string | null;
   fileName: string | null;
@@ -97,29 +97,42 @@ function updatePageInfo(info: TabInfo): void {
  */
 async function updateRecentFiles(): Promise<void> {
   const recentList = document.getElementById('recent-list')!;
+  const clearButton = document.getElementById('clear-recent')!;
   const recentFiles = await getRecentFiles();
 
   if (recentFiles.length === 0) {
     recentList.innerHTML = '<li class="empty">No recent files</li>';
+    clearButton.classList.add('hidden');
     return;
   }
 
+  clearButton.classList.remove('hidden');
+
   recentList.innerHTML = recentFiles
     .map((file) => {
-      // Extract short URL for display
-      const shortUrl = file.url.replace('https://github.com/', '');
+      const shortUrl = file.url.replace('https://github.com/', '').replace('https://gist.github.com/', 'gist:');
       return `
         <li data-url="${encodeURIComponent(file.url)}">
-          <div class="file-title">${file.title}</div>
-          <div class="file-url">${shortUrl}</div>
+          <div class="recent-item-content">
+            <div class="file-title">${file.title}</div>
+            <div class="file-url">${shortUrl}</div>
+          </div>
+          <button class="remove-btn" data-remove-url="${encodeURIComponent(file.url)}" title="Remove">
+            <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
+              <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06z"/>
+            </svg>
+          </button>
         </li>
       `;
     })
     .join('');
 
-  // Add click handlers
+  // Add click handlers for opening files
   recentList.querySelectorAll('li[data-url]').forEach((li) => {
-    li.addEventListener('click', () => {
+    li.addEventListener('click', (e) => {
+      // Don't open if clicking the remove button
+      if ((e.target as HTMLElement).closest('.remove-btn')) return;
+
       const url = decodeURIComponent(li.getAttribute('data-url')!);
       const rawUrl = toRawUrl(url);
       if (rawUrl) {
@@ -131,6 +144,22 @@ async function updateRecentFiles(): Promise<void> {
       }
     });
   });
+
+  // Add click handlers for remove buttons
+  recentList.querySelectorAll('.remove-btn').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const url = decodeURIComponent(btn.getAttribute('data-remove-url')!);
+      await removeRecentFile(url);
+      await updateRecentFiles();
+    });
+  });
+
+  // Clear all button handler
+  clearButton.onclick = async () => {
+    await clearRecentFiles();
+    await updateRecentFiles();
+  };
 }
 
 /**
@@ -147,7 +176,6 @@ async function init(): Promise<void> {
     const pageInfo = await getPageInfoFromContentScript(tab.id);
 
     if (pageInfo && pageInfo.type !== 'none') {
-      // Content script detected markdown
       info = {
         url: pageInfo.url,
         title: tab.title || '',
@@ -156,7 +184,6 @@ async function init(): Promise<void> {
         fileName: pageInfo.fileName,
       };
     } else {
-      // Fallback to URL detection
       info = detectMarkdownFromUrl(tab.url);
       info.title = tab.title || '';
     }

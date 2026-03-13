@@ -68,3 +68,24 @@ export async function addRecentFile(file: Omit<RecentFile, 'timestamp'>): Promis
     chrome.storage.local.set({ recentFiles: updated }, resolve);
   });
 }
+
+/**
+ * Remove a single file from recent files
+ */
+export async function removeRecentFile(url: string): Promise<void> {
+  const recentFiles = await getRecentFiles();
+  const updated = recentFiles.filter((f) => f.url !== url);
+
+  return new Promise((resolve) => {
+    chrome.storage.local.set({ recentFiles: updated }, resolve);
+  });
+}
+
+/**
+ * Clear all recent files
+ */
+export async function clearRecentFiles(): Promise<void> {
+  return new Promise((resolve) => {
+    chrome.storage.local.set({ recentFiles: [] }, resolve);
+  });
+}
