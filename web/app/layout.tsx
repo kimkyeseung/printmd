@@ -114,6 +114,9 @@ export const metadata: Metadata = {
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    other: {
+      "naver-site-verification": "navere5bc71a7ce1f9d0baa47669ace0b31ff",
+    },
   },
   alternates: {
     canonical: "https://printmd.app/en",
