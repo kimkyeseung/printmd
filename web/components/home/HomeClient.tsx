@@ -13,13 +13,16 @@ import { PrintPreview } from '@/components/print/PrintPreview';
 import { SaveDialog, LoadDialog } from '@/components/save';
 import dynamic from 'next/dynamic';
 import { AdBanner } from '@/components/adsense/AdBanner';
+import { AdKakaoBanner } from '@/components/adsense/AdKakaoBanner';
 
 const ExtensionBanner = dynamic(
   () => import('@/components/extension/ExtensionBanner').then((m) => m.ExtensionBanner),
   { ssr: false },
 );
 import { AdMobile } from '@/components/adsense/AdMobile';
+import { AdKakaoMobile } from '@/components/adsense/AdKakaoMobile';
 import { AdSidebar } from '@/components/adsense/AdSidebar';
+import { AdKakaoSidebar } from '@/components/adsense/AdKakaoSidebar';
 import { createDragDropHandler, type FileInfo } from '@/lib/file';
 import { useExtensionReceiver, useKeyboardShortcuts, useFullscreen } from '@/hooks';
 import '@/styles/editor.css';
@@ -385,11 +388,10 @@ export default function HomeClient() {
       {/* Extension install banner - Chrome only */}
       <ExtensionBanner />
 
-      {/* Ad Banner - Desktop only */}
+      {/* Ad Banner - Desktop only (Kakao) */}
       <div className="hidden md:block border-b border-[var(--ui-border)] h-[90px] flex-shrink-0 overflow-hidden">
-        <AdBanner
-          className="h-[90px] max-w-[728px] mx-auto"
-          slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER}
+        <AdKakaoBanner
+          className="h-[90px] max-w-[728px] mx-auto flex items-center justify-center"
         />
       </div>
 
@@ -399,9 +401,8 @@ export default function HomeClient() {
           {renderContent()}
         </main>
         <aside className="hidden xl:flex flex-col w-[160px] flex-shrink-0 border-l border-[var(--ui-border)]">
-          <AdSidebar
+          <AdKakaoSidebar
             className="sticky top-0 w-[160px] h-[600px]"
-            slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR}
           />
         </aside>
       </div>
@@ -427,11 +428,10 @@ export default function HomeClient() {
         onLoad={handleLoadFromDialog}
       />
 
-      {/* Mobile Ad - Fixed bottom */}
+      {/* Mobile Ad - Fixed bottom (Kakao) */}
       <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[var(--background)] border-t border-[var(--ui-border)] h-[50px] overflow-hidden">
-        <AdMobile
-          className="h-[50px]"
-          slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_MOBILE}
+        <AdKakaoMobile
+          className="h-[50px] flex items-center justify-center"
         />
       </div>
 
