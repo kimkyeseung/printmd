@@ -76,6 +76,60 @@ export default async function MarkdownToPdfPage({
     ],
   };
 
+  const howToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: locale === 'ko' ? '마크다운을 PDF로 변환하는 방법' : 'How to Convert Markdown to PDF',
+    description: t.hero.description,
+    totalTime: 'PT1M',
+    tool: {
+      '@type': 'HowToTool',
+      name: 'printmd',
+    },
+    step: [
+      {
+        '@type': 'HowToStep',
+        position: 1,
+        name: t.steps.step1,
+        text: t.steps.step1Desc,
+        url: `https://printmd.app/${locale}`,
+      },
+      {
+        '@type': 'HowToStep',
+        position: 2,
+        name: t.steps.step2,
+        text: t.steps.step2Desc,
+        url: `https://printmd.app/${locale}`,
+      },
+      {
+        '@type': 'HowToStep',
+        position: 3,
+        name: t.steps.step3,
+        text: t.steps.step3Desc,
+        url: `https://printmd.app/${locale}`,
+      },
+    ],
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: `https://printmd.app/${locale}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: locale === 'ko' ? '마크다운 PDF 변환' : 'Markdown to PDF',
+        item: `https://printmd.app/${locale}/markdown-to-pdf`,
+      },
+    ],
+  };
+
   return (
     <>
       <script
@@ -85,6 +139,14 @@ export default async function MarkdownToPdfPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
         {/* Hero Section */}
@@ -125,6 +187,31 @@ export default async function MarkdownToPdfPage({
             <Feature icon="🔒" title={t.why.privacy} description={t.why.privacyDesc} />
             <Feature icon="🎨" title={t.why.themes} description={t.why.themesDesc} />
             <Feature icon="📱" title={t.why.responsive} description={t.why.responsiveDesc} />
+          </div>
+        </section>
+
+        {/* Steps */}
+        <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+          <h2 className="text-center text-3xl font-bold text-gray-900">
+            {t.steps.title}
+          </h2>
+          <div className="mt-12 grid gap-8 sm:grid-cols-3">
+            <Step number={1} title={t.steps.step1} description={t.steps.step1Desc} />
+            <Step number={2} title={t.steps.step2} description={t.steps.step2Desc} />
+            <Step number={3} title={t.steps.step3} description={t.steps.step3Desc} />
+          </div>
+        </section>
+
+        {/* Use Cases */}
+        <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
+          <h2 className="text-center text-3xl font-bold text-gray-900">
+            {t.useCases.title}
+          </h2>
+          <div className="mt-12 space-y-6">
+            <UseCase emoji="👨‍💻" title={t.useCases.developer} description={t.useCases.developerDesc} />
+            <UseCase emoji="📚" title={t.useCases.student} description={t.useCases.studentDesc} />
+            <UseCase emoji="✍️" title={t.useCases.writer} description={t.useCases.writerDesc} />
+            <UseCase emoji="👔" title={t.useCases.worker} description={t.useCases.workerDesc} />
           </div>
         </section>
 
@@ -208,6 +295,46 @@ function SupportedFeature({ children }: { children: React.ReactNode }) {
     <div className="flex items-center gap-2 rounded-lg bg-white px-4 py-3 shadow-sm">
       <span className="text-green-500">✓</span>
       <span className="text-gray-700">{children}</span>
+    </div>
+  );
+}
+
+function Step({
+  number,
+  title,
+  description,
+}: {
+  number: number;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="text-center">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-500 text-xl font-bold text-white">
+        {number}
+      </div>
+      <h3 className="mt-4 text-lg font-semibold text-gray-900">{title}</h3>
+      <p className="mt-2 text-sm text-gray-600">{description}</p>
+    </div>
+  );
+}
+
+function UseCase({
+  emoji,
+  title,
+  description,
+}: {
+  emoji: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="flex items-start gap-4 rounded-xl bg-white p-6 shadow-sm">
+      <div className="text-3xl">{emoji}</div>
+      <div>
+        <h3 className="font-semibold text-gray-900">{title}</h3>
+        <p className="mt-1 text-sm text-gray-600">{description}</p>
+      </div>
     </div>
   );
 }

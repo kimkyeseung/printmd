@@ -132,7 +132,13 @@ const organizationJsonLd = {
   "@type": "Organization",
   name: "printmd",
   url: "https://printmd.app",
-  sameAs: ["https://github.com/kimkyeseung/printmd"],
+  logo: "https://printmd.app/icon-192.png",
+  description:
+    "Free online Markdown to PDF converter. Edit, style, and convert Markdown to PDF instantly in your browser.",
+  sameAs: [
+    "https://github.com/kimkyeseung/printmd",
+    "https://chromewebstore.google.com/detail/printmd-markdown-to-pdf/aogiijhfmcpobikknoclgabgaeiamfjg",
+  ],
 };
 
 const webSiteJsonLd = {

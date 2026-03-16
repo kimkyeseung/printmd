@@ -4,7 +4,7 @@
   },
   "meta": {
     "title": "printmd - Markdown to PDF",
-    "description": "마크다운 편집, PDF 변환, 인쇄를 한 곳에서. 설치 없이 브라우저에서 마크다운을 편집하고 스타일을 골라 바로 PDF로 뽑는 무료 웹 도구.",
+    "description": "Markdown to PDF 변환, 편집, 인쇄를 한 곳에서. 설치 없이 브라우저에서 마크다운을 편집하고 스타일을 골라 바로 PDF로 뽑는 무료 온라인 도구.",
     "keywords": "마크다운 PDF 변환,마크다운 to PDF,markdown to pdf,md to pdf,마크다운 변환기,마크다운 PDF 변환기,마크다운 PDF 저장,마크다운 PDF 내보내기,마크다운 PDF 출력,md 변환,md 파일 변환,마크다운 파일 PDF,마크다운 프린트,마크다운 인쇄,마크다운 편집기,마크다운 에디터,온라인 마크다운 편집기,무료 마크다운 편집기,웹 마크다운 편집기,마크다운 편집,마크다운 작성,마크다운 뷰어,마크다운 미리보기,마크다운 포맷터,README PDF 변환,깃허브 마크다운 PDF,무료 PDF 변환,문서 변환기"
   },
   "common": {
@@ -31,7 +31,7 @@
     "hero": {
       "title1": "마크다운을",
       "title2": "PDF로 변환",
-      "description": ".md 파일을 드래그 앤 드롭으로 업로드하고, 원하는 스타일로 예쁘게 PDF로 저장하세요. 무료이며 가입이 필요 없습니다.",
+      "description": "마크다운(.md) 파일을 드래그 앤 드롭으로 업로드하고, 5가지 테마 중 선택하여 예쁘게 PDF로 변환하세요. 무료이며 가입이 필요 없습니다.",
       "cta": "무료로 변환하기"
     },
     "why": {
@@ -56,6 +56,26 @@
       "links": "링크 & 이미지",
       "hr": "수평선",
       "inlineCode": "인라인 코드"
+    },
+    "steps": {
+      "title": "3단계로 간단하게 변환",
+      "step1": "마크다운 파일 열기",
+      "step1Desc": ".md 파일을 드래그 앤 드롭하거나 직접 입력",
+      "step2": "테마 선택",
+      "step2Desc": "GitHub, Notion 등 5가지 프리셋 중 선택",
+      "step3": "PDF로 저장",
+      "step3Desc": "Ctrl+P로 PDF 저장 또는 바로 인쇄"
+    },
+    "useCases": {
+      "title": "이런 분들이 사용해요",
+      "developer": "개발자",
+      "developerDesc": "README, API 문서, 기술 스펙을 PDF로 변환하여 공유할 때",
+      "student": "학생",
+      "studentDesc": "마크다운으로 작성한 과제물, 레포트를 PDF로 제출할 때",
+      "writer": "작가/블로거",
+      "writerDesc": "마크다운 원고를 깔끔한 PDF로 변환하여 배포할 때",
+      "worker": "직장인",
+      "workerDesc": "회의록, 보고서를 마크다운에서 PDF로 변환하여 전달할 때"
     },
     "cta": {
       "title": "지금 바로 변환해보세요",

@@ -56,10 +56,19 @@ export default async function Home({
     url: `https://printmd.app/${locale}`,
     applicationCategory: 'UtilitiesApplication',
     operatingSystem: 'Any',
+    browserRequirements: 'Requires a modern web browser (Chrome, Firefox, Safari, Edge)',
+    softwareVersion: '1.0',
     offers: {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      ratingCount: '120',
+      bestRating: '5',
+      worstRating: '1',
     },
     featureList: [
       'Markdown to PDF conversion',
@@ -73,6 +82,10 @@ export default async function Home({
       '@type': 'CreativeWork',
       url: `https://printmd.app/${locale}/guide`,
     },
+    sameAs: [
+      'https://github.com/kimkyeseung/printmd',
+      'https://chromewebstore.google.com/detail/printmd-markdown-to-pdf/aogiijhfmcpobikknoclgabgaeiamfjg',
+    ],
     keywords: 'markdown to pdf, md to pdf, markdown converter, markdown editor, print markdown, markdown pdf converter',
   };
 

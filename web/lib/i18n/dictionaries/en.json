@@ -57,6 +57,26 @@
       "hr": "Horizontal Rules",
       "inlineCode": "Inline Code"
     },
+    "steps": {
+      "title": "3 Simple Steps",
+      "step1": "Open Markdown File",
+      "step1Desc": "Drag & drop your .md file or type directly",
+      "step2": "Choose a Theme",
+      "step2Desc": "Pick from 5 presets like GitHub, Notion, and more",
+      "step3": "Save as PDF",
+      "step3Desc": "Press Ctrl+P to save as PDF or print"
+    },
+    "useCases": {
+      "title": "Who Uses This?",
+      "developer": "Developers",
+      "developerDesc": "Convert README, API docs, and tech specs to PDF for sharing",
+      "student": "Students",
+      "studentDesc": "Turn Markdown assignments and reports into PDF for submission",
+      "writer": "Writers/Bloggers",
+      "writerDesc": "Convert Markdown drafts to clean PDFs for distribution",
+      "worker": "Professionals",
+      "workerDesc": "Convert meeting notes and reports from Markdown to PDF"
+    },
     "cta": {
       "title": "Start Converting Now",
       "subtitle": "Free · No Signup · No File Upload"
