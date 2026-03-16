@@ -22,8 +22,73 @@ export async function generateMetadata({
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
     keywords: locale === 'ko'
-      ? ['마크다운 PDF 변환', '마크다운 to PDF', 'markdown to pdf', 'md to pdf', '마크다운 변환기', '마크다운 PDF 변환기', '마크다운 PDF 저장', 'md 변환', 'md 파일 PDF', '마크다운 PDF 출력', '마크다운 PDF 내보내기', '무료 마크다운 변환', '온라인 마크다운 변환', '마크다운 PDF 무료', 'README PDF 변환']
-      : ['markdown to pdf', 'md to pdf', 'markdown converter', 'pdf converter', 'convert markdown to pdf', 'markdown to pdf online', 'markdown to pdf free', 'markdown pdf converter', 'markdown export pdf', 'md to pdf converter', 'md to pdf online', 'markdown file to pdf', 'markdown save as pdf', 'free markdown converter', 'markdown to pdf converter online', 'readme to pdf', 'text to pdf'],
+      ? [
+          // 핵심 키워드
+          '마크다운 PDF 변환', '마크다운 to PDF', 'markdown to pdf', 'md to pdf',
+          '마크다운 변환기', '마크다운 PDF 변환기', '마크다운 PDF 저장', '마크다운 PDF 출력',
+          '마크다운 PDF 내보내기', '무료 마크다운 변환', '온라인 마크다운 변환', '마크다운 PDF 무료',
+          // md 파일 관련
+          'md 변환', 'md 파일 PDF', 'md 파일 변환', 'md 파일 PDF 변환', 'md to pdf 변환기',
+          'md pdf 변환', 'md 문서 PDF', '.md to pdf', '.md 파일 변환',
+          // 마크다운 변환 변형
+          '마크다운 파일 PDF 변환', '마크다운 문서 PDF', '마크다운 텍스트 PDF',
+          '마크다운 pdf 만들기', '마크다운으로 pdf', '마크다운에서 pdf',
+          '마크다운 pdf 변환 사이트', '마크다운 pdf 변환 온라인', '마크다운 pdf 변환 무료',
+          // README 관련
+          'README PDF 변환', 'readme to pdf', 'README md PDF', 'README 파일 PDF',
+          'README PDF 저장', '깃허브 README PDF', 'github readme pdf 변환',
+          // 인쇄/프린트 관련
+          '마크다운 인쇄', '마크다운 프린트', '마크다운 출력', 'md 파일 인쇄', 'md 프린트',
+          // 무료/온라인 강조
+          '무료 PDF 변환', '온라인 PDF 변환', '무료 마크다운 변환기', '온라인 마크다운 변환기',
+          '무료 md 변환', '브라우저 마크다운 변환', '설치 없이 마크다운 변환',
+          // 사용 시나리오
+          '마크다운 과제 PDF', '마크다운 보고서 PDF', '마크다운 문서화', '기술문서 PDF 변환',
+          '노션 마크다운 PDF', '옵시디언 PDF 변환', 'vscode 마크다운 pdf',
+          // 영문 혼합
+          'markdown pdf converter', 'markdown to pdf converter', 'convert markdown to pdf',
+          'markdown to pdf online free', 'best markdown to pdf', 'markdown to pdf tool',
+        ]
+      : [
+          // Core keywords
+          'markdown to pdf', 'md to pdf', 'markdown converter', 'pdf converter',
+          'convert markdown to pdf', 'markdown to pdf online', 'markdown to pdf free',
+          'markdown pdf converter', 'markdown export pdf', 'markdown to pdf converter',
+          // md file variations
+          'md to pdf converter', 'md to pdf online', 'md file to pdf', 'md to pdf free',
+          '.md to pdf', '.md file to pdf', 'md document to pdf', 'md convert to pdf',
+          // Markdown file variations
+          'markdown file to pdf', 'markdown save as pdf', 'markdown document to pdf',
+          'markdown text to pdf', 'markdown to pdf document', 'markdown into pdf',
+          // Free/online emphasis
+          'free markdown converter', 'free markdown to pdf converter',
+          'markdown to pdf converter online', 'online markdown to pdf converter',
+          'best markdown to pdf converter', 'best free markdown to pdf',
+          'markdown to pdf no signup', 'markdown to pdf no install',
+          'markdown to pdf browser', 'markdown to pdf web app',
+          // README related
+          'readme to pdf', 'github readme to pdf', 'github markdown to pdf',
+          'readme md to pdf', 'readme file to pdf', 'convert readme to pdf',
+          // Use case keywords
+          'markdown report to pdf', 'markdown notes to pdf', 'markdown resume to pdf',
+          'markdown document export', 'markdown to printable pdf',
+          'markdown to styled pdf', 'markdown to beautiful pdf',
+          // Tool/action keywords
+          'markdown pdf tool', 'markdown pdf generator', 'markdown pdf maker',
+          'markdown pdf creator', 'markdown pdf export tool', 'generate pdf from markdown',
+          'create pdf from markdown', 'make pdf from markdown', 'turn markdown into pdf',
+          // Print related
+          'print markdown', 'print markdown file', 'markdown printer',
+          'markdown print to pdf', 'print md file',
+          // Comparison/alternative keywords
+          'markdown to pdf alternative', 'pandoc alternative', 'markdown to pdf without pandoc',
+          'markdown to pdf without command line', 'easy markdown to pdf',
+          'simple markdown to pdf', 'quick markdown to pdf', 'fast markdown to pdf',
+          // Format related
+          'text to pdf', 'document converter', 'free pdf converter', 'pdf export',
+          'markdown to pdf with styling', 'markdown to pdf with themes',
+          'markdown to pdf with syntax highlighting', 'markdown to pdf with code blocks',
+        ],
     openGraph: {
       title: `${t.title} - ${t.subtitle} | printmd`,
       description: t.hero.description,
