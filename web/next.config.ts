@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
   compress: true,
   // 빌드 최적화
   poweredByHeader: false,
+  experimental: {
+    optimizePackageImports: ["highlight.js", "zustand", "zundo"],
+  },
   // 보안 헤더
   async headers() {
     return [

@@ -1,9 +1,10 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useEditorStore, useDocumentsStore } from '@/stores';
 
 const STORAGE_KEY = 'printmd-content';
+const SAVE_DEBOUNCE_MS = 500;
 
 const DEFAULT_CONTENT: Record<string, string> = {
   ko: `# Hello printmd
@@ -87,6 +88,7 @@ console.log(hello);
 export function useEditorOrchestrator() {
   const params = useParams();
   const locale = (params.locale as string) || 'en';
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const content = useEditorStore((state) => state.content);
   const sourceUrl = useEditorStore((state) => state.sourceUrl);
@@ -112,7 +114,14 @@ export function useEditorOrchestrator() {
 
   const handleContentChange = useCallback((newContent: string) => {
     setContent(newContent);
-    localStorage.setItem(STORAGE_KEY, newContent);
+    clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      try {
+        localStorage.setItem(STORAGE_KEY, newContent);
+      } catch {
+        // localStorage quota exceeded - silently ignore
+      }
+    }, SAVE_DEBOUNCE_MS);
   }, [setContent]);
 
   const handleSave = useCallback(() => {

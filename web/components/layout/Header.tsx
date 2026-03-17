@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { memo, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import type { ViewMode } from '@/stores/uiStore';
@@ -41,7 +41,7 @@ function ThemeIcon({ theme }: { theme: string | undefined }) {
   );
 }
 
-export function Header({
+export const Header = memo(function Header({
   viewMode,
   onViewModeChange,
   onStylePanelToggle,
@@ -410,7 +410,7 @@ export function Header({
       </div>
     </header>
   );
-}
+});
 
 function ShortcutItem({ keys, description }: { keys: string; description: string }) {
   return (

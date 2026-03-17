@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useStyleStore, useUIStore, usePrintStore } from '@/stores';
 import { Header } from '@/components/layout/Header';
@@ -8,9 +8,6 @@ import { SplitPane } from '@/components/layout/SplitPane';
 import { EditorPanel } from '@/components/editor/EditorPanel';
 import { PreviewPanel } from '@/components/preview/PreviewPanel';
 import dynamic from 'next/dynamic';
-import { AdKakaoBanner } from '@/components/adsense/AdKakaoBanner';
-import { AdKakaoMobile } from '@/components/adsense/AdKakaoMobile';
-import { AdKakaoSidebar } from '@/components/adsense/AdKakaoSidebar';
 import { useExtensionReceiver, useKeyboardShortcuts, useFullscreen, useEditorOrchestrator, useDragDrop } from '@/hooks';
 import { DragDropOverlay } from './DragDropOverlay';
 import '@/styles/editor.css';
@@ -21,6 +18,18 @@ const StylePanel = dynamic(() => import('@/components/style/StylePanel'), { ssr:
 const PrintPreview = dynamic(() => import('@/components/print/PrintPreview'), { ssr: false });
 const SaveDialog = dynamic(() => import('@/components/save/SaveDialog'), { ssr: false });
 const LoadDialog = dynamic(() => import('@/components/save/LoadDialog'), { ssr: false });
+const AdKakaoBanner = dynamic(
+  () => import('@/components/adsense/AdKakaoBanner').then((m) => m.AdKakaoBanner),
+  { ssr: false },
+);
+const AdKakaoMobile = dynamic(
+  () => import('@/components/adsense/AdKakaoMobile').then((m) => m.AdKakaoMobile),
+  { ssr: false },
+);
+const AdKakaoSidebar = dynamic(
+  () => import('@/components/adsense/AdKakaoSidebar').then((m) => m.AdKakaoSidebar),
+  { ssr: false },
+);
 const ExtensionBanner = dynamic(
   () => import('@/components/extension/ExtensionBanner').then((m) => m.ExtensionBanner),
   { ssr: false },
@@ -106,7 +115,7 @@ export default function HomeClient() {
   });
 
   // Render content based on view mode
-  const renderContent = () => {
+  const renderedContent = useMemo(() => {
     if (viewMode === 'editor') {
       return <EditorPanel value={displayContent} onChange={handleContentChange} />;
     }
@@ -121,7 +130,7 @@ export default function HomeClient() {
         right={<PreviewPanel markdown={displayContent} styles={globalStyles} sourceUrl={sourceUrl} />}
       />
     );
-  };
+  }, [viewMode, displayContent, handleContentChange, globalStyles, sourceUrl, editorWidth, setEditorWidth]);
 
   return (
     <div className="flex h-screen max-h-screen flex-col overflow-hidden pb-[50px] md:pb-0">
@@ -158,7 +167,7 @@ export default function HomeClient() {
 
       <div className="flex flex-1 overflow-hidden">
         <main id="main-content" className="flex-1 overflow-hidden" role="main">
-          {renderContent()}
+          {renderedContent}
         </main>
         <aside className="hidden xl:flex flex-col w-[160px] flex-shrink-0 border-l border-[var(--ui-border)]">
           <AdKakaoSidebar className="sticky top-0 w-[160px] h-[600px]" />

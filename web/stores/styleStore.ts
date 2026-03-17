@@ -128,8 +128,8 @@ export const useStyleStore = create<StyleStore>()(
       {
         limit: 50,
         partialize: (state) => {
-          const { currentTheme, globalStyles, listStyles, headingStyles, elementStyles, customFonts } = state;
-          return { currentTheme, globalStyles, listStyles, headingStyles, elementStyles, customFonts } as StyleStore;
+          const { currentTheme, globalStyles, listStyles, headingStyles, elementStyles } = state;
+          return { currentTheme, globalStyles, listStyles, headingStyles, elementStyles } as StyleStore;
         },
       }
     ),

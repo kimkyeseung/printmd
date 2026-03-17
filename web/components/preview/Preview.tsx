@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo, useState, useEffect, useRef } from 'react';
+import { memo, useMemo, useDeferredValue } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { generateElementStylesCss } from '@/lib/themes';
@@ -13,8 +13,7 @@ interface PreviewProps {
 }
 
 export const Preview = memo(function Preview({ markdown, styles }: PreviewProps) {
-  const [debouncedMarkdown, setDebouncedMarkdown] = useState(markdown);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const deferredMarkdown = useDeferredValue(markdown);
   const elementStyles = useStyleStore((state) => state.elementStyles);
 
   const elementStylesCss = useMemo(
@@ -22,17 +21,10 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
     [elementStyles]
   );
 
-  useEffect(() => {
-    timerRef.current = setTimeout(() => {
-      setDebouncedMarkdown(markdown);
-    }, 150);
-    return () => clearTimeout(timerRef.current);
-  }, [markdown]);
-
   const html = useMemo(() => {
-    const parsed = parseMarkdown(debouncedMarkdown);
+    const parsed = parseMarkdown(deferredMarkdown);
     return sanitizeHtml(parsed);
-  }, [debouncedMarkdown]);
+  }, [deferredMarkdown]);
 
   const cssVariables = useMemo(() => ({
     '--preview-font-size': `${styles.fontSize}px`,
