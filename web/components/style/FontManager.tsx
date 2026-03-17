@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { useStyleStore } from '@/stores';
 import { sanitizeFontName } from '@/lib/sanitize/cssValue';
 import { FONT_OPTIONS as DEFAULT_FONTS } from '@/lib/fonts/constants';
@@ -10,27 +10,6 @@ export function FontManager() {
   const addCustomFont = useStyleStore((state) => state.addCustomFont);
   const removeCustomFont = useStyleStore((state) => state.removeCustomFont);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Register custom fonts as @font-face on mount and when customFonts changes
-  useEffect(() => {
-    customFonts.forEach((font) => {
-      const existing = document.getElementById(`custom-font-${font.name}`);
-      if (existing) return;
-
-      const style = document.createElement('style');
-      style.id = `custom-font-${font.name}`;
-      const safeName = sanitizeFontName(font.name);
-      const safeUrl = font.url.startsWith('data:') ? font.url : '';
-      style.textContent = `
-        @font-face {
-          font-family: '${safeName}';
-          src: url('${safeUrl}');
-          font-display: swap;
-        }
-      `;
-      document.head.appendChild(style);
-    });
-  }, [customFonts]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

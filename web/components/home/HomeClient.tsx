@@ -10,6 +10,7 @@ import { PreviewPanel } from '@/components/preview/PreviewPanel';
 import dynamic from 'next/dynamic';
 import { useExtensionReceiver, useKeyboardShortcuts, useFullscreen, useEditorOrchestrator, useDragDrop } from '@/hooks';
 import { DragDropOverlay } from './DragDropOverlay';
+import { CustomFontLoader } from '@/components/style/CustomFontLoader';
 import '@/styles/editor.css';
 import '@/styles/preview.css';
 import '@/styles/print.css';
@@ -197,6 +198,7 @@ export default function HomeClient() {
       </div>
 
       {isDragging && <DragDropOverlay />}
+      <CustomFontLoader />
     </div>
   );
 }

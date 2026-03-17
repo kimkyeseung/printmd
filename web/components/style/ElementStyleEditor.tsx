@@ -205,6 +205,37 @@ export function ElementStyleEditor() {
             {/* Page global settings */}
             <div className="flex flex-col gap-2 border-t border-[var(--ui-border)] pt-3">
               <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">페이지 전역 설정</h4>
+
+              <ColorPicker
+                label="텍스트 색상"
+                value={globalStyles.textColor}
+                onChange={(textColor) => updateGlobalStyles({ textColor })}
+              />
+
+              <div className="flex flex-col gap-1">
+                <label className="text-sm text-[var(--ui-text-muted)]">폰트</label>
+                <select
+                  value={globalStyles.fontFamily}
+                  onChange={(e) => updateGlobalStyles({ fontFamily: e.target.value })}
+                  className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                >
+                  {fontOptions.filter((f) => f.value !== '').map((font) => (
+                    <option key={font.value} value={font.value}>
+                      {font.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <Slider
+                label="폰트 크기"
+                value={globalStyles.fontSize}
+                onChange={(fontSize) => updateGlobalStyles({ fontSize })}
+                min={12}
+                max={24}
+                unit="px"
+              />
+
               <Slider
                 label="최대 너비"
                 value={globalStyles.maxWidth}
