@@ -393,20 +393,19 @@ export function Header({
         {/* Style button (preview document styling) */}
         <button
           onClick={onStylePanelToggle}
-          className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm"
+          className="rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:from-purple-600 hover:to-indigo-600 sm:px-4"
           aria-label="Open style settings (Ctrl+Shift+S)"
           title="Style settings (⌘⇧S)"
         >
-          <span className="hidden sm:inline">Style</span>
-          <span className="sm:hidden">🎨</span>
+          🎨 Style
         </button>
         <button
           onClick={onPrintClick}
-          className="rounded bg-[var(--foreground)] px-2 py-1.5 text-xs text-[var(--background)] hover:opacity-90 sm:px-3 sm:text-sm"
+          className="rounded-lg bg-[var(--foreground)] px-3 py-2 text-sm font-medium text-[var(--background)] hover:opacity-90 sm:px-4"
           aria-label="Print or export to PDF (Ctrl+P)"
           title="Print / PDF (⌘P)"
         >
-          Print
+          🖨️ Print
         </button>
       </div>
     </header>
