@@ -235,3 +235,5 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
     </>
   );
 }
+
+export default SaveDialog;

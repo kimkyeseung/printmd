@@ -1,5 +1,6 @@
 import type { PrintSettings } from '@/types/print';
 import { getPaperDimensions } from './paperSizes';
+import { escapeCssString } from '@/lib/sanitize/cssValue';
 
 export function generatePrintStyles(settings: PrintSettings): string {
   const { width, height } = getPaperDimensions(settings.paperSize, settings.orientation);
@@ -129,9 +130,18 @@ export function generateHeaderFooterStyles(settings: PrintSettings): string {
 }
 
 function replaceVariables(text: string): string {
-  return text
-    .replace(/{title}/g, '" attr(data-title) "')
-    .replace(/{date}/g, new Date().toLocaleDateString())
-    .replace(/{page}/g, '" counter(page) "')
-    .replace(/{pages}/g, '" counter(pages) "');
+  // Replace known variables first, then escape remaining user text
+  const replaced = text
+    .replace(/{title}/g, '\x00TITLE\x00')
+    .replace(/{date}/g, '\x00DATE\x00')
+    .replace(/{page}/g, '\x00PAGE\x00')
+    .replace(/{pages}/g, '\x00PAGES\x00');
+
+  const escaped = escapeCssString(replaced);
+
+  return escaped
+    .replace(/\x00TITLE\x00/g, '" attr(data-title) "')
+    .replace(/\x00DATE\x00/g, new Date().toLocaleDateString())
+    .replace(/\x00PAGE\x00/g, '" counter(page) "')
+    .replace(/\x00PAGES\x00/g, '" counter(pages) "');
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { memo, useCallback, useRef, useState, useEffect } from 'react';
 
 interface SplitPaneProps {
   left: React.ReactNode;
@@ -11,7 +11,7 @@ interface SplitPaneProps {
   onWidthChange?: (width: number) => void;
 }
 
-export function SplitPane({
+export const SplitPane = memo(function SplitPane({
   left,
   right,
   defaultLeftWidth = 50,
@@ -84,6 +84,6 @@ export function SplitPane({
       </div>
     </div>
   );
-}
+});
 
 export default SplitPane;

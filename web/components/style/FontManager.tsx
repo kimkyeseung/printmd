@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from 'react';
 import { useStyleStore } from '@/stores';
+import { sanitizeFontName } from '@/lib/sanitize/cssValue';
 
 const DEFAULT_FONTS = [
   { value: 'system-ui, -apple-system, sans-serif', label: 'System (Sans)' },
@@ -26,10 +27,12 @@ export function FontManager() {
 
       const style = document.createElement('style');
       style.id = `custom-font-${font.name}`;
+      const safeName = sanitizeFontName(font.name);
+      const safeUrl = font.url.startsWith('data:') ? font.url : '';
       style.textContent = `
         @font-face {
-          font-family: '${font.name}';
-          src: url('${font.url}');
+          font-family: '${safeName}';
+          src: url('${safeUrl}');
           font-display: swap;
         }
       `;
@@ -41,7 +44,7 @@ export function FontManager() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const name = file.name.replace(/\.(woff2?|ttf|otf)$/i, '');
+    const name = sanitizeFontName(file.name.replace(/\.(woff2?|ttf|otf)$/i, ''));
 
     // Check for duplicate names
     if (customFonts.some((f) => f.name === name)) {

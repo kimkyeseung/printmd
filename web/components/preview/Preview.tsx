@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { memo, useMemo, useState, useEffect, useRef } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { generateElementStylesCss } from '@/lib/themes';
@@ -12,7 +12,7 @@ interface PreviewProps {
   styles: GlobalStyles;
 }
 
-export function Preview({ markdown, styles }: PreviewProps) {
+export const Preview = memo(function Preview({ markdown, styles }: PreviewProps) {
   const [debouncedMarkdown, setDebouncedMarkdown] = useState(markdown);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const elementStyles = useStyleStore((state) => state.elementStyles);
@@ -75,6 +75,6 @@ export function Preview({ markdown, styles }: PreviewProps) {
       />
     </div>
   );
-}
+});
 
 export default Preview;

@@ -202,3 +202,5 @@ export function LoadDialog({ isOpen, onClose, onLoad }: LoadDialogProps) {
     </>
   );
 }
+
+export default LoadDialog;

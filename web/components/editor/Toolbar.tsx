@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import type { ToolbarProps, ToolbarAction } from '@/types/editor';
 
 interface ToolbarButton {
@@ -29,7 +30,7 @@ const toolbarButtons: (ToolbarButton | 'separator')[] = [
   { action: 'hr', label: 'Horizontal Rule', icon: '—' },
 ];
 
-export function Toolbar({ onAction }: ToolbarProps) {
+export const Toolbar = memo(function Toolbar({ onAction }: ToolbarProps) {
   return (
     <div className="flex items-center gap-0.5 px-2 overflow-x-auto">
       {toolbarButtons.map((item, index) => {
@@ -56,6 +57,6 @@ export function Toolbar({ onAction }: ToolbarProps) {
       })}
     </div>
   );
-}
+});
 
 export default Toolbar;

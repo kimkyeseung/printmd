@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { memo, useCallback, useRef } from 'react';
 import { Editor, type EditorRef } from './Editor';
 import { Toolbar } from './Toolbar';
 import type { ToolbarAction } from '@/types/editor';
@@ -26,7 +26,7 @@ const toolbarActions: Record<ToolbarAction, { before: string; after: string }> =
   ol: { before: '1. ', after: '' },
 };
 
-export function EditorPanel({ value, onChange }: EditorPanelProps) {
+export const EditorPanel = memo(function EditorPanel({ value, onChange }: EditorPanelProps) {
   const editorRef = useRef<EditorRef>(null);
 
   const handleToolbarAction = useCallback((action: ToolbarAction) => {
@@ -47,6 +47,6 @@ export function EditorPanel({ value, onChange }: EditorPanelProps) {
       </div>
     </div>
   );
-}
+});
 
 export default EditorPanel;

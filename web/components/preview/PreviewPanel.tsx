@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Preview } from './Preview';
 import type { GlobalStyles } from '@/types/style';
 
@@ -9,7 +10,7 @@ interface PreviewPanelProps {
   sourceUrl?: string | null;
 }
 
-export function PreviewPanel({ markdown, styles, sourceUrl }: PreviewPanelProps) {
+export const PreviewPanel = memo(function PreviewPanel({ markdown, styles, sourceUrl }: PreviewPanelProps) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-10 items-center justify-between border-b border-[var(--ui-border)] px-3">
@@ -30,6 +31,6 @@ export function PreviewPanel({ markdown, styles, sourceUrl }: PreviewPanelProps)
       </div>
     </div>
   );
-}
+});
 
 export default PreviewPanel;

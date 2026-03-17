@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
+import { memo, useState, useSyncExternalStore } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { ThemeSelector } from './ThemeSelector';
 import { ElementStyleEditor } from './ElementStyleEditor';
 import { FontManager } from './FontManager';
@@ -28,19 +29,19 @@ function useTemporalCanUndoRedo() {
   return { canUndo, canRedo };
 }
 
-export function StylePanel({ isOpen, onClose }: StylePanelProps) {
+export const StylePanel = memo(function StylePanel({ isOpen, onClose }: StylePanelProps) {
   const [activeTab, setActiveTab] = useState<Tab>('preset');
 
   const currentTheme = useStyleStore((state) => state.currentTheme);
   const setTheme = useStyleStore((state) => state.setTheme);
   const resetToDefault = useStyleStore((state) => state.resetToDefault);
-  const customThemes = useStyleStore((state) => state.customThemes);
+  const customThemes = useStyleStore(useShallow((state) => state.customThemes));
   const saveCustomTheme = useStyleStore((state) => state.saveCustomTheme);
   const loadCustomTheme = useStyleStore((state) => state.loadCustomTheme);
   const deleteCustomTheme = useStyleStore((state) => state.deleteCustomTheme);
   const renameCustomTheme = useStyleStore((state) => state.renameCustomTheme);
   const importCustomTheme = useStyleStore((state) => state.importCustomTheme);
-  const elementStyles = useStyleStore((state) => state.elementStyles);
+  const elementStyles = useStyleStore(useShallow((state) => state.elementStyles));
 
   const { canUndo, canRedo } = useTemporalCanUndoRedo();
   const undo = () => useStyleStore.temporal.getState().undo();
@@ -170,6 +171,6 @@ export function StylePanel({ isOpen, onClose }: StylePanelProps) {
       </aside>
     </>
   );
-}
+});
 
 export default StylePanel;

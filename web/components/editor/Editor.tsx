@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useImperativeHandle, forwardRef } from 'react';
+import { memo, useEffect, useRef, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { EditorState } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, highlightActiveLine } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
@@ -12,7 +12,7 @@ export interface EditorRef {
   insertText: (before: string, after?: string) => void;
 }
 
-export const Editor = forwardRef<EditorRef, EditorProps>(function Editor({ value, onChange }, ref) {
+export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ value, onChange }, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
@@ -151,6 +151,6 @@ export const Editor = forwardRef<EditorRef, EditorProps>(function Editor({ value
       className="h-full w-full overflow-hidden"
     />
   );
-});
+}));
 
 export default Editor;

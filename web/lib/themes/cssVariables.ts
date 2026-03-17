@@ -1,14 +1,15 @@
 import type { GlobalStyles, ListStyles, HeadingStyles, ElementStyles, ElementStyle, EditableElement } from '@/types/style';
+import { sanitizeCssValue, escapeCssString, sanitizeCssColor, sanitizeFontFamily } from '@/lib/sanitize/cssValue';
 
 export function generateCssVariables(styles: GlobalStyles): Record<string, string> {
   return {
     '--printmd-font-size': `${styles.fontSize}px`,
-    '--printmd-font-family': styles.fontFamily,
-    '--printmd-text-color': styles.textColor,
-    '--printmd-bg-color': styles.backgroundColor,
+    '--printmd-font-family': sanitizeFontFamily(styles.fontFamily),
+    '--printmd-text-color': sanitizeCssColor(styles.textColor) || styles.textColor,
+    '--printmd-bg-color': sanitizeCssColor(styles.backgroundColor) || styles.backgroundColor,
     '--printmd-line-height': String(styles.lineHeight),
-    '--printmd-link-color': styles.linkColor,
-    '--printmd-code-bg': styles.codeBackground,
+    '--printmd-link-color': sanitizeCssColor(styles.linkColor) || styles.linkColor,
+    '--printmd-code-bg': sanitizeCssColor(styles.codeBackground) || styles.codeBackground,
     '--printmd-max-width': `${styles.maxWidth}px`,
     '--printmd-padding-top': `${styles.padding.top}px`,
     '--printmd-padding-right': `${styles.padding.right}px`,
@@ -23,9 +24,9 @@ export function generateListStylesCss(styles: ListStyles): string {
   if (styles.firstChild) {
     const { color, backgroundColor, fontWeight } = styles.firstChild;
     const props = [
-      color && `color: ${color}`,
-      backgroundColor && `background-color: ${backgroundColor}`,
-      fontWeight && `font-weight: ${fontWeight}`,
+      color && `color: ${sanitizeCssValue(color)}`,
+      backgroundColor && `background-color: ${sanitizeCssValue(backgroundColor)}`,
+      fontWeight && `font-weight: ${sanitizeCssValue(fontWeight)}`,
     ].filter(Boolean).join('; ');
     if (props) rules.push(`.preview-content li:first-child { ${props} }`);
   }
@@ -33,9 +34,9 @@ export function generateListStylesCss(styles: ListStyles): string {
   if (styles.lastChild) {
     const { color, backgroundColor, fontWeight } = styles.lastChild;
     const props = [
-      color && `color: ${color}`,
-      backgroundColor && `background-color: ${backgroundColor}`,
-      fontWeight && `font-weight: ${fontWeight}`,
+      color && `color: ${sanitizeCssValue(color)}`,
+      backgroundColor && `background-color: ${sanitizeCssValue(backgroundColor)}`,
+      fontWeight && `font-weight: ${sanitizeCssValue(fontWeight)}`,
     ].filter(Boolean).join('; ');
     if (props) rules.push(`.preview-content li:last-child { ${props} }`);
   }
@@ -43,9 +44,9 @@ export function generateListStylesCss(styles: ListStyles): string {
   if (styles.oddChild) {
     const { color, backgroundColor, fontWeight } = styles.oddChild;
     const props = [
-      color && `color: ${color}`,
-      backgroundColor && `background-color: ${backgroundColor}`,
-      fontWeight && `font-weight: ${fontWeight}`,
+      color && `color: ${sanitizeCssValue(color)}`,
+      backgroundColor && `background-color: ${sanitizeCssValue(backgroundColor)}`,
+      fontWeight && `font-weight: ${sanitizeCssValue(fontWeight)}`,
     ].filter(Boolean).join('; ');
     if (props) rules.push(`.preview-content li:nth-child(odd) { ${props} }`);
   }
@@ -53,19 +54,19 @@ export function generateListStylesCss(styles: ListStyles): string {
   if (styles.evenChild) {
     const { color, backgroundColor, fontWeight } = styles.evenChild;
     const props = [
-      color && `color: ${color}`,
-      backgroundColor && `background-color: ${backgroundColor}`,
-      fontWeight && `font-weight: ${fontWeight}`,
+      color && `color: ${sanitizeCssValue(color)}`,
+      backgroundColor && `background-color: ${sanitizeCssValue(backgroundColor)}`,
+      fontWeight && `font-weight: ${sanitizeCssValue(fontWeight)}`,
     ].filter(Boolean).join('; ');
     if (props) rules.push(`.preview-content li:nth-child(even) { ${props} }`);
   }
 
   if (styles.prefix) {
-    rules.push(`.preview-content li::before { content: "${styles.prefix} "; }`);
+    rules.push(`.preview-content li::before { content: "${escapeCssString(styles.prefix)} "; }`);
   }
 
   if (styles.suffix) {
-    rules.push(`.preview-content li::after { content: " ${styles.suffix}"; }`);
+    rules.push(`.preview-content li::after { content: " ${escapeCssString(styles.suffix)}"; }`);
   }
 
   return rules.join('\n');
@@ -82,8 +83,8 @@ export function generateHeadingStylesCss(styles: HeadingStyles): string {
 
     const props = [
       style.fontSize && `font-size: ${style.fontSize}px`,
-      style.fontWeight && `font-weight: ${style.fontWeight}`,
-      style.color && `color: ${style.color}`,
+      style.fontWeight && `font-weight: ${sanitizeCssValue(style.fontWeight)}`,
+      style.color && `color: ${sanitizeCssValue(style.color)}`,
       style.marginTop !== undefined && `margin-top: ${style.marginTop}px`,
       style.marginBottom !== undefined && `margin-bottom: ${style.marginBottom}px`,
     ].filter(Boolean).join('; ');
@@ -122,11 +123,11 @@ export function generateElementStylesCss(styles: ElementStyles): string {
     if (!selector) return;
 
     const props = [
-      style.color && `color: ${style.color}`,
-      style.fontFamily && `font-family: ${style.fontFamily}`,
+      style.color && `color: ${sanitizeCssValue(style.color)}`,
+      style.fontFamily && `font-family: ${sanitizeFontFamily(style.fontFamily)}`,
       style.fontSize && `font-size: ${style.fontSize}px`,
-      style.fontWeight && `font-weight: ${style.fontWeight}`,
-      style.backgroundColor && `background-color: ${style.backgroundColor}`,
+      style.fontWeight && `font-weight: ${sanitizeCssValue(style.fontWeight)}`,
+      style.backgroundColor && `background-color: ${sanitizeCssValue(style.backgroundColor)}`,
       style.marginTop !== undefined && `margin-top: ${style.marginTop}px`,
       style.marginBottom !== undefined && `margin-bottom: ${style.marginBottom}px`,
       style.paddingTop !== undefined && `padding-top: ${style.paddingTop}px`,
