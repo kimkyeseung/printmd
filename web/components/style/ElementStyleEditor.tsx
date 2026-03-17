@@ -4,17 +4,8 @@ import { useState, useMemo } from 'react';
 import { ColorPicker } from './ColorPicker';
 import { Slider } from './Slider';
 import { useStyleStore, useEditorStore } from '@/stores';
+import { FONT_OPTIONS_WITH_DEFAULT as FONT_OPTIONS } from '@/lib/fonts/constants';
 import type { EditableElement, ElementStyle } from '@/types/style';
-
-const FONT_OPTIONS = [
-  { value: '', label: 'Default' },
-  { value: 'system-ui, -apple-system, sans-serif', label: 'System (Sans)' },
-  { value: '"Noto Sans KR", system-ui, sans-serif', label: 'Noto Sans KR' },
-  { value: 'Georgia, "Times New Roman", serif', label: 'Georgia (Serif)' },
-  { value: '"Nanum Gothic", sans-serif', label: 'Nanum Gothic' },
-  { value: '"Nanum Myeongjo", serif', label: 'Nanum Myeongjo' },
-  { value: 'ui-monospace, SFMono-Regular, monospace', label: 'Monospace' },
-];
 
 const FONT_WEIGHT_OPTIONS = [
   { value: '', label: 'Default' },

@@ -37,11 +37,3 @@ export function isMarkdownFile(file: File): boolean {
   return validExtensions.some((ext) => fileName.endsWith(ext));
 }
 
-export function sanitizeFilename(filename: string): string {
-  // Remove or replace invalid characters
-  return filename
-    .replace(/[<>:"/\\|?*]/g, '-')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-}

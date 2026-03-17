@@ -76,19 +76,3 @@ export function createDragDropHandler(options: DragDropOptions) {
   };
 }
 
-export function setupDragDrop(element: HTMLElement, options: DragDropOptions): () => void {
-  const handlers = createDragDropHandler(options);
-
-  element.addEventListener('dragenter', handlers.handleDragEnter);
-  element.addEventListener('dragleave', handlers.handleDragLeave);
-  element.addEventListener('dragover', handlers.handleDragOver);
-  element.addEventListener('drop', handlers.handleDrop);
-
-  // Return cleanup function
-  return () => {
-    element.removeEventListener('dragenter', handlers.handleDragEnter);
-    element.removeEventListener('dragleave', handlers.handleDragLeave);
-    element.removeEventListener('dragover', handlers.handleDragOver);
-    element.removeEventListener('drop', handlers.handleDrop);
-  };
-}

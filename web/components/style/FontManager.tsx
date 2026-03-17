@@ -3,15 +3,7 @@
 import { useRef, useEffect } from 'react';
 import { useStyleStore } from '@/stores';
 import { sanitizeFontName } from '@/lib/sanitize/cssValue';
-
-const DEFAULT_FONTS = [
-  { value: 'system-ui, -apple-system, sans-serif', label: 'System (Sans)' },
-  { value: '"Noto Sans KR", system-ui, sans-serif', label: 'Noto Sans KR' },
-  { value: 'Georgia, "Times New Roman", serif', label: 'Georgia (Serif)' },
-  { value: '"Nanum Gothic", sans-serif', label: 'Nanum Gothic' },
-  { value: '"Nanum Myeongjo", serif', label: 'Nanum Myeongjo' },
-  { value: 'ui-monospace, SFMono-Regular, monospace', label: 'Monospace' },
-];
+import { FONT_OPTIONS as DEFAULT_FONTS } from '@/lib/fonts/constants';
 
 export function FontManager() {
   const customFonts = useStyleStore((state) => state.customFonts);

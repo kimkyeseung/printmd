@@ -35,7 +35,3 @@ export function getPaperDimensions(
 export function mmToPx(mm: number, dpi: number = 96): number {
   return (mm / 25.4) * dpi;
 }
-
-export function pxToMm(px: number, dpi: number = 96): number {
-  return (px / dpi) * 25.4;
-}

@@ -1,2 +1,2 @@
-export { paperSizes, getPaperDimensions, mmToPx, pxToMm } from './paperSizes';
+export { paperSizes, getPaperDimensions, mmToPx } from './paperSizes';
 export { generatePrintStyles, generateHeaderFooterStyles } from './printStyles';

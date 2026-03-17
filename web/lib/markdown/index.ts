@@ -1,2 +1,2 @@
-export { parseMarkdown, md } from './parser';
+export { parseMarkdown } from './parser';
 export { sanitizeHtml, createSafeHtml } from './sanitizer';
