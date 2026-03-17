@@ -45,6 +45,12 @@ export async function generateMetadata({
           // 사용 시나리오
           '마크다운 과제 PDF', '마크다운 보고서 PDF', '마크다운 문서화', '기술문서 PDF 변환',
           '노션 마크다운 PDF', '옵시디언 PDF 변환', 'vscode 마크다운 pdf',
+          // 스타일/테마/프리셋 관련
+          '마크다운 스타일 PDF', '마크다운 테마 PDF', '마크다운 커스텀 PDF', '마크다운 프리셋',
+          '마크다운 PDF 꾸미기', '마크다운 PDF 디자인', '마크다운 스타일 저장',
+          '마크다운 폰트 설정', '마크다운 글꼴 변경', '마크다운 PDF 글꼴',
+          '마크다운 다크모드 PDF', '예쁜 마크다운 PDF', '깔끔한 마크다운 PDF',
+          '마크다운 PDF 색상', '마크다운 PDF 여백', '마크다운 PDF 줄간격',
           // 영문 혼합
           'markdown pdf converter', 'markdown to pdf converter', 'convert markdown to pdf',
           'markdown to pdf online free', 'best markdown to pdf', 'markdown to pdf tool',
@@ -88,6 +94,16 @@ export async function generateMetadata({
           'text to pdf', 'document converter', 'free pdf converter', 'pdf export',
           'markdown to pdf with styling', 'markdown to pdf with themes',
           'markdown to pdf with syntax highlighting', 'markdown to pdf with code blocks',
+          // Custom style/theme/preset keywords
+          'markdown custom style', 'markdown custom theme', 'markdown pdf theme preset',
+          'markdown style preset', 'custom markdown pdf template', 'save markdown style',
+          'markdown style template', 'markdown pdf template', 'markdown pdf design',
+          'markdown to pdf with custom styles', 'markdown to pdf custom theme',
+          'markdown pdf custom font', 'custom font markdown', 'markdown element styling',
+          'styled markdown to pdf', 'markdown pdf preset save', 'markdown pdf preset load',
+          'markdown dark theme pdf', 'markdown blog style pdf', 'markdown minimal style',
+          'personalized markdown pdf', 'markdown pdf customization', 'customize markdown pdf',
+          'markdown pdf font size', 'markdown pdf color', 'markdown pdf line height',
         ],
     openGraph: {
       title: `${t.title} - ${t.subtitle} | printmd`,
