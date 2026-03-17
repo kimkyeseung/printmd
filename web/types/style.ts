@@ -108,6 +108,8 @@ export interface StyleActions {
   saveCustomTheme: (name: string) => void;
   loadCustomTheme: (id: string) => void;
   deleteCustomTheme: (id: string) => void;
+  renameCustomTheme: (id: string, name: string) => void;
+  importCustomTheme: (theme: CustomTheme) => void;
   resetToDefault: () => void;
   updateElementStyle: (element: EditableElement, style: Partial<ElementStyle>) => void;
   resetElementStyle: (element: EditableElement) => void;

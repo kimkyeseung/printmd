@@ -248,6 +248,13 @@
     "ctaButton": "printmd 시작하기",
     "syntaxLabel": "마크다운 문법"
   },
+  "presets": {
+    "title": "테마 프리셋",
+    "subtitle": "마크다운 PDF 스타일링을 위한 5가지 기본 테마",
+    "description": "printmd의 5가지 기본 테마 프리셋을 살펴보세요. 기본, 다크, 문서형, 블로그, 미니멀 스타일을 라이브 예제로 미리봅니다.",
+    "cta": "내 마크다운에 프리셋을 적용해 보세요",
+    "ctaButton": "printmd 열기"
+  },
   "github": {
     "title": "GitHub README PDF 변환",
     "description": "GitHub README.md 파일을 예쁘게 PDF로 변환하세요. Chrome 확장프로그램으로 원클릭 변환, 5가지 테마 프리셋, 커스텀 스타일링 지원.",

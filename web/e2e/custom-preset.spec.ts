@@ -20,7 +20,7 @@ test.describe('Custom Preset Save / Load / Delete', () => {
 
   async function savePreset(page: import('@playwright/test').Page, name: string) {
     await page.getByRole('button', { name: /Save Current Style/i }).click();
-    const input = page.getByPlaceholder('프리셋 이름');
+    const input = page.getByPlaceholder('Preset name');
     await expect(input).toBeVisible();
     await input.fill(name);
     await page.getByRole('button', { name: 'Save', exact: true }).click();
@@ -61,7 +61,7 @@ test.describe('Custom Preset Save / Load / Delete', () => {
     await savePreset(page, 'To Delete');
     await expect(page.getByText('To Delete')).toBeVisible();
 
-    await page.getByRole('button', { name: 'To Delete 삭제' }).click();
+    await page.getByRole('button', { name: 'To Delete delete' }).click();
     await expect(page.getByText('To Delete')).not.toBeVisible();
   });
 

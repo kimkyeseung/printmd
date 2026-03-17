@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { ThemeSelector } from './ThemeSelector';
 import { ElementStyleEditor } from './ElementStyleEditor';
 import { FontManager } from './FontManager';
@@ -13,6 +13,21 @@ interface StylePanelProps {
 
 type Tab = 'preset' | 'edit' | 'font';
 
+function useTemporalCanUndoRedo() {
+  const temporal = useStyleStore.temporal;
+  const canUndo = useSyncExternalStore(
+    temporal.subscribe,
+    () => temporal.getState().pastStates.length > 0,
+    () => false,
+  );
+  const canRedo = useSyncExternalStore(
+    temporal.subscribe,
+    () => temporal.getState().futureStates.length > 0,
+    () => false,
+  );
+  return { canUndo, canRedo };
+}
+
 export function StylePanel({ isOpen, onClose }: StylePanelProps) {
   const [activeTab, setActiveTab] = useState<Tab>('preset');
 
@@ -23,6 +38,13 @@ export function StylePanel({ isOpen, onClose }: StylePanelProps) {
   const saveCustomTheme = useStyleStore((state) => state.saveCustomTheme);
   const loadCustomTheme = useStyleStore((state) => state.loadCustomTheme);
   const deleteCustomTheme = useStyleStore((state) => state.deleteCustomTheme);
+  const renameCustomTheme = useStyleStore((state) => state.renameCustomTheme);
+  const importCustomTheme = useStyleStore((state) => state.importCustomTheme);
+  const elementStyles = useStyleStore((state) => state.elementStyles);
+
+  const { canUndo, canRedo } = useTemporalCanUndoRedo();
+  const undo = () => useStyleStore.temporal.getState().undo();
+  const redo = () => useStyleStore.temporal.getState().redo();
 
   if (!isOpen) return null;
 
@@ -54,7 +76,7 @@ export function StylePanel({ isOpen, onClose }: StylePanelProps) {
           <button
             onClick={onClose}
             className="rounded p-1 hover:bg-[var(--ui-bg-hover)]"
-            aria-label="스타일 패널 닫기"
+            aria-label="Close style panel"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -63,7 +85,7 @@ export function StylePanel({ isOpen, onClose }: StylePanelProps) {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-[var(--ui-border)]" role="tablist" aria-label="스타일 설정 탭">
+        <div className="flex border-b border-[var(--ui-border)]" role="tablist" aria-label="Style settings tabs">
           {tabs.map(({ key, label }) => (
             <button
               key={key}
@@ -93,6 +115,9 @@ export function StylePanel({ isOpen, onClose }: StylePanelProps) {
               onLoadCustom={loadCustomTheme}
               onDeleteCustom={deleteCustomTheme}
               onSaveCustom={saveCustomTheme}
+              onRenameCustom={renameCustomTheme}
+              onImportCustom={importCustomTheme}
+              elementStyles={elementStyles}
             />
           )}
 
@@ -107,6 +132,28 @@ export function StylePanel({ isOpen, onClose }: StylePanelProps) {
 
         {/* Footer */}
         <div className="flex gap-2 border-t border-[var(--ui-border)] p-4">
+          <button
+            onClick={() => undo()}
+            disabled={!canUndo}
+            className="rounded border border-[var(--ui-border)] px-2 py-2 text-sm hover:bg-[var(--ui-bg-hover)] disabled:opacity-30"
+            aria-label="Undo"
+            title="Undo"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a5 5 0 015 5v2M3 10l4-4M3 10l4 4" />
+            </svg>
+          </button>
+          <button
+            onClick={() => redo()}
+            disabled={!canRedo}
+            className="rounded border border-[var(--ui-border)] px-2 py-2 text-sm hover:bg-[var(--ui-bg-hover)] disabled:opacity-30"
+            aria-label="Redo"
+            title="Redo"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10H11a5 5 0 00-5 5v2m15-7l-4-4m4 4l-4 4" />
+            </svg>
+          </button>
           <button
             onClick={resetToDefault}
             className="flex-1 rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)]"

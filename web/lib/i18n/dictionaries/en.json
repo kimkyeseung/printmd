@@ -248,6 +248,13 @@
     "ctaButton": "Start printmd",
     "syntaxLabel": "Markdown syntax"
   },
+  "presets": {
+    "title": "Theme Presets",
+    "subtitle": "5 built-in themes for styling your Markdown PDF",
+    "description": "Browse printmd's 5 built-in theme presets for Markdown to PDF. Preview Default, Dark, Document, Blog, and Minimal styles with live examples.",
+    "cta": "Try these presets on your own Markdown",
+    "ctaButton": "Open printmd"
+  },
   "github": {
     "title": "GitHub README to PDF",
     "description": "Convert your GitHub README.md to a beautiful PDF. One-click conversion with Chrome extension, 5 theme presets, and custom styling.",
