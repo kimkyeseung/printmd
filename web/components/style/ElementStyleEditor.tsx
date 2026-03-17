@@ -124,109 +124,285 @@ export function ElementStyleEditor() {
           {ELEMENTS.find((e) => e.key === selectedElement)?.label} 스타일
         </h3>
 
-        {/* Typography */}
-        <div className="flex flex-col gap-2">
-          <ColorPicker
-            label="색상"
-            value={currentStyle.color || '#000000'}
-            onChange={(color) => handleStyleChange({ color })}
-          />
+        {selectedElement === 'page' ? (
+          <>
+            {/* Page-specific controls */}
+            <div className="flex flex-col gap-2">
+              <ColorPicker
+                label="배경색"
+                value={currentStyle.backgroundColor || '#ffffff'}
+                onChange={(backgroundColor) => handleStyleChange({ backgroundColor })}
+              />
+            </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm text-[var(--ui-text-muted)]">폰트</label>
-            <select
-              value={currentStyle.fontFamily || ''}
-              onChange={(e) => handleStyleChange({ fontFamily: e.target.value || undefined })}
-              className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
-            >
-              {fontOptions.map((font) => (
-                <option key={font.value} value={font.value}>
-                  {font.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <Slider
-            label="폰트 크기"
-            value={currentStyle.fontSize || 16}
-            onChange={(fontSize) => handleStyleChange({ fontSize })}
-            min={8}
-            max={72}
-            unit="px"
-          />
-
-          <div className="flex flex-col gap-1">
-            <label className="text-sm text-[var(--ui-text-muted)]">폰트 굵기</label>
-            <select
-              value={currentStyle.fontWeight || ''}
-              onChange={(e) => handleStyleChange({ fontWeight: e.target.value || undefined })}
-              className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
-            >
-              {FONT_WEIGHT_OPTIONS.map((fw) => (
-                <option key={fw.value} value={fw.value}>
-                  {fw.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <ColorPicker
-            label="배경색"
-            value={currentStyle.backgroundColor || '#ffffff'}
-            onChange={(backgroundColor) => handleStyleChange({ backgroundColor })}
-          />
-        </div>
-
-        {/* Spacing */}
-        <div className="flex flex-col gap-2">
-          <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">여백</h4>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-[var(--ui-text-muted)]">상단 여백</label>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  value={currentStyle.marginTop ?? ''}
-                  onChange={(e) => handleStyleChange({ marginTop: e.target.value ? Number(e.target.value) : undefined })}
-                  placeholder="auto"
-                  className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                  min={0}
-                  max={200}
-                />
-                <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+            {/* Page padding - uses globalStyles.padding (inline style) */}
+            <div className="flex flex-col gap-2">
+              <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">패딩</h4>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-[var(--ui-text-muted)]">상</label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={globalStyles.padding.top}
+                      onChange={(e) => updateGlobalStyles({ padding: { ...globalStyles.padding, top: Number(e.target.value) || 0 } })}
+                      placeholder="0"
+                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
+                      min={0}
+                      max={100}
+                    />
+                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-[var(--ui-text-muted)]">하</label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={globalStyles.padding.bottom}
+                      onChange={(e) => updateGlobalStyles({ padding: { ...globalStyles.padding, bottom: Number(e.target.value) || 0 } })}
+                      placeholder="0"
+                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
+                      min={0}
+                      max={100}
+                    />
+                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-[var(--ui-text-muted)]">좌</label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={globalStyles.padding.left}
+                      onChange={(e) => updateGlobalStyles({ padding: { ...globalStyles.padding, left: Number(e.target.value) || 0 } })}
+                      placeholder="0"
+                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
+                      min={0}
+                      max={100}
+                    />
+                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-[var(--ui-text-muted)]">우</label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={globalStyles.padding.right}
+                      onChange={(e) => updateGlobalStyles({ padding: { ...globalStyles.padding, right: Number(e.target.value) || 0 } })}
+                      placeholder="0"
+                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
+                      min={0}
+                      max={100}
+                    />
+                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-[var(--ui-text-muted)]">하단 여백</label>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  value={currentStyle.marginBottom ?? ''}
-                  onChange={(e) => handleStyleChange({ marginBottom: e.target.value ? Number(e.target.value) : undefined })}
-                  placeholder="auto"
-                  className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                  min={0}
-                  max={200}
-                />
-                <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+
+            {/* Page global settings */}
+            <div className="flex flex-col gap-2 border-t border-[var(--ui-border)] pt-3">
+              <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">페이지 전역 설정</h4>
+              <Slider
+                label="최대 너비"
+                value={globalStyles.maxWidth}
+                onChange={(maxWidth) => updateGlobalStyles({ maxWidth })}
+                min={500}
+                max={1200}
+                step={50}
+                unit="px"
+              />
+              <Slider
+                label="줄 높이"
+                value={globalStyles.lineHeight}
+                onChange={(lineHeight) => updateGlobalStyles({ lineHeight })}
+                min={1.2}
+                max={2.5}
+                step={0.1}
+              />
+              <ColorPicker
+                label="링크 색상"
+                value={globalStyles.linkColor}
+                onChange={(linkColor) => updateGlobalStyles({ linkColor })}
+              />
+              <ColorPicker
+                label="코드 배경"
+                value={globalStyles.codeBackground}
+                onChange={(codeBackground) => updateGlobalStyles({ codeBackground })}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Typography (non-page elements only) */}
+            <div className="flex flex-col gap-2">
+              <ColorPicker
+                label="색상"
+                value={currentStyle.color || '#000000'}
+                onChange={(color) => handleStyleChange({ color })}
+              />
+
+              <div className="flex flex-col gap-1">
+                <label className="text-sm text-[var(--ui-text-muted)]">폰트</label>
+                <select
+                  value={currentStyle.fontFamily || ''}
+                  onChange={(e) => handleStyleChange({ fontFamily: e.target.value || undefined })}
+                  className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                >
+                  {fontOptions.map((font) => (
+                    <option key={font.value} value={font.value}>
+                      {font.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <Slider
+                label="폰트 크기"
+                value={currentStyle.fontSize || 16}
+                onChange={(fontSize) => handleStyleChange({ fontSize })}
+                min={8}
+                max={72}
+                unit="px"
+              />
+
+              <div className="flex flex-col gap-1">
+                <label className="text-sm text-[var(--ui-text-muted)]">폰트 굵기</label>
+                <select
+                  value={currentStyle.fontWeight || ''}
+                  onChange={(e) => handleStyleChange({ fontWeight: e.target.value || undefined })}
+                  className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                >
+                  {FONT_WEIGHT_OPTIONS.map((fw) => (
+                    <option key={fw.value} value={fw.value}>
+                      {fw.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <ColorPicker
+                label="배경색"
+                value={currentStyle.backgroundColor || '#ffffff'}
+                onChange={(backgroundColor) => handleStyleChange({ backgroundColor })}
+              />
+            </div>
+
+            {/* Spacing (non-page elements only) */}
+            <div className="flex flex-col gap-2">
+              <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">여백</h4>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-[var(--ui-text-muted)]">상단 여백</label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={currentStyle.marginTop ?? ''}
+                      onChange={(e) => handleStyleChange({ marginTop: e.target.value ? Number(e.target.value) : undefined })}
+                      placeholder="auto"
+                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
+                      min={0}
+                      max={200}
+                    />
+                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-[var(--ui-text-muted)]">하단 여백</label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={currentStyle.marginBottom ?? ''}
+                      onChange={(e) => handleStyleChange({ marginBottom: e.target.value ? Number(e.target.value) : undefined })}
+                      placeholder="auto"
+                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
+                      min={0}
+                      max={200}
+                    />
+                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Padding */}
-        <div className="flex flex-col gap-2">
-          <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">패딩</h4>
-          <div className="grid grid-cols-2 gap-2">
+            {/* Padding (non-page elements only) */}
+            <div className="flex flex-col gap-2">
+              <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">패딩</h4>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-[var(--ui-text-muted)]">상</label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={currentStyle.paddingTop ?? ''}
+                      onChange={(e) => handleStyleChange({ paddingTop: e.target.value ? Number(e.target.value) : undefined })}
+                      placeholder="auto"
+                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
+                      min={0}
+                      max={100}
+                    />
+                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-[var(--ui-text-muted)]">하</label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={currentStyle.paddingBottom ?? ''}
+                      onChange={(e) => handleStyleChange({ paddingBottom: e.target.value ? Number(e.target.value) : undefined })}
+                      placeholder="auto"
+                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
+                      min={0}
+                      max={100}
+                    />
+                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-[var(--ui-text-muted)]">좌</label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={currentStyle.paddingLeft ?? ''}
+                      onChange={(e) => handleStyleChange({ paddingLeft: e.target.value ? Number(e.target.value) : undefined })}
+                      placeholder="auto"
+                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
+                      min={0}
+                      max={100}
+                    />
+                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs text-[var(--ui-text-muted)]">우</label>
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="number"
+                      value={currentStyle.paddingRight ?? ''}
+                      onChange={(e) => handleStyleChange({ paddingRight: e.target.value ? Number(e.target.value) : undefined })}
+                      placeholder="auto"
+                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
+                      min={0}
+                      max={100}
+                    />
+                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Text indent (non-page elements only) */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-[var(--ui-text-muted)]">상</label>
+              <label className="text-sm text-[var(--ui-text-muted)]">들여쓰기</label>
               <div className="flex items-center gap-1">
                 <input
                   type="number"
-                  value={currentStyle.paddingTop ?? ''}
-                  onChange={(e) => handleStyleChange({ paddingTop: e.target.value ? Number(e.target.value) : undefined })}
-                  placeholder="auto"
+                  value={currentStyle.textIndent ?? ''}
+                  onChange={(e) => handleStyleChange({ textIndent: e.target.value ? Number(e.target.value) : undefined })}
+                  placeholder="0"
                   className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
                   min={0}
                   max={100}
@@ -234,103 +410,7 @@ export function ElementStyleEditor() {
                 <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-[var(--ui-text-muted)]">하</label>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  value={currentStyle.paddingBottom ?? ''}
-                  onChange={(e) => handleStyleChange({ paddingBottom: e.target.value ? Number(e.target.value) : undefined })}
-                  placeholder="auto"
-                  className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                  min={0}
-                  max={100}
-                />
-                <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-              </div>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-[var(--ui-text-muted)]">좌</label>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  value={currentStyle.paddingLeft ?? ''}
-                  onChange={(e) => handleStyleChange({ paddingLeft: e.target.value ? Number(e.target.value) : undefined })}
-                  placeholder="auto"
-                  className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                  min={0}
-                  max={100}
-                />
-                <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-              </div>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-xs text-[var(--ui-text-muted)]">우</label>
-              <div className="flex items-center gap-1">
-                <input
-                  type="number"
-                  value={currentStyle.paddingRight ?? ''}
-                  onChange={(e) => handleStyleChange({ paddingRight: e.target.value ? Number(e.target.value) : undefined })}
-                  placeholder="auto"
-                  className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                  min={0}
-                  max={100}
-                />
-                <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Text indent */}
-        <div className="flex flex-col gap-1">
-          <label className="text-sm text-[var(--ui-text-muted)]">들여쓰기</label>
-          <div className="flex items-center gap-1">
-            <input
-              type="number"
-              value={currentStyle.textIndent ?? ''}
-              onChange={(e) => handleStyleChange({ textIndent: e.target.value ? Number(e.target.value) : undefined })}
-              placeholder="0"
-              className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-              min={0}
-              max={100}
-            />
-            <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-          </div>
-        </div>
-
-        {/* Page-specific: GlobalStyles fields */}
-        {selectedElement === 'page' && (
-          <div className="flex flex-col gap-2 border-t border-[var(--ui-border)] pt-3">
-            <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">페이지 전역 설정</h4>
-            <Slider
-              label="최대 너비"
-              value={globalStyles.maxWidth}
-              onChange={(maxWidth) => updateGlobalStyles({ maxWidth })}
-              min={500}
-              max={1200}
-              step={50}
-              unit="px"
-            />
-            <Slider
-              label="줄 높이"
-              value={globalStyles.lineHeight}
-              onChange={(lineHeight) => updateGlobalStyles({ lineHeight })}
-              min={1.2}
-              max={2.5}
-              step={0.1}
-            />
-            <ColorPicker
-              label="링크 색상"
-              value={globalStyles.linkColor}
-              onChange={(linkColor) => updateGlobalStyles({ linkColor })}
-            />
-            <ColorPicker
-              label="코드 배경"
-              value={globalStyles.codeBackground}
-              onChange={(codeBackground) => updateGlobalStyles({ codeBackground })}
-            />
-          </div>
+          </>
         )}
 
         {/* Reset button */}
