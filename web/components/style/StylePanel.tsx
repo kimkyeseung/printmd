@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import { ThemeSelector } from './ThemeSelector';
-import { GlobalStyleControls } from './GlobalStyleControls';
-import { ListStyleControls } from './ListStyleControls';
-import { HeadingStyleControls } from './HeadingStyleControls';
+import { ElementStyleEditor } from './ElementStyleEditor';
+import { FontManager } from './FontManager';
 import { useStyleStore } from '@/stores';
 
 interface StylePanelProps {
@@ -12,28 +11,25 @@ interface StylePanelProps {
   onClose: () => void;
 }
 
-type Tab = 'theme' | 'global' | 'list' | 'heading';
+type Tab = 'preset' | 'edit' | 'font';
 
 export function StylePanel({ isOpen, onClose }: StylePanelProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('theme');
+  const [activeTab, setActiveTab] = useState<Tab>('preset');
 
   const currentTheme = useStyleStore((state) => state.currentTheme);
-  const globalStyles = useStyleStore((state) => state.globalStyles);
-  const listStyles = useStyleStore((state) => state.listStyles);
-  const headingStyles = useStyleStore((state) => state.headingStyles);
   const setTheme = useStyleStore((state) => state.setTheme);
-  const updateGlobalStyles = useStyleStore((state) => state.updateGlobalStyles);
-  const updateListStyles = useStyleStore((state) => state.updateListStyles);
-  const updateHeadingStyles = useStyleStore((state) => state.updateHeadingStyles);
   const resetToDefault = useStyleStore((state) => state.resetToDefault);
+  const customThemes = useStyleStore((state) => state.customThemes);
+  const saveCustomTheme = useStyleStore((state) => state.saveCustomTheme);
+  const loadCustomTheme = useStyleStore((state) => state.loadCustomTheme);
+  const deleteCustomTheme = useStyleStore((state) => state.deleteCustomTheme);
 
   if (!isOpen) return null;
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: 'theme', label: 'Theme' },
-    { key: 'global', label: 'Global' },
-    { key: 'list', label: 'List' },
-    { key: 'heading', label: 'Heading' },
+    { key: 'preset', label: 'Preset' },
+    { key: 'edit', label: 'Edit' },
+    { key: 'font', label: 'Font' },
   ];
 
   return (
@@ -89,32 +85,23 @@ export function StylePanel({ isOpen, onClose }: StylePanelProps) {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
-          {activeTab === 'theme' && (
+          {activeTab === 'preset' && (
             <ThemeSelector
               currentTheme={currentTheme}
               onSelect={setTheme}
+              customThemes={customThemes}
+              onLoadCustom={loadCustomTheme}
+              onDeleteCustom={deleteCustomTheme}
+              onSaveCustom={saveCustomTheme}
             />
           )}
 
-          {activeTab === 'global' && (
-            <GlobalStyleControls
-              styles={globalStyles}
-              onChange={updateGlobalStyles}
-            />
+          {activeTab === 'edit' && (
+            <ElementStyleEditor />
           )}
 
-          {activeTab === 'list' && (
-            <ListStyleControls
-              styles={listStyles}
-              onChange={updateListStyles}
-            />
-          )}
-
-          {activeTab === 'heading' && (
-            <HeadingStyleControls
-              styles={headingStyles}
-              onChange={updateHeadingStyles}
-            />
+          {activeTab === 'font' && (
+            <FontManager />
           )}
         </div>
 

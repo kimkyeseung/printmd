@@ -3,6 +3,8 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
+import { generateElementStylesCss } from '@/lib/themes';
+import { useStyleStore } from '@/stores';
 import type { GlobalStyles } from '@/types/style';
 
 interface PreviewProps {
@@ -13,6 +15,12 @@ interface PreviewProps {
 export function Preview({ markdown, styles }: PreviewProps) {
   const [debouncedMarkdown, setDebouncedMarkdown] = useState(markdown);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const elementStyles = useStyleStore((state) => state.elementStyles);
+
+  const elementStylesCss = useMemo(
+    () => generateElementStylesCss(elementStyles),
+    [elementStyles]
+  );
 
   useEffect(() => {
     timerRef.current = setTimeout(() => {
@@ -49,6 +57,9 @@ export function Preview({ markdown, styles }: PreviewProps) {
         ...cssVariables,
       }}
     >
+      {elementStylesCss && (
+        <style dangerouslySetInnerHTML={{ __html: elementStylesCss }} />
+      )}
       <article
         className="preview-content"
         style={{

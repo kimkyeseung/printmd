@@ -5,6 +5,33 @@ export interface Padding {
   left: number;
 }
 
+export interface ElementStyle {
+  color?: string;
+  fontFamily?: string;
+  fontSize?: number;
+  fontWeight?: string;
+  backgroundColor?: string;
+  marginTop?: number;
+  marginBottom?: number;
+  paddingTop?: number;
+  paddingRight?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
+  textIndent?: number;
+}
+
+export type EditableElement =
+  | 'page' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+  | 'paragraph' | 'bulletList' | 'orderedList' | 'todoList'
+  | 'blockquote' | 'hr' | 'image' | 'code' | 'table';
+
+export type ElementStyles = Partial<Record<EditableElement, ElementStyle>>;
+
+export interface CustomFont {
+  name: string;
+  url: string;
+}
+
 export interface GlobalStyles {
   fontSize: number;
   fontFamily: string;
@@ -59,6 +86,7 @@ export interface CustomTheme {
   globalStyles: GlobalStyles;
   listStyles?: ListStyles;
   headingStyles?: HeadingStyles;
+  elementStyles?: ElementStyles;
   createdAt: string;
 }
 
@@ -68,6 +96,8 @@ export interface StyleState {
   listStyles: ListStyles;
   headingStyles: HeadingStyles;
   customThemes: CustomTheme[];
+  elementStyles: ElementStyles;
+  customFonts: CustomFont[];
 }
 
 export interface StyleActions {
@@ -79,6 +109,10 @@ export interface StyleActions {
   loadCustomTheme: (id: string) => void;
   deleteCustomTheme: (id: string) => void;
   resetToDefault: () => void;
+  updateElementStyle: (element: EditableElement, style: Partial<ElementStyle>) => void;
+  resetElementStyle: (element: EditableElement) => void;
+  addCustomFont: (font: CustomFont) => void;
+  removeCustomFont: (name: string) => void;
 }
 
 export type StyleStore = StyleState & StyleActions;

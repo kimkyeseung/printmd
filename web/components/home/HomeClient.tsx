@@ -177,6 +177,8 @@ export default function HomeClient() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       setContent(saved);
+    } else {
+      setContent(DEFAULT_CONTENT[locale] || DEFAULT_CONTENT['en']);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

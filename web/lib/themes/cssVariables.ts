@@ -1,4 +1,4 @@
-import type { GlobalStyles, ListStyles, HeadingStyles } from '@/types/style';
+import type { GlobalStyles, ListStyles, HeadingStyles, ElementStyles, ElementStyle, EditableElement } from '@/types/style';
 
 export function generateCssVariables(styles: GlobalStyles): Record<string, string> {
   return {
@@ -89,6 +89,54 @@ export function generateHeadingStylesCss(styles: HeadingStyles): string {
     ].filter(Boolean).join('; ');
 
     if (props) rules.push(`.preview-content ${h} { ${props} }`);
+  });
+
+  return rules.join('\n');
+}
+
+const ELEMENT_SELECTORS: Record<EditableElement, string> = {
+  page: '.preview-content',
+  h1: '.preview-content h1',
+  h2: '.preview-content h2',
+  h3: '.preview-content h3',
+  h4: '.preview-content h4',
+  h5: '.preview-content h5',
+  h6: '.preview-content h6',
+  paragraph: '.preview-content p',
+  bulletList: '.preview-content ul',
+  orderedList: '.preview-content ol',
+  todoList: '.preview-content .task-list',
+  blockquote: '.preview-content blockquote',
+  hr: '.preview-content hr',
+  image: '.preview-content img',
+  code: '.preview-content pre, .preview-content code',
+  table: '.preview-content table',
+};
+
+export function generateElementStylesCss(styles: ElementStyles): string {
+  const rules: string[] = [];
+
+  (Object.entries(styles) as [EditableElement, ElementStyle | undefined][]).forEach(([element, style]) => {
+    if (!style) return;
+    const selector = ELEMENT_SELECTORS[element];
+    if (!selector) return;
+
+    const props = [
+      style.color && `color: ${style.color}`,
+      style.fontFamily && `font-family: ${style.fontFamily}`,
+      style.fontSize && `font-size: ${style.fontSize}px`,
+      style.fontWeight && `font-weight: ${style.fontWeight}`,
+      style.backgroundColor && `background-color: ${style.backgroundColor}`,
+      style.marginTop !== undefined && `margin-top: ${style.marginTop}px`,
+      style.marginBottom !== undefined && `margin-bottom: ${style.marginBottom}px`,
+      style.paddingTop !== undefined && `padding-top: ${style.paddingTop}px`,
+      style.paddingRight !== undefined && `padding-right: ${style.paddingRight}px`,
+      style.paddingBottom !== undefined && `padding-bottom: ${style.paddingBottom}px`,
+      style.paddingLeft !== undefined && `padding-left: ${style.paddingLeft}px`,
+      style.textIndent !== undefined && `text-indent: ${style.textIndent}px`,
+    ].filter(Boolean).join('; ');
+
+    if (props) rules.push(`${selector} { ${props} }`);
   });
 
   return rules.join('\n');

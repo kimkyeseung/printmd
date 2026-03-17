@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
+import { generateElementStylesCss } from '@/lib/themes';
+import { useStyleStore } from '@/stores';
 import type { GlobalStyles } from '@/types/style';
 import type { PrintSettings } from '@/types/print';
 
@@ -24,6 +26,12 @@ export function PagedPreview({
   const measureRef = useRef<HTMLDivElement>(null);
   const [pages, setPages] = useState<string[]>([]);
   const [isRendering, setIsRendering] = useState(true);
+  const elementStyles = useStyleStore((state) => state.elementStyles);
+
+  const elementStylesCss = useMemo(
+    () => generateElementStylesCss(elementStyles),
+    [elementStyles]
+  );
 
   const html = useMemo(() => {
     return sanitizeHtml(parseMarkdown(markdown));
@@ -140,6 +148,10 @@ export function PagedPreview({
             {pages.length} page{pages.length > 1 ? 's' : ''}
           </div>
         </>
+      )}
+
+      {elementStylesCss && (
+        <style dangerouslySetInnerHTML={{ __html: elementStylesCss }} />
       )}
 
       <style jsx global>{`

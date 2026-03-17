@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { StyleStore, ThemePreset, GlobalStyles, ListStyles, HeadingStyles, CustomTheme } from '@/types/style';
+import type { StyleStore, ThemePreset, GlobalStyles, ListStyles, HeadingStyles, CustomTheme, EditableElement, ElementStyle, ElementStyles, CustomFont } from '@/types/style';
 
 const defaultGlobalStyles: GlobalStyles = {
   fontSize: 16,
@@ -68,6 +68,8 @@ const initialState = {
   listStyles: {} as ListStyles,
   headingStyles: {} as HeadingStyles,
   customThemes: [] as CustomTheme[],
+  elementStyles: {} as ElementStyles,
+  customFonts: [] as CustomFont[],
 };
 
 export const useStyleStore = create<StyleStore>()(
@@ -97,13 +99,14 @@ export const useStyleStore = create<StyleStore>()(
         })),
 
       saveCustomTheme: (name: string) => {
-        const { globalStyles, listStyles, headingStyles, customThemes } = get();
+        const { globalStyles, listStyles, headingStyles, elementStyles, customThemes } = get();
         const newTheme: CustomTheme = {
           id: `custom-${Date.now()}`,
           name,
           globalStyles: { ...globalStyles },
           listStyles: { ...listStyles },
           headingStyles: { ...headingStyles },
+          elementStyles: { ...elementStyles },
           createdAt: new Date().toISOString(),
         };
         set({ customThemes: [...customThemes, newTheme] });
@@ -117,6 +120,7 @@ export const useStyleStore = create<StyleStore>()(
             globalStyles: { ...theme.globalStyles },
             listStyles: { ...theme.listStyles },
             headingStyles: { ...theme.headingStyles },
+            elementStyles: theme.elementStyles ? { ...theme.elementStyles } : {},
           });
         }
       },
@@ -126,12 +130,38 @@ export const useStyleStore = create<StyleStore>()(
           customThemes: state.customThemes.filter((t) => t.id !== id),
         })),
 
+      updateElementStyle: (element: EditableElement, style: Partial<ElementStyle>) =>
+        set((state) => ({
+          elementStyles: {
+            ...state.elementStyles,
+            [element]: { ...state.elementStyles[element], ...style },
+          },
+        })),
+
+      resetElementStyle: (element: EditableElement) =>
+        set((state) => {
+          const { [element]: _, ...rest } = state.elementStyles;
+          return { elementStyles: rest };
+        }),
+
+      addCustomFont: (font: CustomFont) =>
+        set((state) => ({
+          customFonts: [...state.customFonts, font],
+        })),
+
+      removeCustomFont: (name: string) =>
+        set((state) => ({
+          customFonts: state.customFonts.filter((f) => f.name !== name),
+        })),
+
       resetToDefault: () =>
         set({
           currentTheme: 'default',
           globalStyles: defaultGlobalStyles,
           listStyles: {},
           headingStyles: {},
+          elementStyles: {},
+          customFonts: [],
         }),
     }),
     {
@@ -142,6 +172,8 @@ export const useStyleStore = create<StyleStore>()(
         listStyles: state.listStyles,
         headingStyles: state.headingStyles,
         customThemes: state.customThemes,
+        elementStyles: state.elementStyles,
+        customFonts: state.customFonts,
       }),
     }
   )
