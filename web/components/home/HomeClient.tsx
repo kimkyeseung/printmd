@@ -15,6 +15,61 @@ import '@/styles/editor.css';
 import '@/styles/preview.css';
 import '@/styles/print.css';
 
+/** Resizable wrapper for the style panel (right side) */
+function StylePanelResizer({
+  width,
+  onWidthChange,
+  children,
+}: {
+  width: number;
+  onWidthChange: (w: number) => void;
+  children: React.ReactNode;
+}) {
+  const isDragging = useRef(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+      const newWidth = window.innerWidth - e.clientX;
+      onWidthChange(newWidth);
+    };
+    const handleMouseUp = () => {
+      isDragging.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [onWidthChange]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, []);
+
+  return (
+    <div className="flex h-full flex-shrink-0" style={{ width }}>
+      {/* Drag handle */}
+      <div
+        className="relative h-full w-1 cursor-col-resize bg-[var(--ui-border)] hover:bg-[var(--printmd-link-color)] active:bg-[var(--printmd-link-color)]"
+        onMouseDown={handleMouseDown}
+      >
+        <div className="absolute inset-y-0 -left-1 -right-1" />
+      </div>
+      {/* Panel content */}
+      <div className="flex-1 min-w-0 overflow-hidden">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 const StylePanel = dynamic(() => import('@/components/style/StylePanel'), { ssr: false });
 const PrintPreview = dynamic(() => import('@/components/print/PrintPreview'), { ssr: false });
 const SaveDialog = dynamic(() => import('@/components/save/SaveDialog'), { ssr: false });
@@ -66,6 +121,8 @@ export default function HomeClient() {
   const closeStylePanel = useUIStore((state) => state.closeStylePanel);
   const editorWidth = useUIStore((state) => state.editorWidth);
   const setEditorWidth = useUIStore((state) => state.setEditorWidth);
+  const stylePanelWidth = useUIStore((state) => state.stylePanelWidth);
+  const setStylePanelWidth = useUIStore((state) => state.setStylePanelWidth);
   const isPrintPreviewOpen = usePrintStore((state) => state.isPreviewOpen);
   const openPrintPreview = usePrintStore((state) => state.openPreview);
   const closePrintPreview = usePrintStore((state) => state.closePreview);
@@ -115,23 +172,46 @@ export default function HomeClient() {
     onEscape: handleEscape,
   });
 
-  // Render content based on view mode
+  // Preview element used in both normal and style-panel modes
+  const previewElement = useMemo(
+    () => <PreviewPanel markdown={displayContent} styles={globalStyles} sourceUrl={sourceUrl} />,
+    [displayContent, globalStyles, sourceUrl],
+  );
+
+  // Render content based on view mode and style panel state
   const renderedContent = useMemo(() => {
+    if (isStylePanelOpen) {
+      // Style panel open → Preview(left) + StylePanel(right) regardless of viewMode
+      return (
+        <div className="flex h-full w-full">
+          <div className="flex-1 min-w-0 overflow-hidden">
+            {previewElement}
+          </div>
+          <StylePanelResizer
+            width={stylePanelWidth}
+            onWidthChange={setStylePanelWidth}
+          >
+            <StylePanel onClose={closeStylePanel} />
+          </StylePanelResizer>
+        </div>
+      );
+    }
+
     if (viewMode === 'editor') {
       return <EditorPanel value={displayContent} onChange={handleContentChange} />;
     }
     if (viewMode === 'preview') {
-      return <PreviewPanel markdown={displayContent} styles={globalStyles} sourceUrl={sourceUrl} />;
+      return previewElement;
     }
     return (
       <SplitPane
         defaultLeftWidth={editorWidth}
         onWidthChange={setEditorWidth}
         left={<EditorPanel value={displayContent} onChange={handleContentChange} />}
-        right={<PreviewPanel markdown={displayContent} styles={globalStyles} sourceUrl={sourceUrl} />}
+        right={previewElement}
       />
     );
-  }, [viewMode, displayContent, handleContentChange, globalStyles, sourceUrl, editorWidth, setEditorWidth]);
+  }, [isStylePanelOpen, viewMode, displayContent, handleContentChange, previewElement, editorWidth, setEditorWidth, stylePanelWidth, setStylePanelWidth, closeStylePanel]);
 
   return (
     <div className="flex h-screen max-h-screen flex-col overflow-hidden pb-[50px] md:pb-0">
@@ -175,7 +255,6 @@ export default function HomeClient() {
         </aside>
       </div>
 
-      {isStylePanelOpen && <StylePanel isOpen={isStylePanelOpen} onClose={closeStylePanel} />}
       {isPrintPreviewOpen && <PrintPreview isOpen={isPrintPreviewOpen} onClose={closePrintPreview} content={displayContent} />}
       {isSaveDialogOpen && (
         <SaveDialog

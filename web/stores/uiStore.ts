@@ -8,6 +8,7 @@ export interface UIState {
   isStylePanelOpen: boolean;
   isFullscreen: boolean;
   editorWidth: number;
+  stylePanelWidth: number;
 }
 
 export interface UIActions {
@@ -17,6 +18,7 @@ export interface UIActions {
   closeStylePanel: () => void;
   toggleFullscreen: () => void;
   setEditorWidth: (width: number) => void;
+  setStylePanelWidth: (width: number) => void;
 }
 
 export type UIStore = UIState & UIActions;
@@ -26,6 +28,7 @@ const initialState: UIState = {
   isStylePanelOpen: false,
   isFullscreen: false,
   editorWidth: 50,
+  stylePanelWidth: 320,
 };
 
 export const useUIStore = create<UIStore>()(
@@ -55,12 +58,16 @@ export const useUIStore = create<UIStore>()(
 
       setEditorWidth: (editorWidth: number) =>
         set({ editorWidth: Math.min(Math.max(editorWidth, 20), 80) }),
+
+      setStylePanelWidth: (stylePanelWidth: number) =>
+        set({ stylePanelWidth: Math.min(Math.max(stylePanelWidth, 240), 480) }),
     }),
     {
       name: 'printmd-ui',
       partialize: (state) => ({
         viewMode: state.viewMode,
         editorWidth: state.editorWidth,
+        stylePanelWidth: state.stylePanelWidth,
       }),
     }
   )
