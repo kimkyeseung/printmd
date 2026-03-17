@@ -13,6 +13,7 @@ const knownPaths = [
   '/blog',
   '/about',
   '/terms',
+  '/presets',
 ];
 
 function getLocale(request: NextRequest): Locale {
@@ -74,7 +75,7 @@ export function middleware(request: NextRequest) {
   // Preserve query parameters
   newUrl.search = request.nextUrl.search;
 
-  return NextResponse.redirect(newUrl);
+  return NextResponse.redirect(newUrl, 301);
 }
 
 export const config = {

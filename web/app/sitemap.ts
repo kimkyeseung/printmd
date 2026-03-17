@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/guide', priority: 0.8, changeFrequency: 'monthly' as const },
     { path: '/about', priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/github', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/presets', priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/terms', priority: 0.3, changeFrequency: 'yearly' as const },
     { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' as const },
   ];
@@ -38,21 +39,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  // Add blog post pages
+  // Add blog post pages (only include alternates for slugs that exist in both locales)
+  const slugsByLocale = Object.fromEntries(
+    locales.map((locale) => [locale, new Set(getPostSlugs(locale))])
+  );
+
   for (const locale of locales) {
-    const slugs = getPostSlugs(locale);
-    for (const slug of slugs) {
+    for (const slug of slugsByLocale[locale]) {
+      const languages: Record<string, string> = {};
+      for (const altLocale of locales) {
+        if (slugsByLocale[altLocale].has(slug)) {
+          languages[altLocale] = `${baseUrl}/${altLocale}/blog/${slug}`;
+        }
+      }
+
       sitemapEntries.push({
         url: `${baseUrl}/${locale}/blog/${slug}`,
         lastModified,
         changeFrequency: 'monthly' as const,
         priority: 0.6,
-        alternates: {
-          languages: {
-            ko: `${baseUrl}/ko/blog/${slug}`,
-            en: `${baseUrl}/en/blog/${slug}`,
-          },
-        },
+        alternates: { languages },
       });
     }
   }

@@ -249,7 +249,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://printmd.app/en",
+    canonical: "https://printmd.app",
     languages: {
       "en-US": "https://printmd.app/en",
       "ko-KR": "https://printmd.app/ko",
