@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import type { ThemePreset, CustomTheme, ElementStyles, GlobalStyles } from '@/types/style';
 import { THEME_NAMES, THEME_DESCRIPTIONS } from '@/types/theme';
 import { themePresets } from '@/stores/styleStore';
+import { showToast } from '@/components/ui/Toast';
 
 interface ThemeSelectorProps {
   currentTheme: ThemePreset;
@@ -21,19 +22,21 @@ const themes: ThemePreset[] = ['default', 'dark', 'document', 'blog', 'minimal']
 
 function ColorSwatches({ globalStyles }: { globalStyles: GlobalStyles }) {
   const colors = [
-    { color: globalStyles.backgroundColor, label: 'bg' },
-    { color: globalStyles.textColor, label: 'text' },
-    { color: globalStyles.linkColor, label: 'link' },
+    { color: globalStyles.backgroundColor, label: 'BG' },
+    { color: globalStyles.textColor, label: 'Text' },
+    { color: globalStyles.linkColor, label: 'Link' },
   ];
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1.5">
       {colors.map(({ color, label }) => (
-        <span
-          key={label}
-          className="h-4 w-4 shrink-0 rounded-full border border-[var(--ui-border)]"
-          style={{ backgroundColor: color }}
-          title={`${label}: ${color}`}
-        />
+        <div key={label} className="flex flex-col items-center gap-0.5">
+          <span
+            className="h-5 w-5 shrink-0 rounded-full border border-[var(--ui-border)]"
+            style={{ backgroundColor: color }}
+            title={`${label}: ${color}`}
+          />
+          <span className="text-[10px] text-[var(--ui-text-muted)]">{label}</span>
+        </div>
       ))}
     </div>
   );
@@ -54,6 +57,7 @@ export function ThemeSelector({
   const [newName, setNewName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const hasElementStyles = Object.keys(elementStyles).length > 0;
@@ -64,6 +68,7 @@ export function ThemeSelector({
     onSaveCustom(trimmed);
     setNewName('');
     setIsAdding(false);
+    showToast('프리셋이 저장되었습니다.', 'success');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -82,6 +87,7 @@ export function ThemeSelector({
   const handleRenameConfirm = () => {
     if (editingId && editName.trim()) {
       onRenameCustom(editingId, editName.trim());
+      showToast('이름이 변경되었습니다.', 'success');
     }
     setEditingId(null);
     setEditName('');
@@ -95,6 +101,17 @@ export function ThemeSelector({
     }
   };
 
+  const handleDelete = (id: string) => {
+    if (confirmDeleteId === id) {
+      onDeleteCustom(id);
+      setConfirmDeleteId(null);
+      showToast('프리셋이 삭제되었습니다.', 'success');
+    } else {
+      setConfirmDeleteId(id);
+      setTimeout(() => setConfirmDeleteId(null), 3000);
+    }
+  };
+
   const handleExport = (theme: CustomTheme) => {
     const data = JSON.stringify(theme, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
@@ -104,6 +121,12 @@ export function ThemeSelector({
     a.download = `${theme.name.replace(/\s+/g, '-')}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    showToast('프리셋을 내보냈습니다.', 'success');
+  };
+
+  const handleLoad = (id: string) => {
+    onLoadCustom(id);
+    showToast('프리셋을 불러왔습니다.', 'success');
   };
 
   const handleImport = useCallback(
@@ -115,12 +138,13 @@ export function ThemeSelector({
         try {
           const parsed = JSON.parse(reader.result as string);
           if (!parsed.name || !parsed.globalStyles) {
-            alert('Invalid preset file.');
+            showToast('유효하지 않은 프리셋 파일입니다.', 'error');
             return;
           }
           onImportCustom(parsed as CustomTheme);
+          showToast('프리셋을 가져왔습니다.', 'success');
         } catch {
-          alert('Failed to parse JSON file.');
+          showToast('JSON 파일을 읽을 수 없습니다.', 'error');
         }
       };
       reader.readAsText(file);
@@ -184,13 +208,11 @@ export function ThemeSelector({
             {customThemes.map((theme) => (
               <div
                 key={theme.id}
-                className="flex items-center gap-2 rounded-lg border border-[var(--ui-border)] p-3 transition-colors hover:border-[var(--ui-border-hover)] hover:bg-[var(--ui-bg-hover)]"
+                className="flex flex-col gap-2 rounded-lg border border-[var(--ui-border)] p-3 transition-colors hover:border-[var(--ui-border-hover)]"
               >
-                <button
-                  onClick={() => onLoadCustom(theme.id)}
-                  className="flex flex-1 items-center justify-between text-left"
-                >
-                  <div className="flex flex-col" onDoubleClick={(e) => { e.stopPropagation(); handleRenameStart(theme); }}>
+                {/* Row 1: Name + Swatches */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
                     {editingId === theme.id ? (
                       <input
                         type="text"
@@ -199,39 +221,56 @@ export function ThemeSelector({
                         onKeyDown={handleRenameKeyDown}
                         onBlur={handleRenameConfirm}
                         onClick={(e) => e.stopPropagation()}
-                        className="rounded border border-[var(--printmd-link-color)] bg-transparent px-1 py-0.5 text-sm outline-none"
+                        className="flex-1 rounded border border-[var(--printmd-link-color)] bg-transparent px-2 py-1 text-sm outline-none"
                         autoFocus
                       />
                     ) : (
-                      <span className="text-sm font-medium">{theme.name}</span>
+                      <>
+                        <span className="text-sm font-medium truncate">{theme.name}</span>
+                        <button
+                          onClick={() => handleRenameStart(theme)}
+                          className="shrink-0 rounded p-1 text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)] hover:text-[var(--foreground)]"
+                          aria-label={`${theme.name} 이름 변경`}
+                          title="이름 변경"
+                        >
+                          <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+                      </>
                     )}
-                    <span className="text-xs text-[var(--ui-text-muted)]">
-                      {formatDate(theme.createdAt)}
-                    </span>
                   </div>
-                  <ColorSwatches globalStyles={theme.globalStyles} />
-                </button>
-                {/* Export */}
-                <button
-                  onClick={() => handleExport(theme)}
-                  className="shrink-0 rounded p-1 text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)] hover:text-[var(--foreground)]"
-                  aria-label={`${theme.name} export`}
-                  title="Export JSON"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                </button>
-                {/* Delete */}
-                <button
-                  onClick={() => onDeleteCustom(theme.id)}
-                  className="shrink-0 rounded p-1 text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)] hover:text-red-500"
-                  aria-label={`${theme.name} delete`}
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-[var(--ui-text-muted)]">{formatDate(theme.createdAt)}</span>
+                    <ColorSwatches globalStyles={theme.globalStyles} />
+                  </div>
+                </div>
+
+                {/* Row 2: Action buttons */}
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={() => handleLoad(theme.id)}
+                    className="flex-1 rounded border border-[var(--ui-border)] px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)]"
+                  >
+                    Load
+                  </button>
+                  <button
+                    onClick={() => handleExport(theme)}
+                    className="flex-1 rounded border border-[var(--ui-border)] px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)]"
+                  >
+                    Export
+                  </button>
+                  <button
+                    onClick={() => handleDelete(theme.id)}
+                    className={`flex-1 rounded border px-2 py-1.5 text-xs ${
+                      confirmDeleteId === theme.id
+                        ? 'border-red-300 bg-red-50 text-red-600'
+                        : 'border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)] hover:text-red-500'
+                    }`}
+                  >
+                    {confirmDeleteId === theme.id ? 'Confirm?' : 'Delete'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -275,12 +314,13 @@ export function ThemeSelector({
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-1 rounded-lg border border-dashed border-[var(--ui-border)] px-3 py-3 text-sm text-[var(--ui-text-muted)] transition-colors hover:border-[var(--ui-border-hover)] hover:bg-[var(--ui-bg-hover)]"
+              className="flex items-center gap-1.5 rounded-lg border border-dashed border-[var(--ui-border)] px-3 py-3 text-sm text-[var(--ui-text-muted)] transition-colors hover:border-[var(--ui-border-hover)] hover:bg-[var(--ui-bg-hover)]"
               title="Import Preset (.json)"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
+              Import
             </button>
             <input
               ref={fileInputRef}

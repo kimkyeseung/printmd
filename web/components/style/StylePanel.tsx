@@ -1,11 +1,12 @@
 'use client';
 
-import { memo, useState, useSyncExternalStore } from 'react';
+import { memo, useState, useCallback, useSyncExternalStore } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ThemeSelector } from './ThemeSelector';
 import { ElementStyleEditor } from './ElementStyleEditor';
 import { FontManager } from './FontManager';
 import { useStyleStore } from '@/stores';
+import { ToastContainer, showToast } from '@/components/ui/Toast';
 
 interface StylePanelProps {
   onClose: () => void;
@@ -30,6 +31,7 @@ function useTemporalCanUndoRedo() {
 
 export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps) {
   const [activeTab, setActiveTab] = useState<Tab>('preset');
+  const [confirmReset, setConfirmReset] = useState(false);
 
   const currentTheme = useStyleStore((state) => state.currentTheme);
   const setTheme = useStyleStore((state) => state.setTheme);
@@ -46,6 +48,17 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
   const undo = () => useStyleStore.temporal.getState().undo();
   const redo = () => useStyleStore.temporal.getState().redo();
 
+  const handleResetClick = useCallback(() => {
+    if (confirmReset) {
+      resetToDefault();
+      setConfirmReset(false);
+      showToast('모든 스타일이 초기화되었습니다.', 'info');
+    } else {
+      setConfirmReset(true);
+      setTimeout(() => setConfirmReset(false), 3000);
+    }
+  }, [confirmReset, resetToDefault]);
+
   const tabs: { key: Tab; label: string }[] = [
     { key: 'preset', label: 'Preset' },
     { key: 'edit', label: 'Edit' },
@@ -54,7 +67,7 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
 
   return (
     <aside
-      className="flex h-full flex-col border-l border-[var(--ui-border)] bg-[var(--background)]"
+      className="relative flex h-full flex-col border-l border-[var(--ui-border)] bg-[var(--background)]"
       aria-labelledby="style-panel-title"
     >
       {/* Header */}
@@ -62,7 +75,7 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
         <h2 id="style-panel-title" className="font-medium">Style Settings</h2>
         <button
           onClick={onClose}
-          className="rounded p-1 hover:bg-[var(--ui-bg-hover)]"
+          className="rounded p-1.5 hover:bg-[var(--ui-bg-hover)]"
           aria-label="Close style panel"
         >
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -77,7 +90,7 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
           <button
             key={key}
             onClick={() => setActiveTab(key)}
-            className={`flex-1 px-3 py-2 text-sm ${
+            className={`flex-1 px-3 py-2.5 text-sm ${
               activeTab === key
                 ? 'border-b-2 border-[var(--printmd-link-color)] font-medium'
                 : 'text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)]'
@@ -118,42 +131,44 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
       </div>
 
       {/* Footer */}
-      <div className="flex gap-2 border-t border-[var(--ui-border)] p-4">
+      <div className="flex gap-2 border-t border-[var(--ui-border)] p-3">
         <button
           onClick={() => undo()}
           disabled={!canUndo}
-          className="rounded border border-[var(--ui-border)] px-2 py-2 text-sm hover:bg-[var(--ui-bg-hover)] disabled:opacity-30"
+          className="flex items-center gap-1.5 rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)] disabled:opacity-30"
           aria-label="Undo"
           title="Undo"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a5 5 0 015 5v2M3 10l4-4M3 10l4 4" />
           </svg>
+          Undo
         </button>
         <button
           onClick={() => redo()}
           disabled={!canRedo}
-          className="rounded border border-[var(--ui-border)] px-2 py-2 text-sm hover:bg-[var(--ui-bg-hover)] disabled:opacity-30"
+          className="flex items-center gap-1.5 rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)] disabled:opacity-30"
           aria-label="Redo"
           title="Redo"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10H11a5 5 0 00-5 5v2m15-7l-4-4m4 4l-4 4" />
           </svg>
+          Redo
         </button>
         <button
-          onClick={resetToDefault}
-          className="flex-1 rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)]"
+          onClick={handleResetClick}
+          className={`flex-1 rounded border px-3 py-2 text-sm ${
+            confirmReset
+              ? 'border-red-300 bg-red-50 text-red-600 hover:bg-red-100'
+              : 'border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)]'
+          }`}
         >
-          Reset All
-        </button>
-        <button
-          onClick={onClose}
-          className="flex-1 rounded bg-[var(--foreground)] px-3 py-2 text-sm text-[var(--background)]"
-        >
-          Done
+          {confirmReset ? 'Reset? Click again' : 'Reset All'}
         </button>
       </div>
+
+      <ToastContainer />
     </aside>
   );
 });

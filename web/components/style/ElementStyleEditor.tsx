@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { ColorPicker } from './ColorPicker';
 import { Slider } from './Slider';
 import { useStyleStore, useEditorStore } from '@/stores';
 import { FONT_OPTIONS_WITH_DEFAULT as FONT_OPTIONS } from '@/lib/fonts/constants';
+import { showToast } from '@/components/ui/Toast';
 import type { EditableElement, ElementStyle } from '@/types/style';
 
 const FONT_WEIGHT_OPTIONS = [
@@ -18,22 +19,22 @@ const FONT_WEIGHT_OPTIONS = [
 ];
 
 const ELEMENTS: { key: EditableElement; label: string }[] = [
-  { key: 'page', label: '페이지' },
-  { key: 'h1', label: '제목 1' },
-  { key: 'h2', label: '제목 2' },
-  { key: 'h3', label: '제목 3' },
-  { key: 'h4', label: '제목 4' },
-  { key: 'h5', label: '제목 5' },
-  { key: 'h6', label: '제목 6' },
-  { key: 'paragraph', label: '텍스트' },
-  { key: 'bulletList', label: '글머리 기호 목록' },
-  { key: 'orderedList', label: '번호 매기기 목록' },
-  { key: 'todoList', label: '할 일 목록' },
-  { key: 'blockquote', label: '인용' },
-  { key: 'hr', label: '구분선' },
-  { key: 'image', label: '이미지' },
-  { key: 'code', label: '코드' },
-  { key: 'table', label: '표' },
+  { key: 'page', label: 'Page' },
+  { key: 'h1', label: 'H1' },
+  { key: 'h2', label: 'H2' },
+  { key: 'h3', label: 'H3' },
+  { key: 'h4', label: 'H4' },
+  { key: 'h5', label: 'H5' },
+  { key: 'h6', label: 'H6' },
+  { key: 'paragraph', label: 'Text' },
+  { key: 'bulletList', label: 'Bullet List' },
+  { key: 'orderedList', label: 'Ordered List' },
+  { key: 'todoList', label: 'Todo List' },
+  { key: 'blockquote', label: 'Quote' },
+  { key: 'hr', label: 'Divider' },
+  { key: 'image', label: 'Image' },
+  { key: 'code', label: 'Code' },
+  { key: 'table', label: 'Table' },
 ];
 
 function detectUsedElements(markdown: string): Set<EditableElement> {
@@ -56,9 +57,78 @@ function detectUsedElements(markdown: string): Set<EditableElement> {
   return used;
 }
 
+/** Collapsible section wrapper */
+function Section({ title, defaultOpen = true, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="flex flex-col gap-2">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 text-xs font-medium text-[var(--ui-text-muted)] uppercase hover:text-[var(--foreground)]"
+      >
+        <svg
+          className={`h-3 w-3 transition-transform ${open ? 'rotate-90' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+        {title}
+      </button>
+      {open && children}
+    </div>
+  );
+}
+
+/** Padding/Margin 4-field grid */
+function SpacingGrid({
+  values,
+  onChange,
+  max = 100,
+  fields: fieldOverride,
+}: {
+  values: { top?: number; bottom?: number; left?: number; right?: number };
+  onChange: (field: string, value: number | undefined) => void;
+  max?: number;
+  fields?: readonly { key: 'top' | 'bottom' | 'left' | 'right'; label: string }[];
+}) {
+  const fields = fieldOverride ?? [
+    { key: 'top', label: 'Top' },
+    { key: 'bottom', label: 'Bottom' },
+    { key: 'left', label: 'Left' },
+    { key: 'right', label: 'Right' },
+  ] as const;
+
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {fields.map(({ key, label }) => (
+        <div key={key} className="flex flex-col gap-1">
+          <label className="text-xs text-[var(--ui-text-muted)]">{label}</label>
+          <div className="flex items-center gap-1">
+            <input
+              type="number"
+              value={values[key] ?? ''}
+              onChange={(e) => onChange(key, e.target.value ? Number(e.target.value) : undefined)}
+              placeholder="auto"
+              className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+              min={0}
+              max={max}
+            />
+            <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function ElementStyleEditor() {
   const [selectedElement, setSelectedElement] = useState<EditableElement>('page');
   const [showAll, setShowAll] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   const content = useEditorStore((state) => state.content);
   const elementStyles = useStyleStore((state) => state.elementStyles);
@@ -74,6 +144,8 @@ export function ElementStyleEditor() {
     ? ELEMENTS
     : ELEMENTS.filter((e) => usedElements.has(e.key));
 
+  const hasHiddenElements = visibleElements.length < ELEMENTS.length;
+
   const currentStyle = elementStyles[selectedElement] || {};
 
   const fontOptions = [
@@ -85,28 +157,45 @@ export function ElementStyleEditor() {
     updateElementStyle(selectedElement, style);
   };
 
+  const handleReset = useCallback(() => {
+    if (confirmReset) {
+      resetElementStyle(selectedElement);
+      setConfirmReset(false);
+      const label = ELEMENTS.find((e) => e.key === selectedElement)?.label;
+      showToast(`${label} style has been reset.`, 'info');
+    } else {
+      setConfirmReset(true);
+      setTimeout(() => setConfirmReset(false), 3000);
+    }
+  }, [confirmReset, resetElementStyle, selectedElement]);
+
+  const isNonTypographyElement = (['hr', 'image'] as EditableElement[]).includes(selectedElement);
+  const isTextElement = (['paragraph', 'bulletList', 'orderedList', 'todoList', 'blockquote'] as EditableElement[]).includes(selectedElement);
+
   return (
     <div className="flex flex-col gap-3">
-      {/* Element list */}
-      <div className="flex flex-col gap-1">
+      {/* Element selector */}
+      <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between border-b border-[var(--ui-border)] pb-2">
-          <label className="text-sm font-medium">요소 선택</label>
-          <label className="flex items-center gap-1 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={showAll}
-              onChange={(e) => setShowAll(e.target.checked)}
-              className="accent-[var(--printmd-link-color)]"
-            />
-            <span className="text-xs text-[var(--ui-text-muted)]">전체 보기</span>
-          </label>
+          <label className="text-sm font-medium">Element</label>
+          {hasHiddenElements && (
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showAll}
+                onChange={(e) => setShowAll(e.target.checked)}
+                className="accent-[var(--printmd-link-color)]"
+              />
+              <span className="text-xs text-[var(--ui-text-muted)]">Show all</span>
+            </label>
+          )}
         </div>
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5">
           {visibleElements.map(({ key, label }) => (
             <button
               key={key}
-              onClick={() => setSelectedElement(key)}
-              className={`rounded px-2 py-1 text-xs ${
+              onClick={() => { setSelectedElement(key); setConfirmReset(false); }}
+              className={`rounded-md px-3 py-1.5 text-sm ${
                 selectedElement === key
                   ? 'bg-[var(--foreground)] text-[var(--background)]'
                   : 'border border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)]'
@@ -118,102 +207,40 @@ export function ElementStyleEditor() {
         </div>
       </div>
 
-      {/* Style form */}
+      {/* Style controls */}
       <div className="flex flex-col gap-3 border-t border-[var(--ui-border)] pt-3">
         <h3 className="text-sm font-medium">
-          {ELEMENTS.find((e) => e.key === selectedElement)?.label} 스타일
+          {ELEMENTS.find((e) => e.key === selectedElement)?.label}
         </h3>
 
         {selectedElement === 'page' ? (
           <>
-            {/* Page-specific controls */}
-            <div className="flex flex-col gap-2">
+            <Section title="Background">
               <ColorPicker
-                label="배경색"
+                label="Background"
                 value={currentStyle.backgroundColor || '#ffffff'}
                 onChange={(backgroundColor) => handleStyleChange({ backgroundColor })}
               />
-            </div>
+            </Section>
 
-            {/* Page padding - uses globalStyles.padding (inline style) */}
-            <div className="flex flex-col gap-2">
-              <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">패딩</h4>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs text-[var(--ui-text-muted)]">상</label>
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      value={globalStyles.padding.top}
-                      onChange={(e) => updateGlobalStyles({ padding: { ...globalStyles.padding, top: Number(e.target.value) || 0 } })}
-                      placeholder="0"
-                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                      min={0}
-                      max={100}
-                    />
-                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs text-[var(--ui-text-muted)]">하</label>
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      value={globalStyles.padding.bottom}
-                      onChange={(e) => updateGlobalStyles({ padding: { ...globalStyles.padding, bottom: Number(e.target.value) || 0 } })}
-                      placeholder="0"
-                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                      min={0}
-                      max={100}
-                    />
-                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs text-[var(--ui-text-muted)]">좌</label>
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      value={globalStyles.padding.left}
-                      onChange={(e) => updateGlobalStyles({ padding: { ...globalStyles.padding, left: Number(e.target.value) || 0 } })}
-                      placeholder="0"
-                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                      min={0}
-                      max={100}
-                    />
-                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs text-[var(--ui-text-muted)]">우</label>
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      value={globalStyles.padding.right}
-                      onChange={(e) => updateGlobalStyles({ padding: { ...globalStyles.padding, right: Number(e.target.value) || 0 } })}
-                      placeholder="0"
-                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                      min={0}
-                      max={100}
-                    />
-                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <Section title="Padding">
+              <SpacingGrid
+                values={globalStyles.padding}
+                onChange={(field, value) =>
+                  updateGlobalStyles({ padding: { ...globalStyles.padding, [field]: value ?? 0 } })
+                }
+              />
+            </Section>
 
-            {/* Page global settings */}
-            <div className="flex flex-col gap-2 border-t border-[var(--ui-border)] pt-3">
-              <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">페이지 전역 설정</h4>
-
+            <Section title="Typography">
               <ColorPicker
-                label="텍스트 색상"
+                label="Text Color"
                 value={globalStyles.textColor}
                 onChange={(textColor) => updateGlobalStyles({ textColor })}
               />
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm text-[var(--ui-text-muted)]">폰트</label>
+                <label className="text-sm text-[var(--ui-text-muted)]">Font</label>
                 <select
                   value={globalStyles.fontFamily}
                   onChange={(e) => updateGlobalStyles({ fontFamily: e.target.value })}
@@ -228,7 +255,7 @@ export function ElementStyleEditor() {
               </div>
 
               <Slider
-                label="폰트 크기"
+                label="Font Size"
                 value={globalStyles.fontSize}
                 onChange={(fontSize) => updateGlobalStyles({ fontSize })}
                 min={12}
@@ -237,7 +264,18 @@ export function ElementStyleEditor() {
               />
 
               <Slider
-                label="최대 너비"
+                label="Line Height"
+                value={globalStyles.lineHeight}
+                onChange={(lineHeight) => updateGlobalStyles({ lineHeight })}
+                min={1.2}
+                max={2.5}
+                step={0.1}
+              />
+            </Section>
+
+            <Section title="Layout">
+              <Slider
+                label="Max Width"
                 value={globalStyles.maxWidth}
                 onChange={(maxWidth) => updateGlobalStyles({ maxWidth })}
                 min={500}
@@ -245,39 +283,34 @@ export function ElementStyleEditor() {
                 step={50}
                 unit="px"
               />
-              <Slider
-                label="줄 높이"
-                value={globalStyles.lineHeight}
-                onChange={(lineHeight) => updateGlobalStyles({ lineHeight })}
-                min={1.2}
-                max={2.5}
-                step={0.1}
-              />
+            </Section>
+
+            <Section title="Colors">
               <ColorPicker
-                label="링크 색상"
+                label="Link"
                 value={globalStyles.linkColor}
                 onChange={(linkColor) => updateGlobalStyles({ linkColor })}
               />
               <ColorPicker
-                label="코드 배경"
+                label="Code BG"
                 value={globalStyles.codeBackground}
                 onChange={(codeBackground) => updateGlobalStyles({ codeBackground })}
               />
-            </div>
+            </Section>
           </>
         ) : (
           <>
-            {/* Typography - hide for hr, image */}
-            {!(['hr', 'image'] as EditableElement[]).includes(selectedElement) && (
-              <div className="flex flex-col gap-2">
+            {/* Typography */}
+            {!isNonTypographyElement && (
+              <Section title="Typography">
                 <ColorPicker
-                  label="색상"
+                  label="Color"
                   value={currentStyle.color || '#000000'}
                   onChange={(color) => handleStyleChange({ color })}
                 />
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm text-[var(--ui-text-muted)]">폰트</label>
+                  <label className="text-sm text-[var(--ui-text-muted)]">Font</label>
                   <select
                     value={currentStyle.fontFamily || ''}
                     onChange={(e) => handleStyleChange({ fontFamily: e.target.value || undefined })}
@@ -292,7 +325,7 @@ export function ElementStyleEditor() {
                 </div>
 
                 <Slider
-                  label="폰트 크기"
+                  label="Font Size"
                   value={currentStyle.fontSize || 16}
                   onChange={(fontSize) => handleStyleChange({ fontSize })}
                   min={8}
@@ -301,7 +334,7 @@ export function ElementStyleEditor() {
                 />
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm text-[var(--ui-text-muted)]">폰트 굵기</label>
+                  <label className="text-sm text-[var(--ui-text-muted)]">Font Weight</label>
                   <select
                     value={currentStyle.fontWeight || ''}
                     onChange={(e) => handleStyleChange({ fontWeight: e.target.value || undefined })}
@@ -314,151 +347,84 @@ export function ElementStyleEditor() {
                     ))}
                   </select>
                 </div>
-              </div>
+              </Section>
             )}
 
-            {/* Background color - hide for image */}
+            {/* Background */}
             {selectedElement !== 'image' && (
-              <ColorPicker
-                label={selectedElement === 'hr' ? '선 색상' : '배경색'}
-                value={currentStyle.backgroundColor || '#ffffff'}
-                onChange={(backgroundColor) => handleStyleChange({ backgroundColor })}
+              <Section title="Background">
+                <ColorPicker
+                  label={selectedElement === 'hr' ? 'Line Color' : 'Background'}
+                  value={currentStyle.backgroundColor || '#ffffff'}
+                  onChange={(backgroundColor) => handleStyleChange({ backgroundColor })}
+                />
+              </Section>
+            )}
+
+            {/* Margin */}
+            <Section title="Margin">
+              <SpacingGrid
+                values={{ top: currentStyle.marginTop, bottom: currentStyle.marginBottom }}
+                fields={[{ key: 'top', label: 'Top' }, { key: 'bottom', label: 'Bottom' }]}
+                onChange={(field, value) => {
+                  if (field === 'top') handleStyleChange({ marginTop: value });
+                  if (field === 'bottom') handleStyleChange({ marginBottom: value });
+                }}
+                max={200}
               />
+            </Section>
+
+            {/* Padding */}
+            {!isNonTypographyElement && (
+              <Section title="Padding">
+                <SpacingGrid
+                  values={{
+                    top: currentStyle.paddingTop,
+                    bottom: currentStyle.paddingBottom,
+                    left: currentStyle.paddingLeft,
+                    right: currentStyle.paddingRight,
+                  }}
+                  onChange={(field, value) => {
+                    const map: Record<string, string> = { top: 'paddingTop', bottom: 'paddingBottom', left: 'paddingLeft', right: 'paddingRight' };
+                    handleStyleChange({ [map[field]]: value });
+                  }}
+                />
+              </Section>
             )}
 
-            {/* Margin - all non-page elements */}
-            <div className="flex flex-col gap-2">
-              <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">여백</h4>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs text-[var(--ui-text-muted)]">상단 여백</label>
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      value={currentStyle.marginTop ?? ''}
-                      onChange={(e) => handleStyleChange({ marginTop: e.target.value ? Number(e.target.value) : undefined })}
-                      placeholder="auto"
-                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                      min={0}
-                      max={200}
-                    />
-                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs text-[var(--ui-text-muted)]">하단 여백</label>
-                  <div className="flex items-center gap-1">
-                    <input
-                      type="number"
-                      value={currentStyle.marginBottom ?? ''}
-                      onChange={(e) => handleStyleChange({ marginBottom: e.target.value ? Number(e.target.value) : undefined })}
-                      placeholder="auto"
-                      className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                      min={0}
-                      max={200}
-                    />
-                    <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Padding - hide for hr, image */}
-            {!(['hr', 'image'] as EditableElement[]).includes(selectedElement) && (
-              <div className="flex flex-col gap-2">
-                <h4 className="text-xs font-medium text-[var(--ui-text-muted)] uppercase">패딩</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs text-[var(--ui-text-muted)]">상</label>
-                    <div className="flex items-center gap-1">
-                      <input
-                        type="number"
-                        value={currentStyle.paddingTop ?? ''}
-                        onChange={(e) => handleStyleChange({ paddingTop: e.target.value ? Number(e.target.value) : undefined })}
-                        placeholder="auto"
-                        className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                        min={0}
-                        max={100}
-                      />
-                      <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs text-[var(--ui-text-muted)]">하</label>
-                    <div className="flex items-center gap-1">
-                      <input
-                        type="number"
-                        value={currentStyle.paddingBottom ?? ''}
-                        onChange={(e) => handleStyleChange({ paddingBottom: e.target.value ? Number(e.target.value) : undefined })}
-                        placeholder="auto"
-                        className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                        min={0}
-                        max={100}
-                      />
-                      <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs text-[var(--ui-text-muted)]">좌</label>
-                    <div className="flex items-center gap-1">
-                      <input
-                        type="number"
-                        value={currentStyle.paddingLeft ?? ''}
-                        onChange={(e) => handleStyleChange({ paddingLeft: e.target.value ? Number(e.target.value) : undefined })}
-                        placeholder="auto"
-                        className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                        min={0}
-                        max={100}
-                      />
-                      <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs text-[var(--ui-text-muted)]">우</label>
-                    <div className="flex items-center gap-1">
-                      <input
-                        type="number"
-                        value={currentStyle.paddingRight ?? ''}
-                        onChange={(e) => handleStyleChange({ paddingRight: e.target.value ? Number(e.target.value) : undefined })}
-                        placeholder="auto"
-                        className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
-                        min={0}
-                        max={100}
-                      />
-                      <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Text indent - only for text-based elements */}
-            {(['paragraph', 'bulletList', 'orderedList', 'todoList', 'blockquote'] as EditableElement[]).includes(selectedElement) && (
-              <div className="flex flex-col gap-1">
-                <label className="text-sm text-[var(--ui-text-muted)]">들여쓰기</label>
+            {/* Text indent */}
+            {isTextElement && (
+              <Section title="Indent" defaultOpen={false}>
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
                     value={currentStyle.textIndent ?? ''}
                     onChange={(e) => handleStyleChange({ textIndent: e.target.value ? Number(e.target.value) : undefined })}
                     placeholder="0"
-                    className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-sm"
+                    className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
                     min={0}
                     max={100}
                   />
                   <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
                 </div>
-              </div>
+              </Section>
             )}
           </>
         )}
 
         {/* Reset button */}
         <button
-          onClick={() => resetElementStyle(selectedElement)}
-          className="mt-2 rounded border border-[var(--ui-border)] px-3 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)]"
+          onClick={handleReset}
+          className={`mt-2 rounded border px-3 py-2 text-sm ${
+            confirmReset
+              ? 'border-red-300 bg-red-50 text-red-600 hover:bg-red-100'
+              : 'border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)]'
+          }`}
         >
-          {ELEMENTS.find((e) => e.key === selectedElement)?.label} 스타일 초기화
+          {confirmReset
+            ? `Reset ${ELEMENTS.find((e) => e.key === selectedElement)?.label}? Click again`
+            : `Reset ${ELEMENTS.find((e) => e.key === selectedElement)?.label}`
+          }
         </button>
       </div>
     </div>
