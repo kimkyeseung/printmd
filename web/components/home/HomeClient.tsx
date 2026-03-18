@@ -54,7 +54,7 @@ function StylePanelResizer({
   }, []);
 
   return (
-    <div className="flex h-full flex-shrink-0" style={{ width }}>
+    <div className="flex h-full shrink-0" style={{ width }}>
       {/* Drag handle */}
       <div
         className="relative h-full w-1 cursor-col-resize bg-[var(--ui-border)] hover:bg-[var(--printmd-link-color)] active:bg-[var(--printmd-link-color)]"
@@ -245,7 +245,7 @@ export default function HomeClient() {
 
       <ExtensionBanner />
 
-      <div className="hidden md:block border-b border-[var(--ui-border)] h-[90px] flex-shrink-0 overflow-hidden">
+      <div className="hidden md:block border-b border-[var(--ui-border)] h-[90px] shrink-0 overflow-hidden">
         <AdKakaoBanner className="h-[90px] max-w-[728px] mx-auto flex items-center justify-center" />
       </div>
 
@@ -253,7 +253,7 @@ export default function HomeClient() {
         <main id="main-content" className="flex-1 overflow-hidden" role="main">
           {renderedContent}
         </main>
-        <aside className="hidden xl:flex flex-col w-[160px] flex-shrink-0 border-l border-[var(--ui-border)]">
+        <aside className="hidden xl:flex flex-col w-[160px] shrink-0 border-l border-[var(--ui-border)]">
           <AdKakaoSidebar className="sticky top-0 w-[160px] h-[600px]" />
         </aside>
       </div>
