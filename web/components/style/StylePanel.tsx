@@ -5,6 +5,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { ThemeSelector } from './ThemeSelector';
 import { ElementStyleEditor } from './ElementStyleEditor';
 import { FontManager } from './FontManager';
+import { ColorPresetEditor } from './ColorPresetEditor';
 import { useStyleStore } from '@/stores';
 import { ToastContainer, showToast } from '@/components/ui/Toast';
 
@@ -12,7 +13,7 @@ interface StylePanelProps {
   onClose: () => void;
 }
 
-type Tab = 'preset' | 'edit' | 'font';
+type Tab = 'preset' | 'edit' | 'color' | 'font';
 
 function useTemporalCanUndoRedo() {
   const temporal = useStyleStore.temporal;
@@ -62,6 +63,7 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
   const tabs: { key: Tab; label: string }[] = [
     { key: 'preset', label: 'Preset' },
     { key: 'edit', label: 'Edit' },
+    { key: 'color', label: 'Color' },
     { key: 'font', label: 'Font' },
   ];
 
@@ -123,6 +125,10 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
 
         {activeTab === 'edit' && (
           <ElementStyleEditor />
+        )}
+
+        {activeTab === 'color' && (
+          <ColorPresetEditor />
         )}
 
         {activeTab === 'font' && (

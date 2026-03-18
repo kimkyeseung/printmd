@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { temporal } from 'zundo';
-import type { StyleStore, ThemePreset, GlobalStyles, ListStyles, HeadingStyles, CustomTheme, EditableElement, ElementStyle, ElementStyles, CustomFont } from '@/types/style';
+import type { StyleStore, ThemePreset, GlobalStyles, ListStyles, HeadingStyles, CustomTheme, EditableElement, ElementStyle, ElementStyles, CustomFont, ColorPreset } from '@/types/style';
 import { themePresets, defaultStyles } from '@/lib/themes/presets';
 
 const defaultGlobalStyles = defaultStyles;
@@ -14,6 +14,7 @@ const initialState = {
   customThemes: [] as CustomTheme[],
   elementStyles: {} as ElementStyles,
   customFonts: [] as CustomFont[],
+  colorPresets: [] as ColorPreset[],
 };
 
 export const useStyleStore = create<StyleStore>()(
@@ -115,6 +116,23 @@ export const useStyleStore = create<StyleStore>()(
             customFonts: state.customFonts.filter((f) => f.name !== name),
           })),
 
+        addColorPreset: (preset: ColorPreset) =>
+          set((state) => ({
+            colorPresets: [...state.colorPresets, preset],
+          })),
+
+        removeColorPreset: (name: string) =>
+          set((state) => ({
+            colorPresets: state.colorPresets.filter((p) => p.name !== name),
+          })),
+
+        updateColorPreset: (name: string, update: Partial<ColorPreset>) =>
+          set((state) => ({
+            colorPresets: state.colorPresets.map((p) =>
+              p.name === name ? { ...p, ...update } : p
+            ),
+          })),
+
         resetToDefault: () =>
           set({
             currentTheme: 'default',
@@ -143,6 +161,7 @@ export const useStyleStore = create<StyleStore>()(
         customThemes: state.customThemes,
         elementStyles: state.elementStyles,
         customFonts: state.customFonts,
+        colorPresets: state.colorPresets,
       }),
     }
   )

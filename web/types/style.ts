@@ -32,6 +32,11 @@ export interface CustomFont {
   url: string;
 }
 
+export interface ColorPreset {
+  name: string;
+  color: string;
+}
+
 export interface GlobalStyles {
   fontSize: number;
   fontFamily: string;
@@ -98,6 +103,7 @@ export interface StyleState {
   customThemes: CustomTheme[];
   elementStyles: ElementStyles;
   customFonts: CustomFont[];
+  colorPresets: ColorPreset[];
 }
 
 export interface StyleActions {
@@ -115,6 +121,9 @@ export interface StyleActions {
   resetElementStyle: (element: EditableElement) => void;
   addCustomFont: (font: CustomFont) => void;
   removeCustomFont: (name: string) => void;
+  addColorPreset: (preset: ColorPreset) => void;
+  removeColorPreset: (name: string) => void;
+  updateColorPreset: (name: string, preset: Partial<ColorPreset>) => void;
 }
 
 export type StyleStore = StyleState & StyleActions;
