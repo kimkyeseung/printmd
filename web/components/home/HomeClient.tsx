@@ -228,7 +228,10 @@ export default function HomeClient() {
 
       <Header
         viewMode={viewMode}
-        onViewModeChange={setViewMode}
+        onViewModeChange={(mode) => {
+          if (mode !== 'preview' && isStylePanelOpen) closeStylePanel();
+          setViewMode(mode);
+        }}
         onStylePanelToggle={toggleStylePanel}
         onPrintClick={handlePrint}
         onSaveClick={handleSaveClick}
