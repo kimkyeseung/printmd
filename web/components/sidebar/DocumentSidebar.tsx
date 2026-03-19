@@ -76,8 +76,7 @@ export function DocumentSidebar() {
   const setCurrentDocumentId = useEditorStore((s) => s.setCurrentDocumentId);
 
   const [selectedFolderId, setSelectedFolderId] = useState('root');
-  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
-  const [newFolderName, setNewFolderName] = useState('');
+  const [isCreatingRootFolder, setIsCreatingRootFolder] = useState(false);
 
   const handleDocumentSelect = useCallback(
     (doc: Document) => {
@@ -93,17 +92,20 @@ export function DocumentSidebar() {
     [setContent, setCurrentDocumentId],
   );
 
-  const handleCreateFolder = useCallback(() => {
-    if (newFolderName.trim()) {
-      const parentId = selectedFolderId === 'root' ? null : selectedFolderId;
-      createFolder(newFolderName.trim(), parentId);
-      setNewFolderName('');
-      setIsCreatingFolder(false);
-    }
-  }, [newFolderName, selectedFolderId, createFolder]);
+  const handleCreateFolder = useCallback(
+    (name: string, parentId: string | null) => {
+      createFolder(name, parentId);
+      toast.success('폴더가 생성되었습니다');
+    },
+    [createFolder],
+  );
 
   const deleteDocument = useDocumentsStore((s) => s.deleteDocument);
   const deleteFolder = useDocumentsStore((s) => s.deleteFolder);
+  const renameDocument = useDocumentsStore((s) => s.renameDocument);
+  const renameFolder = useDocumentsStore((s) => s.renameFolder);
+  const moveDocument = useDocumentsStore((s) => s.moveDocument);
+  const moveFolder = useDocumentsStore((s) => s.moveFolder);
 
   const handleDeleteDocument = useCallback(
     (id: string) => {
@@ -132,6 +134,44 @@ export function DocumentSidebar() {
       }
     },
     [folders, deleteFolder],
+  );
+
+  const handleRenameDocument = useCallback(
+    (id: string, newName: string) => {
+      renameDocument(id, newName);
+      toast.success('문서 이름이 변경되었습니다');
+    },
+    [renameDocument],
+  );
+
+  const handleRenameFolder = useCallback(
+    (id: string, newName: string) => {
+      renameFolder(id, newName);
+      toast.success('폴더 이름이 변경되었습니다');
+    },
+    [renameFolder],
+  );
+
+  const handleMoveDocument = useCallback(
+    (id: string, newFolderId: string) => {
+      const doc = documents.find((d) => d.id === id);
+      if (!doc || doc.folderId === newFolderId) return;
+      moveDocument(id, newFolderId);
+      toast.success('문서를 이동했습니다');
+    },
+    [documents, moveDocument],
+  );
+
+  const handleMoveFolder = useCallback(
+    (id: string, newParentId: string | null) => {
+      const success = moveFolder(id, newParentId);
+      if (!success) {
+        toast.error('해당 위치로 이동할 수 없습니다');
+      } else {
+        toast.success('폴더를 이동했습니다');
+      }
+    },
+    [moveFolder],
   );
 
   const isEmpty = documents.length === 0 && folders.length === 0;
@@ -178,7 +218,7 @@ export function DocumentSidebar() {
           }
           actions={
             <button
-              onClick={() => setIsCreatingFolder(true)}
+              onClick={() => setIsCreatingRootFolder(true)}
               className="rounded p-0.5 hover:bg-[var(--ui-bg-hover)] text-[var(--ui-text-muted)] hover:text-[var(--foreground)]"
               title="New Folder"
             >
@@ -188,30 +228,34 @@ export function DocumentSidebar() {
             </button>
           }
         >
-          {/* New folder input */}
-          {isCreatingFolder && (
-            <div className="flex gap-1 px-3 py-1.5">
+          {/* Root-level new folder input */}
+          {isCreatingRootFolder && (
+            <div className="flex items-center gap-1 px-3 py-1.5">
+              <svg className="w-4 h-4 text-yellow-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+              </svg>
               <input
                 autoFocus
-                value={newFolderName}
-                onChange={(e) => setNewFolderName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleCreateFolder();
-                  if (e.key === 'Escape') {
-                    setIsCreatingFolder(false);
-                    setNewFolderName('');
-                  }
-                }}
                 placeholder="Folder name"
-                className="flex-1 min-w-0 rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-xs"
+                className="flex-1 min-w-0 rounded border border-[var(--ui-border)] bg-transparent px-1 py-0 text-xs"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const value = (e.target as HTMLInputElement).value.trim();
+                    if (value) {
+                      handleCreateFolder(value, null);
+                      setIsCreatingRootFolder(false);
+                    }
+                  }
+                  if (e.key === 'Escape') setIsCreatingRootFolder(false);
+                }}
+                onBlur={(e) => {
+                  const value = e.target.value.trim();
+                  if (value) {
+                    handleCreateFolder(value, null);
+                  }
+                  setIsCreatingRootFolder(false);
+                }}
               />
-              <button
-                onClick={handleCreateFolder}
-                disabled={!newFolderName.trim()}
-                className="shrink-0 rounded bg-[var(--foreground)] px-2 py-1 text-xs text-[var(--background)] disabled:opacity-30"
-              >
-                OK
-              </button>
             </div>
           )}
 
@@ -229,6 +273,11 @@ export function DocumentSidebar() {
               currentDocumentId={currentDocumentId}
               onDeleteDocument={handleDeleteDocument}
               onDeleteFolder={handleDeleteFolder}
+              onRenameDocument={handleRenameDocument}
+              onRenameFolder={handleRenameFolder}
+              onMoveDocument={handleMoveDocument}
+              onMoveFolder={handleMoveFolder}
+              onCreateFolder={handleCreateFolder}
               showDocuments
             />
           )}

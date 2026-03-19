@@ -25,8 +25,12 @@ interface DocumentsActions {
   saveDocument: (name: string, content: string, folderId: string) => string;
   updateDocument: (id: string, content: string) => void;
   deleteDocument: (id: string) => void;
+  renameDocument: (id: string, newName: string) => void;
+  moveDocument: (id: string, newFolderId: string) => void;
   createFolder: (name: string, parentId: string | null) => string;
   deleteFolder: (id: string) => boolean; // returns false if has documents
+  renameFolder: (id: string, newName: string) => void;
+  moveFolder: (id: string, newParentId: string | null) => boolean; // returns false on circular ref
   getDocumentsInFolder: (folderId: string) => Document[];
   getFoldersInFolder: (parentId: string | null) => Folder[];
   getDocument: (id: string) => Document | undefined;
@@ -75,6 +79,22 @@ export const useDocumentsStore = create<DocumentsStore>()(
         }));
       },
 
+      renameDocument: (id: string, newName: string) => {
+        set((state) => ({
+          documents: state.documents.map((doc) =>
+            doc.id === id ? { ...doc, name: newName, updatedAt: Date.now() } : doc
+          ),
+        }));
+      },
+
+      moveDocument: (id: string, newFolderId: string) => {
+        set((state) => ({
+          documents: state.documents.map((doc) =>
+            doc.id === id ? { ...doc, folderId: newFolderId, updatedAt: Date.now() } : doc
+          ),
+        }));
+      },
+
       createFolder: (name: string, parentId: string | null) => {
         const id = generateId();
         const newFolder: Folder = { id, name, parentId };
@@ -97,6 +117,35 @@ export const useDocumentsStore = create<DocumentsStore>()(
 
         set((state) => ({
           folders: state.folders.filter((folder) => folder.id !== id),
+        }));
+        return true;
+      },
+
+      renameFolder: (id: string, newName: string) => {
+        set((state) => ({
+          folders: state.folders.map((folder) =>
+            folder.id === id ? { ...folder, name: newName } : folder
+          ),
+        }));
+      },
+
+      moveFolder: (id: string, newParentId: string | null) => {
+        const state = get();
+        // Cannot move into itself
+        if (id === newParentId) return false;
+
+        // Check for circular reference: walk up from newParentId
+        let current = newParentId;
+        while (current !== null) {
+          if (current === id) return false; // circular!
+          const parent = state.folders.find((f) => f.id === current);
+          current = parent?.parentId ?? null;
+        }
+
+        set((state) => ({
+          folders: state.folders.map((folder) =>
+            folder.id === id ? { ...folder, parentId: newParentId } : folder
+          ),
         }));
         return true;
       },
