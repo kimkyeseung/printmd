@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useEffect, useRef, useCallback, useImperativeHandle, forwardRef } from 'react';
-import { EditorState } from '@codemirror/state';
+import { EditorState, type Transaction } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, highlightActiveLine } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { markdown } from '@codemirror/lang-markdown';
@@ -34,6 +34,36 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
       }
     });
 
+    // Auto-convert `[ ] ` or `[x] ` at line start to `- [ ] ` or `- [x] `
+    const checkboxTransactionFilter = EditorState.transactionFilter.of((tr: Transaction) => {
+      if (!tr.docChanged) return tr;
+      const changes: { from: number; to: number; insert: string }[] = [];
+      tr.changes.iterChanges((fromA, toA, _fromB, _toB, inserted) => {
+        const insertedText = inserted.toString();
+        // Only trigger on single-char inserts (typing space after `[ ]` or `[x]`)
+        if (insertedText !== ' ') return;
+        const doc = tr.newDoc;
+        const pos = fromA + 1; // position after inserted space
+        const lineObj = doc.lineAt(pos);
+        const lineText = lineObj.text;
+        // Check if line now starts with `[ ] ` or `[x] ` (without `- ` prefix)
+        const match = lineText.match(/^(\s*)\[( |x|X)\] $/);
+        if (match && !lineText.match(/^(\s*)- \[/)) {
+          const indent = match[1];
+          const check = match[2];
+          changes.push({
+            from: lineObj.from,
+            to: lineObj.from + lineText.length,
+            insert: `${indent}- [${check}] `,
+          });
+        }
+      });
+      if (changes.length > 0) {
+        return [tr, { changes, sequential: true }];
+      }
+      return tr;
+    });
+
     const state = EditorState.create({
       doc: value,
       extensions: [
@@ -53,6 +83,7 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
           indentWithTab,
         ]),
         updateListener,
+        checkboxTransactionFilter,
         EditorView.lineWrapping,
         EditorView.theme({
           '&': {

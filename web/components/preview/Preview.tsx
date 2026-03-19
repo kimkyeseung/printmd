@@ -1,10 +1,10 @@
 'use client';
 
-import { memo, useMemo, useDeferredValue } from 'react';
+import { memo, useMemo, useDeferredValue, useRef, useEffect, useCallback } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { generateElementStylesCss, ELEMENT_SELECTORS } from '@/lib/themes';
-import { useStyleStore, useUIStore } from '@/stores';
+import { useStyleStore, useUIStore, useEditorStore } from '@/stores';
 import type { GlobalStyles, EditableElement } from '@/types/style';
 
 /** Default spacing values (px) matching preview.css at 16px base */
@@ -20,6 +20,7 @@ const HIGHLIGHT_DEFAULTS: Record<EditableElement, Record<string, number>> = {
   bulletList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 0 },
   orderedList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 0 },
   todoList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  todoChecked: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
   blockquote: { marginTop: 0, marginBottom: 16, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
   hr: { marginTop: 24, marginBottom: 24, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
   image: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
@@ -89,6 +90,8 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
   const deferredMarkdown = useDeferredValue(markdown);
   const elementStyles = useStyleStore((state) => state.elementStyles);
   const spacingHighlight = useUIStore((state) => state.spacingHighlight);
+  const setContent = useEditorStore((state) => state.setContent);
+  const articleRef = useRef<HTMLElement>(null);
 
   const elementStylesCss = useMemo(
     () => generateElementStylesCss(elementStyles),
@@ -104,6 +107,47 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
     const parsed = parseMarkdown(deferredMarkdown);
     return sanitizeHtml(parsed);
   }, [deferredMarkdown]);
+
+  // Update article innerHTML when html changes
+  useEffect(() => {
+    if (articleRef.current) {
+      articleRef.current.innerHTML = html;
+    }
+  }, [html]);
+
+  // Handle checkbox click toggle
+  const handleCheckboxClick = useCallback((e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName !== 'INPUT' || target.getAttribute('type') !== 'checkbox') return;
+
+    e.preventDefault();
+    const lineStr = target.getAttribute('data-line');
+    if (lineStr === null) return;
+    const lineNum = parseInt(lineStr, 10);
+    if (isNaN(lineNum)) return;
+
+    const content = useEditorStore.getState().content;
+    const lines = content.split('\n');
+    if (lineNum < 0 || lineNum >= lines.length) return;
+
+    const line = lines[lineNum];
+    if (/- \[ \]/.test(line)) {
+      lines[lineNum] = line.replace('- [ ]', '- [x]');
+    } else if (/- \[x\]/i.test(line)) {
+      lines[lineNum] = line.replace(/- \[x\]/i, '- [ ]');
+    } else {
+      return;
+    }
+
+    setContent(lines.join('\n'));
+  }, [setContent]);
+
+  useEffect(() => {
+    const article = articleRef.current;
+    if (!article) return;
+    article.addEventListener('click', handleCheckboxClick);
+    return () => article.removeEventListener('click', handleCheckboxClick);
+  }, [handleCheckboxClick]);
 
   const cssVariables = useMemo(() => ({
     '--preview-font-size': `${styles.fontSize}px`,
@@ -135,6 +179,7 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
         <style dangerouslySetInnerHTML={{ __html: highlightCss }} />
       )}
       <article
+        ref={articleRef}
         className="preview-content"
         style={{
           maxWidth: styles.maxWidth,
@@ -145,7 +190,6 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
           lineHeight: styles.lineHeight,
           color: styles.textColor,
         }}
-        dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
   );

@@ -38,6 +38,7 @@ const SPACING_DEFAULTS: Record<EditableElement, {
   bulletList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 0 },
   orderedList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 0 },
   todoList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  todoChecked: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
   blockquote: { marginTop: 0, marginBottom: 16, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
   hr: { marginTop: 24, marginBottom: 24, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
   image: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
@@ -57,6 +58,7 @@ const ELEMENTS: { key: EditableElement; label: string }[] = [
   { key: 'bulletList', label: 'Bullet List' },
   { key: 'orderedList', label: 'Ordered List' },
   { key: 'todoList', label: 'Todo List' },
+  { key: 'todoChecked', label: 'Todo (checked)' },
   { key: 'blockquote', label: 'Quote' },
   { key: 'hr', label: 'Divider' },
   { key: 'image', label: 'Image' },
@@ -76,6 +78,7 @@ function detectUsedElements(markdown: string): Set<EditableElement> {
   if (/^[\-\*] /m.test(markdown)) used.add('bulletList');
   if (/^\d+\. /m.test(markdown)) used.add('orderedList');
   if (/^- \[[ x]\]/m.test(markdown)) used.add('todoList');
+  if (/^- \[x\]/mi.test(markdown)) used.add('todoChecked');
   if (/^>/m.test(markdown)) used.add('blockquote');
   if (/^---/m.test(markdown) || /^\*\*\*/m.test(markdown)) used.add('hr');
   if (/!\[.*\]\(.*\)/m.test(markdown)) used.add('image');
@@ -206,7 +209,7 @@ export function ElementStyleEditor() {
   }, [confirmReset, resetElementStyle, selectedElement]);
 
   const isNonTypographyElement = (['hr', 'image'] as EditableElement[]).includes(selectedElement);
-  const isTextElement = (['paragraph', 'bulletList', 'orderedList', 'todoList', 'blockquote'] as EditableElement[]).includes(selectedElement);
+  const isTextElement = (['paragraph', 'bulletList', 'orderedList', 'todoList', 'todoChecked', 'blockquote'] as EditableElement[]).includes(selectedElement);
 
   return (
     <div className="flex flex-col gap-3">

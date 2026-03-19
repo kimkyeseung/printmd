@@ -73,6 +73,86 @@ function cjkEmphasisPlugin(mdi: MarkdownIt) {
 
 md.use(cjkEmphasisPlugin);
 
+// Task list plugin: converts `- [ ]` / `- [x]` into checkboxes
+function taskListPlugin(mdi: MarkdownIt) {
+  mdi.core.ruler.after('inline', 'task-list', (state) => {
+    const tokens = state.tokens;
+
+    for (let i = 0; i < tokens.length; i++) {
+      // Look for bullet_list_open
+      if (tokens[i].type !== 'bullet_list_open') continue;
+
+      let isTaskList = false;
+      let j = i + 1;
+
+      // Scan items inside this list to check if any are task items
+      while (j < tokens.length && tokens[j].type !== 'bullet_list_close') {
+        if (tokens[j].type === 'inline' && tokens[j].content) {
+          const match = tokens[j].content.match(/^\[([ xX])\]\s/);
+          if (match) {
+            isTaskList = true;
+            break;
+          }
+        }
+        j++;
+      }
+
+      if (!isTaskList) continue;
+
+      // Mark the list as a task list
+      tokens[i].attrJoin('class', 'task-list');
+
+      // Process each item
+      j = i + 1;
+      while (j < tokens.length && tokens[j].type !== 'bullet_list_close') {
+        if (tokens[j].type === 'list_item_open') {
+          const listItemOpen = tokens[j];
+          // Find the inline content of this list item
+          let k = j + 1;
+          while (k < tokens.length && tokens[k].type !== 'list_item_close') {
+            if (tokens[k].type === 'inline' && tokens[k].content) {
+              const match = tokens[k].content.match(/^\[([ xX])\]\s/);
+              if (match) {
+                const checked = match[1] !== ' ';
+                const tokenMap = tokens[k].map;
+                const sourceLine = tokenMap ? tokenMap[0] : -1;
+
+                listItemOpen.attrJoin('class', 'task-list-item');
+                if (checked) {
+                  listItemOpen.attrJoin('class', 'task-list-item-checked');
+                }
+
+                // Replace the inline content: strip `[ ] ` prefix and prepend checkbox html
+                const checkboxHtml =
+                  `<input type="checkbox"${checked ? ' checked' : ''} disabled data-line="${sourceLine}"> `;
+                tokens[k].content = tokens[k].content.slice(match[0].length);
+                tokens[k].children = tokens[k].children || [];
+
+                // Prepend checkbox as html_inline token
+                const checkboxToken = new state.Token('html_inline', '', 0);
+                checkboxToken.content = checkboxHtml;
+
+                // Remove the text token that contains `[ ] ` or `[x] `
+                const children = tokens[k].children;
+                if (children && children.length > 0 && children[0].type === 'text') {
+                  children[0].content = children[0].content.slice(match[0].length);
+                }
+                if (children) {
+                  children.unshift(checkboxToken);
+                }
+              }
+            }
+            k++;
+          }
+        }
+        j++;
+      }
+    }
+  });
+}
+
+md.use(taskListPlugin);
+
 // Add target="_blank" to external links
 const defaultRender =
   md.renderer.rules.link_open ||

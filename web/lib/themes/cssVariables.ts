@@ -107,6 +107,7 @@ export const ELEMENT_SELECTORS: Record<EditableElement, string> = {
   bulletList: '.preview-content ul',
   orderedList: '.preview-content ol',
   todoList: '.preview-content .task-list',
+  todoChecked: '.preview-content .task-list-item-checked',
   blockquote: '.preview-content blockquote',
   hr: '.preview-content hr',
   image: '.preview-content img',
