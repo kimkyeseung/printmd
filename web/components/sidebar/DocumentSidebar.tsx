@@ -102,6 +102,38 @@ export function DocumentSidebar() {
     }
   }, [newFolderName, selectedFolderId, createFolder]);
 
+  const deleteDocument = useDocumentsStore((s) => s.deleteDocument);
+  const deleteFolder = useDocumentsStore((s) => s.deleteFolder);
+
+  const handleDeleteDocument = useCallback(
+    (id: string) => {
+      const doc = documents.find((d) => d.id === id);
+      if (!doc) return;
+      if (!window.confirm(`"${doc.name}" 문서를 삭제하시겠습니까?`)) return;
+      deleteDocument(id);
+      if (currentDocumentId === id) {
+        setCurrentDocumentId(null);
+      }
+      toast.success('문서가 삭제되었습니다');
+    },
+    [documents, deleteDocument, currentDocumentId, setCurrentDocumentId],
+  );
+
+  const handleDeleteFolder = useCallback(
+    (id: string) => {
+      const folder = folders.find((f) => f.id === id);
+      if (!folder) return;
+      if (!window.confirm(`"${folder.name}" 폴더를 삭제하시겠습니까?`)) return;
+      const success = deleteFolder(id);
+      if (!success) {
+        toast.error('폴더 안에 문서나 하위 폴더가 있어 삭제할 수 없습니다');
+      } else {
+        toast.success('폴더가 삭제되었습니다');
+      }
+    },
+    [folders, deleteFolder],
+  );
+
   const isEmpty = documents.length === 0 && folders.length === 0;
 
   // Collapsed: protruding hamburger tab
@@ -195,6 +227,8 @@ export function DocumentSidebar() {
               onFolderSelect={setSelectedFolderId}
               onDocumentSelect={handleDocumentSelect}
               currentDocumentId={currentDocumentId}
+              onDeleteDocument={handleDeleteDocument}
+              onDeleteFolder={handleDeleteFolder}
               showDocuments
             />
           )}
