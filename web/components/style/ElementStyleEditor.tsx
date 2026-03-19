@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { ColorPicker } from './ColorPicker';
 import { Slider } from './Slider';
-import { useStyleStore, useEditorStore } from '@/stores';
+import { useStyleStore, useEditorStore, useUIStore } from '@/stores';
 import { FONT_OPTIONS_WITH_DEFAULT as FONT_OPTIONS } from '@/lib/fonts/constants';
 import { showToast } from '@/components/ui/Toast';
 import type { EditableElement, ElementStyle } from '@/types/style';
@@ -89,11 +89,15 @@ function SpacingGrid({
   onChange,
   max = 100,
   fields: fieldOverride,
+  onFieldFocus,
+  onFieldBlur,
 }: {
   values: { top?: number; bottom?: number; left?: number; right?: number };
   onChange: (field: string, value: number | undefined) => void;
   max?: number;
   fields?: readonly { key: 'top' | 'bottom' | 'left' | 'right'; label: string }[];
+  onFieldFocus?: (field: string) => void;
+  onFieldBlur?: () => void;
 }) {
   const fields = fieldOverride ?? [
     { key: 'top', label: 'Top' },
@@ -112,6 +116,8 @@ function SpacingGrid({
               type="number"
               value={values[key] ?? ''}
               onChange={(e) => onChange(key, e.target.value ? Number(e.target.value) : undefined)}
+              onFocus={() => onFieldFocus?.(key)}
+              onBlur={() => onFieldBlur?.()}
               placeholder="auto"
               className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
               min={0}
@@ -137,6 +143,7 @@ export function ElementStyleEditor() {
   const updateElementStyle = useStyleStore((state) => state.updateElementStyle);
   const resetElementStyle = useStyleStore((state) => state.resetElementStyle);
   const updateGlobalStyles = useStyleStore((state) => state.updateGlobalStyles);
+  const setSpacingHighlight = useUIStore((state) => state.setSpacingHighlight);
 
   const usedElements = useMemo(() => detectUsedElements(content), [content]);
 
@@ -229,6 +236,8 @@ export function ElementStyleEditor() {
                 onChange={(field, value) =>
                   updateGlobalStyles({ padding: { ...globalStyles.padding, [field]: value ?? 0 } })
                 }
+                onFieldFocus={(field) => setSpacingHighlight({ element: 'page', type: 'padding', side: field as 'top' | 'bottom' | 'left' | 'right' })}
+                onFieldBlur={() => setSpacingHighlight(null)}
               />
             </Section>
 
@@ -371,6 +380,8 @@ export function ElementStyleEditor() {
                   if (field === 'bottom') handleStyleChange({ marginBottom: value });
                 }}
                 max={200}
+                onFieldFocus={(field) => setSpacingHighlight({ element: selectedElement, type: 'margin', side: field as 'top' | 'bottom' })}
+                onFieldBlur={() => setSpacingHighlight(null)}
               />
             </Section>
 
@@ -388,6 +399,8 @@ export function ElementStyleEditor() {
                     const map: Record<string, string> = { top: 'paddingTop', bottom: 'paddingBottom', left: 'paddingLeft', right: 'paddingRight' };
                     handleStyleChange({ [map[field]]: value });
                   }}
+                  onFieldFocus={(field) => setSpacingHighlight({ element: selectedElement, type: 'padding', side: field as 'top' | 'bottom' | 'left' | 'right' })}
+                  onFieldBlur={() => setSpacingHighlight(null)}
                 />
               </Section>
             )}

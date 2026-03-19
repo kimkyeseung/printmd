@@ -1,1 +1,1 @@
-export { generateCssVariables, generateListStylesCss, generateHeadingStylesCss, generateElementStylesCss } from './cssVariables';
+export { generateCssVariables, generateListStylesCss, generateHeadingStylesCss, generateElementStylesCss, ELEMENT_SELECTORS } from './cssVariables';

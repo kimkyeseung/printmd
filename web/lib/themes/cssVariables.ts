@@ -95,7 +95,7 @@ export function generateHeadingStylesCss(styles: HeadingStyles): string {
   return rules.join('\n');
 }
 
-const ELEMENT_SELECTORS: Record<EditableElement, string> = {
+export const ELEMENT_SELECTORS: Record<EditableElement, string> = {
   page: '.preview-content',
   h1: '.preview-content h1',
   h2: '.preview-content h2',

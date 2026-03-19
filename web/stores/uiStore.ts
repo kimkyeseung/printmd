@@ -1,7 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { EditableElement } from '@/types/style';
 
 export type ViewMode = 'split' | 'editor' | 'preview';
+
+export interface SpacingHighlight {
+  element: EditableElement;
+  type: 'margin' | 'padding';
+  side: 'top' | 'bottom' | 'left' | 'right';
+}
 
 export interface UIState {
   viewMode: ViewMode;
@@ -9,6 +16,7 @@ export interface UIState {
   isFullscreen: boolean;
   editorWidth: number;
   stylePanelWidth: number;
+  spacingHighlight: SpacingHighlight | null;
 }
 
 export interface UIActions {
@@ -19,6 +27,7 @@ export interface UIActions {
   toggleFullscreen: () => void;
   setEditorWidth: (width: number) => void;
   setStylePanelWidth: (width: number) => void;
+  setSpacingHighlight: (highlight: SpacingHighlight | null) => void;
 }
 
 export type UIStore = UIState & UIActions;
@@ -29,6 +38,7 @@ const initialState: UIState = {
   isFullscreen: false,
   editorWidth: 50,
   stylePanelWidth: 320,
+  spacingHighlight: null,
 };
 
 export const useUIStore = create<UIStore>()(
@@ -61,6 +71,8 @@ export const useUIStore = create<UIStore>()(
 
       setStylePanelWidth: (stylePanelWidth: number) =>
         set({ stylePanelWidth: Math.min(Math.max(stylePanelWidth, 240), 480) }),
+
+      setSpacingHighlight: (spacingHighlight) => set({ spacingHighlight }),
     }),
     {
       name: 'printmd-ui',
