@@ -33,7 +33,7 @@ function getLocale(request: NextRequest): Locale {
   return defaultLocale;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip for static files, API routes, and special Next.js paths
