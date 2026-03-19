@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { useEditorStore, useDocumentsStore } from '@/stores';
-
-const STORAGE_KEY = 'printmd-content';
-const SAVE_DEBOUNCE_MS = 500;
+import { useEditorStore, useDocumentsStore, useTabsStore } from '@/stores';
 
 const DEFAULT_CONTENT: Record<string, string> = {
   ko: `# printmd
@@ -262,61 +259,97 @@ Below are examples of h3 through h6 headings:
 export function useEditorOrchestrator() {
   const params = useParams();
   const locale = (params.locale as string) || 'en';
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const initRef = useRef(false);
 
-  const content = useEditorStore((state) => state.content);
   const sourceUrl = useEditorStore((state) => state.sourceUrl);
-  const setContent = useEditorStore((state) => state.setContent);
-  const currentDocumentId = useEditorStore((state) => state.currentDocumentId);
-  const setCurrentDocumentId = useEditorStore((state) => state.setCurrentDocumentId);
   const updateDocument = useDocumentsStore((state) => state.updateDocument);
+  const getDocument = useDocumentsStore((state) => state.getDocument);
 
-  const displayContent = content || DEFAULT_CONTENT[locale] || DEFAULT_CONTENT['en'];
+  const tabs = useTabsStore((state) => state.tabs);
+  const activeTabId = useTabsStore((state) => state.activeTabId);
+  const addTab = useTabsStore((state) => state.addTab);
+  const updateTabContent = useTabsStore((state) => state.updateTabContent);
+  const markTabSaved = useTabsStore((state) => state.markTabSaved);
+  const getActiveTab = useTabsStore((state) => state.getActiveTab);
 
-  // Load saved content from localStorage on mount only
+  const activeTab = getActiveTab();
+  const content = activeTab?.content ?? '';
+  const currentDocumentId = activeTab?.documentId ?? null;
+
+  const displayContent = content;
+
+  // Initialize: ensure at least one tab exists and restore persisted tabs' content
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.get('src')) return;
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      setContent(saved);
+    if (initRef.current) return;
+    initRef.current = true;
+
+    const state = useTabsStore.getState();
+
+    if (state.tabs.length === 0) {
+      // No tabs — check for legacy localStorage content, or create default tab
+      const searchParams = new URLSearchParams(window.location.search);
+      if (!searchParams.get('src')) {
+        const saved = localStorage.getItem('printmd-content');
+        const defaultContent = saved || DEFAULT_CONTENT[locale] || DEFAULT_CONTENT['en'];
+        addTab({ content: defaultContent, title: 'Untitled' });
+        // Clean up legacy storage
+        localStorage.removeItem('printmd-content');
+      } else {
+        addTab();
+      }
     } else {
-      setContent(DEFAULT_CONTENT[locale] || DEFAULT_CONTENT['en']);
+      // Restore content for persisted tabs (content was not persisted)
+      const { tabs: persistedTabs } = state;
+      for (const tab of persistedTabs) {
+        if (tab.documentId) {
+          const doc = getDocument(tab.documentId);
+          if (doc) {
+            updateTabContent(tab.id, doc.content);
+            // Reset dirty since we just loaded from source
+            markTabSaved(tab.id);
+          }
+        }
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleContentChange = useCallback((newContent: string) => {
-    setContent(newContent);
-    clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, newContent);
-      } catch {
-        // localStorage quota exceeded - silently ignore
-      }
-    }, SAVE_DEBOUNCE_MS);
-  }, [setContent]);
+    if (!activeTabId) return;
+    updateTabContent(activeTabId, newContent);
+  }, [activeTabId, updateTabContent]);
 
   const handleSave = useCallback(() => {
-    if (currentDocumentId) {
-      updateDocument(currentDocumentId, displayContent);
+    if (!activeTab) return false;
+    if (activeTab.documentId) {
+      updateDocument(activeTab.documentId, displayContent);
+      markTabSaved(activeTab.id);
       toast.success('저장되었습니다');
-      return true; // Saved to existing document
+      return true;
     }
     return false; // Need Save As dialog
-  }, [currentDocumentId, displayContent, updateDocument]);
+  }, [activeTab, displayContent, updateDocument, markTabSaved]);
 
   const handleSaveComplete = useCallback((id: string) => {
-    setCurrentDocumentId(id);
+    if (!activeTabId) return;
+    const doc = getDocument(id);
+    markTabSaved(activeTabId, id, doc?.name);
     toast.success('저장되었습니다');
-  }, [setCurrentDocumentId]);
+  }, [activeTabId, markTabSaved, getDocument]);
 
   const handleLoadFromDialog = useCallback((id: string, loadedContent: string) => {
-    setContent(loadedContent);
-    setCurrentDocumentId(id);
+    // Check if this document is already open in a tab
+    const state = useTabsStore.getState();
+    const existingTab = state.tabs.find((t) => t.documentId === id);
+    if (existingTab) {
+      useTabsStore.getState().setActiveTab(existingTab.id);
+      toast.success('문서를 불러왔습니다');
+      return;
+    }
+    const doc = getDocument(id);
+    addTab({ documentId: id, content: loadedContent, title: doc?.name ?? 'Untitled' });
     toast.success('문서를 불러왔습니다');
-  }, [setContent, setCurrentDocumentId]);
+  }, [addTab, getDocument]);
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -326,23 +359,26 @@ export function useEditorOrchestrator() {
     reader.onload = (event) => {
       const text = event.target?.result;
       if (typeof text === 'string') {
-        setContent(text);
-        setCurrentDocumentId(null);
+        addTab({ content: text, title: file.name.replace(/\.(md|markdown|txt)$/, '') });
       }
     };
     reader.readAsText(file);
     e.target.value = '';
-  }, [setContent, setCurrentDocumentId]);
+  }, [addTab]);
 
   const handleDownloadMd = useCallback(() => {
     const blob = new Blob([displayContent], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'document.md';
+    a.download = (activeTab?.title || 'document') + '.md';
     a.click();
     URL.revokeObjectURL(url);
-  }, [displayContent]);
+  }, [displayContent, activeTab?.title]);
+
+  const handleNewTab = useCallback(() => {
+    addTab();
+  }, [addTab]);
 
   return {
     locale,
@@ -350,11 +386,14 @@ export function useEditorOrchestrator() {
     displayContent,
     sourceUrl,
     currentDocumentId,
+    activeTabId,
+    tabs,
     handleContentChange,
     handleSave,
     handleSaveComplete,
     handleLoadFromDialog,
     handleFileChange,
     handleDownloadMd,
+    handleNewTab,
   };
 }

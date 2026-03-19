@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { Preview } from '../Preview';
-import { useEditorStore } from '@/stores';
 
 // Mock stores
-const mockSetContent = vi.fn();
+const mockUpdateTabContent = vi.fn();
+const mockActiveTab = { id: 'tab-1', content: '# Hello\n\nParagraph text', documentId: null, title: 'Test', lastSavedContent: '', isDirty: false };
+
 vi.mock('@/stores', () => ({
   useStyleStore: (selector: (s: Record<string, unknown>) => unknown) => {
     const state = { elementStyles: {} };
@@ -14,15 +15,13 @@ vi.mock('@/stores', () => ({
     const state = { spacingHighlight: null };
     return selector(state);
   },
-  useEditorStore: Object.assign(
-    (selector: (s: Record<string, unknown>) => unknown) => {
-      const state = { setContent: mockSetContent };
-      return selector(state);
-    },
-    {
-      getState: () => ({ content: '# Hello\n\nParagraph text' }),
-    },
-  ),
+  useTabsStore: (selector: (s: Record<string, unknown>) => unknown) => {
+    const state = {
+      updateTabContent: mockUpdateTabContent,
+      getActiveTab: () => mockActiveTab,
+    };
+    return selector(state);
+  },
 }));
 
 vi.mock('@/lib/themes', () => ({
@@ -45,10 +44,7 @@ const defaultStyles = {
 describe('Preview - inline editing', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset the mock content for each test
-    (useEditorStore as unknown as { getState: () => Record<string, unknown> }).getState = () => ({
-      content: '# Hello\n\nParagraph text',
-    });
+    mockActiveTab.content = '# Hello\n\nParagraph text';
   });
 
   it('renders markdown as HTML', () => {
@@ -84,9 +80,7 @@ describe('Preview - inline editing', () => {
 
   it('does not open textarea when double-clicking a checkbox input', () => {
     const md = '- [ ] task item';
-    (useEditorStore as unknown as { getState: () => Record<string, unknown> }).getState = () => ({
-      content: md,
-    });
+    mockActiveTab.content = md;
     render(<Preview markdown={md} styles={defaultStyles} />);
     const article = document.querySelector('.preview-content')!;
     const input = article.querySelector('input[type="checkbox"]');
@@ -117,14 +111,12 @@ describe('Preview - inline editing', () => {
     });
 
     expect(document.querySelector('textarea')).toBeNull();
-    expect(mockSetContent).not.toHaveBeenCalled();
+    expect(mockUpdateTabContent).not.toHaveBeenCalled();
   });
 
   it('confirms editing on blur with changed text', () => {
     const md = '# Hello';
-    (useEditorStore as unknown as { getState: () => Record<string, unknown> }).getState = () => ({
-      content: md,
-    });
+    mockActiveTab.content = md;
     render(<Preview markdown={md} styles={defaultStyles} />);
     const article = document.querySelector('.preview-content')!;
     const h1 = article.querySelector('h1')!;
@@ -137,19 +129,16 @@ describe('Preview - inline editing', () => {
 
     act(() => {
       fireEvent.change(textarea, { target: { value: '# Updated' } });
-      // Simulate the native value being set (defaultValue textarea)
       Object.defineProperty(textarea, 'value', { value: '# Updated', writable: true });
       fireEvent.blur(textarea);
     });
 
-    expect(mockSetContent).toHaveBeenCalledWith('# Updated');
+    expect(mockUpdateTabContent).toHaveBeenCalledWith('tab-1', '# Updated');
   });
 
   it('confirms editing on Meta+Enter for multi-line blocks', () => {
     const md = 'Paragraph text';
-    (useEditorStore as unknown as { getState: () => Record<string, unknown> }).getState = () => ({
-      content: md,
-    });
+    mockActiveTab.content = md;
     render(<Preview markdown={md} styles={defaultStyles} />);
     const article = document.querySelector('.preview-content')!;
     const p = article.querySelector('p')!;
@@ -165,14 +154,12 @@ describe('Preview - inline editing', () => {
       fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true });
     });
 
-    expect(mockSetContent).toHaveBeenCalledWith('Updated paragraph');
+    expect(mockUpdateTabContent).toHaveBeenCalledWith('tab-1', 'Updated paragraph');
   });
 
   it('confirms editing on plain Enter for single-line heading', () => {
     const md = '# Hello';
-    (useEditorStore as unknown as { getState: () => Record<string, unknown> }).getState = () => ({
-      content: md,
-    });
+    mockActiveTab.content = md;
     render(<Preview markdown={md} styles={defaultStyles} />);
     const article = document.querySelector('.preview-content')!;
     const h1 = article.querySelector('h1')!;
@@ -188,14 +175,12 @@ describe('Preview - inline editing', () => {
       fireEvent.keyDown(textarea, { key: 'Enter' });
     });
 
-    expect(mockSetContent).toHaveBeenCalledWith('# Changed');
+    expect(mockUpdateTabContent).toHaveBeenCalledWith('tab-1', '# Changed');
   });
 
   it('does NOT confirm on plain Enter for paragraph (allows newline)', () => {
     const md = 'Paragraph text';
-    (useEditorStore as unknown as { getState: () => Record<string, unknown> }).getState = () => ({
-      content: md,
-    });
+    mockActiveTab.content = md;
     render(<Preview markdown={md} styles={defaultStyles} />);
     const article = document.querySelector('.preview-content')!;
     const p = article.querySelector('p')!;
@@ -210,16 +195,13 @@ describe('Preview - inline editing', () => {
       fireEvent.keyDown(textarea, { key: 'Enter' });
     });
 
-    // Textarea should still be visible (not confirmed)
     expect(document.querySelector('textarea')).not.toBeNull();
-    expect(mockSetContent).not.toHaveBeenCalled();
+    expect(mockUpdateTabContent).not.toHaveBeenCalled();
   });
 
-  it('does not call setContent if text is unchanged on blur', () => {
+  it('does not call updateTabContent if text is unchanged on blur', () => {
     const md = '# Hello';
-    (useEditorStore as unknown as { getState: () => Record<string, unknown> }).getState = () => ({
-      content: md,
-    });
+    mockActiveTab.content = md;
     render(<Preview markdown={md} styles={defaultStyles} />);
     const article = document.querySelector('.preview-content')!;
     const h1 = article.querySelector('h1')!;
@@ -231,18 +213,15 @@ describe('Preview - inline editing', () => {
     const textarea = document.querySelector('textarea')!;
 
     act(() => {
-      // value unchanged
       fireEvent.blur(textarea);
     });
 
-    expect(mockSetContent).not.toHaveBeenCalled();
+    expect(mockUpdateTabContent).not.toHaveBeenCalled();
   });
 
   it('checkbox click still toggles correctly', () => {
     const md = '- [ ] task item';
-    (useEditorStore as unknown as { getState: () => Record<string, unknown> }).getState = () => ({
-      content: md,
-    });
+    mockActiveTab.content = md;
     render(<Preview markdown={md} styles={defaultStyles} />);
     const article = document.querySelector('.preview-content')!;
     const checkbox = article.querySelector('input[type="checkbox"]')!;
@@ -251,7 +230,7 @@ describe('Preview - inline editing', () => {
       fireEvent.click(checkbox);
     });
 
-    expect(mockSetContent).toHaveBeenCalledWith('- [x] task item');
+    expect(mockUpdateTabContent).toHaveBeenCalledWith('tab-1', '- [x] task item');
   });
 
   it('preview-container has position relative for textarea overlay', () => {

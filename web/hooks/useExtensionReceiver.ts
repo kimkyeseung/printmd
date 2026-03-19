@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useEditorStore } from '@/stores';
+import { useEditorStore, useTabsStore } from '@/stores';
 
 interface ExtensionMessage {
   type: 'PRINTMD_CONTENT';
@@ -12,8 +12,8 @@ interface ExtensionMessage {
  * Handles both URL parameter and postMessage methods
  */
 export function useExtensionReceiver() {
-  const setContent = useEditorStore((state) => state.setContent);
   const setSourceUrl = useEditorStore((state) => state.setSourceUrl);
+  const addTab = useTabsStore((state) => state.addTab);
 
   useEffect(() => {
     // Handle URL parameter method
@@ -45,10 +45,9 @@ export function useExtensionReceiver() {
           }
 
           const content = await response.text();
-          setContent(content);
+          addTab({ content, title: 'From Extension' });
 
           // Convert raw URL back to GitHub URL for display
-          // raw.githubusercontent.com/owner/repo/branch/path -> github.com/owner/repo/blob/branch/path
           const rawMatch = decodedUrl.match(/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+)/);
           if (rawMatch) {
             const [, owner, repo, branch, path] = rawMatch;
@@ -74,7 +73,7 @@ export function useExtensionReceiver() {
 
       const data = event.data as ExtensionMessage;
       if (data?.type === 'PRINTMD_CONTENT' && data.content) {
-        setContent(data.content);
+        addTab({ content: data.content, title: 'From Extension' });
         if (data.sourceUrl) {
           setSourceUrl(data.sourceUrl);
         }
@@ -90,5 +89,5 @@ export function useExtensionReceiver() {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [setContent, setSourceUrl]);
+  }, [addTab, setSourceUrl]);
 }

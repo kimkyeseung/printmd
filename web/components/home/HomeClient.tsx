@@ -5,6 +5,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useStyleStore, useUIStore, usePrintStore } from '@/stores';
 import { Header } from '@/components/layout/Header';
 import { SplitPane } from '@/components/layout/SplitPane';
+import { TabBar } from '@/components/layout/TabBar';
 import { EditorPanel } from '@/components/editor/EditorPanel';
 import { PreviewPanel } from '@/components/preview/PreviewPanel';
 import dynamic from 'next/dynamic';
@@ -111,6 +112,7 @@ export default function HomeClient() {
     handleLoadFromDialog,
     handleFileChange,
     handleDownloadMd,
+    handleNewTab,
   } = useEditorOrchestrator();
 
   // Store selectors
@@ -171,6 +173,7 @@ export default function HomeClient() {
     onToggleStylePanel: toggleStylePanel,
     onToggleFullscreen: toggleFullscreen,
     onEscape: handleEscape,
+    onNewTab: handleNewTab,
   });
 
   // Preview element used in both normal and style-panel modes
@@ -243,6 +246,8 @@ export default function HomeClient() {
         onDownloadPdf={handleDownloadPdf}
         hasCurrentDocument={!!currentDocumentId}
       />
+
+      <TabBar />
 
       <ExtensionBanner />
 

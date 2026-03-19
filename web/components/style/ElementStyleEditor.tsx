@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { ColorPicker } from './ColorPicker';
 import { Slider } from './Slider';
-import { useStyleStore, useEditorStore, useUIStore } from '@/stores';
+import { useStyleStore, useTabsStore, useUIStore } from '@/stores';
 import { FONT_OPTIONS_WITH_DEFAULT as FONT_OPTIONS } from '@/lib/fonts/constants';
 import { showToast } from '@/components/ui/Toast';
 import type { EditableElement, ElementStyle } from '@/types/style';
@@ -168,7 +168,7 @@ export function ElementStyleEditor() {
   const [showAll, setShowAll] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
 
-  const content = useEditorStore((state) => state.content);
+  const content = useTabsStore((state) => state.getActiveTab()?.content ?? '');
   const elementStyles = useStyleStore((state) => state.elementStyles);
   const customFonts = useStyleStore((state) => state.customFonts);
   const globalStyles = useStyleStore((state) => state.globalStyles);

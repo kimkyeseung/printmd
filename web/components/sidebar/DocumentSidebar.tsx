@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { FolderTree } from '@/components/save/FolderTree';
 import { useDocumentsStore } from '@/stores/documentsStore';
-import { useEditorStore } from '@/stores/editorStore';
+import { useTabsStore } from '@/stores/tabsStore';
 import { useUIStore } from '@/stores/uiStore';
 import { toast } from 'sonner';
 import type { Document } from '@/stores/documentsStore';
@@ -71,25 +71,28 @@ export function DocumentSidebar() {
   const documents = useDocumentsStore((s) => s.documents);
   const createFolder = useDocumentsStore((s) => s.createFolder);
 
-  const setContent = useEditorStore((s) => s.setContent);
-  const currentDocumentId = useEditorStore((s) => s.currentDocumentId);
-  const setCurrentDocumentId = useEditorStore((s) => s.setCurrentDocumentId);
+  const tabsList = useTabsStore((s) => s.tabs);
+  const addTab = useTabsStore((s) => s.addTab);
+  const setActiveTab = useTabsStore((s) => s.setActiveTab);
+  const removeTab = useTabsStore((s) => s.removeTab);
+  const activeTab = useTabsStore((s) => s.getActiveTab());
+  const currentDocumentId = activeTab?.documentId ?? null;
 
   const [selectedFolderId, setSelectedFolderId] = useState('root');
   const [isCreatingRootFolder, setIsCreatingRootFolder] = useState(false);
 
   const handleDocumentSelect = useCallback(
     (doc: Document) => {
-      setContent(doc.content);
-      setCurrentDocumentId(doc.id);
-      try {
-        localStorage.setItem('printmd-content', doc.content);
-      } catch {
-        // ignore
+      // Check if this document is already open in a tab
+      const existingTab = tabsList.find((t) => t.documentId === doc.id);
+      if (existingTab) {
+        setActiveTab(existingTab.id);
+        return;
       }
+      addTab({ documentId: doc.id, content: doc.content, title: doc.name });
       toast.success('문서를 불러왔습니다');
     },
-    [setContent, setCurrentDocumentId],
+    [tabsList, setActiveTab, addTab],
   );
 
   const handleCreateFolder = useCallback(
@@ -113,12 +116,14 @@ export function DocumentSidebar() {
       if (!doc) return;
       if (!window.confirm(`"${doc.name}" 문서를 삭제하시겠습니까?`)) return;
       deleteDocument(id);
-      if (currentDocumentId === id) {
-        setCurrentDocumentId(null);
+      // Close any tabs that have this document open
+      const tabWithDoc = tabsList.find((t) => t.documentId === id);
+      if (tabWithDoc) {
+        removeTab(tabWithDoc.id);
       }
       toast.success('문서가 삭제되었습니다');
     },
-    [documents, deleteDocument, currentDocumentId, setCurrentDocumentId],
+    [documents, deleteDocument, tabsList, removeTab],
   );
 
   const handleDeleteFolder = useCallback(
@@ -139,9 +144,14 @@ export function DocumentSidebar() {
   const handleRenameDocument = useCallback(
     (id: string, newName: string) => {
       renameDocument(id, newName);
+      // Sync tab title if this document is open
+      const tab = tabsList.find((t) => t.documentId === id);
+      if (tab) {
+        useTabsStore.getState().updateTabTitle(tab.id, newName);
+      }
       toast.success('문서 이름이 변경되었습니다');
     },
-    [renameDocument],
+    [renameDocument, tabsList],
   );
 
   const handleRenameFolder = useCallback(

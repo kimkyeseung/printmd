@@ -8,6 +8,7 @@ interface KeyboardShortcutsOptions {
   onToggleStylePanel?: () => void;
   onToggleFullscreen?: () => void;
   onEscape?: () => void;
+  onNewTab?: () => void;
 }
 
 /**
@@ -31,6 +32,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions) {
     onToggleStylePanel,
     onToggleFullscreen,
     onEscape,
+    onNewTab,
   } = options;
 
   const handleKeyDown = useCallback(
@@ -49,6 +51,13 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions) {
       if (e.key === 'F11') {
         e.preventDefault();
         onToggleFullscreen?.();
+        return;
+      }
+
+      // Alt+N or Cmd+Alt+N: New tab
+      if (e.altKey && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        onNewTab?.();
         return;
       }
 
@@ -94,7 +103,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions) {
           break;
       }
     },
-    [onSave, onPrint, onBold, onItalic, onToggleStylePanel, onToggleFullscreen, onEscape]
+    [onSave, onPrint, onBold, onItalic, onToggleStylePanel, onToggleFullscreen, onEscape, onNewTab]
   );
 
   useEffect(() => {

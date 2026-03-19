@@ -4,7 +4,7 @@ import { memo, useMemo, useDeferredValue, useRef, useEffect, useCallback, useSta
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { generateElementStylesCss, ELEMENT_SELECTORS } from '@/lib/themes';
-import { useStyleStore, useUIStore, useEditorStore } from '@/stores';
+import { useStyleStore, useUIStore, useTabsStore } from '@/stores';
 import type { GlobalStyles, EditableElement } from '@/types/style';
 
 /** Default spacing values (px) matching preview.css at 16px base */
@@ -179,7 +179,8 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
   const deferredMarkdown = useDeferredValue(markdown);
   const elementStyles = useStyleStore((state) => state.elementStyles);
   const spacingHighlight = useUIStore((state) => state.spacingHighlight);
-  const setContent = useEditorStore((state) => state.setContent);
+  const updateTabContent = useTabsStore((state) => state.updateTabContent);
+  const getActiveTab = useTabsStore((state) => state.getActiveTab);
   const articleRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState<EditingState | null>(null);
@@ -224,8 +225,9 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
     const lineNum = parseInt(lineStr, 10);
     if (isNaN(lineNum)) return;
 
-    const content = useEditorStore.getState().content;
-    const lines = content.split('\n');
+    const activeTab = getActiveTab();
+    if (!activeTab) return;
+    const lines = activeTab.content.split('\n');
     if (lineNum < 0 || lineNum >= lines.length) return;
 
     const line = lines[lineNum];
@@ -237,8 +239,8 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
       return;
     }
 
-    setContent(lines.join('\n'));
-  }, [setContent]);
+    updateTabContent(activeTab.id, lines.join('\n'));
+  }, [getActiveTab, updateTabContent]);
 
   // Handle double-click to start inline editing
   const handleDblClick = useCallback((e: MouseEvent) => {
@@ -262,8 +264,9 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
     const containerRect = container.getBoundingClientRect();
     const elRect = block.getBoundingClientRect();
 
-    const content = useEditorStore.getState().content;
-    const lines = content.split('\n');
+    const activeTab = getActiveTab();
+    if (!activeTab) return;
+    const lines = activeTab.content.split('\n');
     const sliced = lines.slice(startLine, endLine);
     const originalMarkdown = sliced.join('\n');
 
@@ -287,15 +290,16 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
       if (!editing) return;
       const trimmed = newText.replace(/\n$/, '');
       if (trimmed !== editing.originalMarkdown) {
-        const content = useEditorStore.getState().content;
-        const lines = content.split('\n');
+        const activeTab = getActiveTab();
+        if (!activeTab) return;
+        const lines = activeTab.content.split('\n');
         const newLines = trimmed.split('\n');
         lines.splice(editing.startLine, editing.endLine - editing.startLine, ...newLines);
-        setContent(lines.join('\n'));
+        updateTabContent(activeTab.id, lines.join('\n'));
       }
       setEditing(null);
     },
-    [editing, setContent],
+    [editing, getActiveTab, updateTabContent],
   );
 
   const handleCancel = useCallback(() => {

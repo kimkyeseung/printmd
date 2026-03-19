@@ -1,14 +1,15 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useEditorStore } from '@/stores';
+import { useTabsStore } from '@/stores';
 import { createDragDropHandler, type FileInfo } from '@/lib/file';
 
 export function useDragDrop() {
   const [isDragging, setIsDragging] = useState(false);
-  const setContent = useEditorStore((state) => state.setContent);
+  const addTab = useTabsStore((state) => state.addTab);
 
   const handleFileDrop = useCallback((file: FileInfo) => {
-    setContent(file.content);
-  }, [setContent]);
+    const title = file.name.replace(/\.(md|markdown|txt)$/, '');
+    addTab({ content: file.content, title });
+  }, [addTab]);
 
   const dragDropHandlers = useMemo(() => createDragDropHandler({
     onDragEnter: () => setIsDragging(true),

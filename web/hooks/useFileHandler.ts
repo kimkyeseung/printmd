@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createDragDropHandler, type FileInfo } from '@/lib/file';
-import { useEditorStore } from '@/stores';
+import { useTabsStore } from '@/stores';
 
 interface UseFileHandlerOptions {
   onFileLoad?: (file: FileInfo) => void;
@@ -24,12 +24,13 @@ export function useFileHandler(options: UseFileHandlerOptions = {}): UseFileHand
   const { onFileLoad, onError } = options;
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const setContent = useEditorStore((state) => state.setContent);
+  const addTab = useTabsStore((state) => state.addTab);
 
   const handleFileDrop = useCallback((file: FileInfo) => {
-    setContent(file.content);
+    const title = file.name.replace(/\.(md|markdown|txt)$/, '');
+    addTab({ content: file.content, title });
     onFileLoad?.(file);
-  }, [setContent, onFileLoad]);
+  }, [addTab, onFileLoad]);
 
   const handleError = useCallback((error: Error) => {
     console.error('File handling error:', error);
