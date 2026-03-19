@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
@@ -17,6 +17,7 @@
     "@codemirror/language": "^6.12.1",
     "@codemirror/state": "^6.5.4",
     "@codemirror/view": "^6.39.15",
+    "@serwist/next": "^9.5.7",
     "dompurify": "^3.3.1",
     "gray-matter": "^4.0.3",
     "highlight.js": "^11.11.1",
@@ -45,6 +46,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "jsdom": "^28.1.0",
+    "serwist": "^9.5.7",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.0"
