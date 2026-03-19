@@ -4,7 +4,7 @@ import { parseMarkdown } from '../parser';
 describe('parseMarkdown', () => {
   it('converts heading markdown to HTML', () => {
     const result = parseMarkdown('# Hello');
-    expect(result).toContain('<h1>');
+    expect(result).toContain('<h1');
     expect(result).toContain('Hello');
     expect(result).toContain('</h1>');
   });
@@ -17,8 +17,8 @@ describe('parseMarkdown', () => {
 
   it('converts lists', () => {
     const result = parseMarkdown('- item1\n- item2');
-    expect(result).toContain('<ul>');
-    expect(result).toContain('<li>');
+    expect(result).toContain('<ul');
+    expect(result).toContain('<li');
     expect(result).toContain('item1');
     expect(result).toContain('item2');
   });
@@ -37,7 +37,7 @@ describe('parseMarkdown', () => {
 
   it('converts tables', () => {
     const result = parseMarkdown('| A | B |\n|---|---|\n| 1 | 2 |');
-    expect(result).toContain('<table>');
+    expect(result).toContain('<table');
     expect(result).toContain('<th>');
     expect(result).toContain('<td>');
   });
@@ -62,7 +62,7 @@ describe('parseMarkdown', () => {
 
   it('converts blockquotes', () => {
     const result = parseMarkdown('> quote text');
-    expect(result).toContain('<blockquote>');
+    expect(result).toContain('<blockquote');
     expect(result).toContain('quote text');
   });
 
@@ -80,5 +80,57 @@ describe('parseMarkdown', () => {
   it('renders italic when _ is adjacent to CJK characters', () => {
     const result = parseMarkdown('한국의_이탤릭_처리');
     expect(result).toContain('<em>이탤릭</em>');
+  });
+});
+
+describe('lineAnnotationPlugin', () => {
+  it('adds data-line and data-line-end to heading', () => {
+    const result = parseMarkdown('# Hello');
+    expect(result).toContain('data-line="0"');
+    expect(result).toContain('data-line-end="1"');
+  });
+
+  it('adds data-line and data-line-end to paragraph', () => {
+    const result = parseMarkdown('Some paragraph text');
+    expect(result).toContain('data-line="0"');
+    expect(result).toContain('data-line-end="1"');
+  });
+
+  it('adds correct line numbers for multi-block content', () => {
+    const result = parseMarkdown('# Heading\n\nParagraph');
+    // heading: lines 0-1
+    expect(result).toMatch(/<h1[^>]*data-line="0"[^>]*data-line-end="1"/);
+    // paragraph: lines 2-3
+    expect(result).toMatch(/<p[^>]*data-line="2"[^>]*data-line-end="3"/);
+  });
+
+  it('adds data-line and data-line-end to blockquote', () => {
+    const result = parseMarkdown('> quote text');
+    expect(result).toMatch(/<blockquote[^>]*data-line="0"/);
+    expect(result).toMatch(/<blockquote[^>]*data-line-end="1"/);
+  });
+
+  it('adds data-line and data-line-end to ul', () => {
+    const result = parseMarkdown('- item1\n- item2');
+    expect(result).toMatch(/<ul[^>]*data-line="0"/);
+    expect(result).toMatch(/<ul[^>]*data-line-end="2"/);
+  });
+
+  it('adds data-line and data-line-end to fence (code block) via <pre>', () => {
+    const result = parseMarkdown('```javascript\nconst x = 1;\n```');
+    expect(result).toMatch(/<pre[^>]*data-line="0"/);
+    expect(result).toMatch(/<pre[^>]*data-line-end="3"/);
+  });
+
+  it('adds data-line to fence without language', () => {
+    const result = parseMarkdown('```\nplain code\n```');
+    expect(result).toMatch(/<pre[^>]*data-line="0"/);
+    expect(result).toMatch(/<pre[^>]*data-line-end="3"/);
+  });
+
+  it('does not break task list checkbox data-line', () => {
+    const result = parseMarkdown('- [ ] task item');
+    expect(result).toContain('type="checkbox"');
+    expect(result).toMatch(/data-line="0"/);
   });
 });

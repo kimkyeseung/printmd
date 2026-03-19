@@ -60,6 +60,32 @@ describe('sanitizeHtml', () => {
     expect(result).toContain('<th>');
     expect(result).toContain('<td>');
   });
+
+  it('preserves data-line attribute', () => {
+    const html = '<p data-line="0">text</p>';
+    const result = sanitizeHtml(html);
+    expect(result).toContain('data-line="0"');
+  });
+
+  it('preserves data-line-end attribute', () => {
+    const html = '<h1 data-line="0" data-line-end="1">Title</h1>';
+    const result = sanitizeHtml(html);
+    expect(result).toContain('data-line-end="1"');
+  });
+
+  it('preserves both data-line and data-line-end together', () => {
+    const html = '<pre data-line="5" data-line-end="10"><code>code</code></pre>';
+    const result = sanitizeHtml(html);
+    expect(result).toContain('data-line="5"');
+    expect(result).toContain('data-line-end="10"');
+  });
+
+  it('strips other data-* attributes', () => {
+    const html = '<p data-custom="bad" data-line="0">text</p>';
+    const result = sanitizeHtml(html);
+    expect(result).not.toContain('data-custom');
+    expect(result).toContain('data-line="0"');
+  });
 });
 
 describe('createSafeHtml', () => {
