@@ -180,7 +180,7 @@ export function ElementStyleEditor() {
     ? ELEMENTS
     : ELEMENTS.filter((e) => usedElements.has(e.key));
 
-  const hasHiddenElements = visibleElements.length < ELEMENTS.length;
+  const hasHiddenElements = usedElements.size < ELEMENTS.length;
 
   const currentStyle = elementStyles[selectedElement] || {};
 

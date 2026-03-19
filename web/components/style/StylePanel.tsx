@@ -61,8 +61,8 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
   }, [confirmReset, resetToDefault]);
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: 'preset', label: 'Preset' },
     { key: 'edit', label: 'Edit' },
+    { key: 'preset', label: 'Preset' },
     { key: 'color', label: 'Color' },
     { key: 'font', label: 'Font' },
   ];
