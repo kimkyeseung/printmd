@@ -12,7 +12,15 @@ export function createDragDropHandler(options: DragDropOptions) {
 
   let dragCounter = 0;
 
+  // Ignore internal sidebar drag operations (folder/document reordering)
+  const isInternalDrag = (e: DragEvent): boolean => {
+    if (!e.dataTransfer) return false;
+    const types = Array.from(e.dataTransfer.types);
+    return types.includes('application/x-doc-id') || types.includes('application/x-folder-id');
+  };
+
   const handleDragEnter = (e: DragEvent) => {
+    if (isInternalDrag(e)) return;
     e.preventDefault();
     e.stopPropagation();
     dragCounter++;
@@ -23,6 +31,7 @@ export function createDragDropHandler(options: DragDropOptions) {
   };
 
   const handleDragLeave = (e: DragEvent) => {
+    if (isInternalDrag(e)) return;
     e.preventDefault();
     e.stopPropagation();
     dragCounter--;
@@ -33,6 +42,7 @@ export function createDragDropHandler(options: DragDropOptions) {
   };
 
   const handleDragOver = (e: DragEvent) => {
+    if (isInternalDrag(e)) return;
     e.preventDefault();
     e.stopPropagation();
 
@@ -42,6 +52,7 @@ export function createDragDropHandler(options: DragDropOptions) {
   };
 
   const handleDrop = async (e: DragEvent) => {
+    if (isInternalDrag(e)) return;
     e.preventDefault();
     e.stopPropagation();
     dragCounter = 0;
