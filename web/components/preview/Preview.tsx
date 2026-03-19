@@ -5,7 +5,27 @@ import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { generateElementStylesCss, ELEMENT_SELECTORS } from '@/lib/themes';
 import { useStyleStore, useUIStore } from '@/stores';
-import type { GlobalStyles } from '@/types/style';
+import type { GlobalStyles, EditableElement } from '@/types/style';
+
+/** Default spacing values (px) matching preview.css at 16px base */
+const HIGHLIGHT_DEFAULTS: Record<EditableElement, Record<string, number>> = {
+  page: { paddingTop: 40, paddingBottom: 40, paddingLeft: 40, paddingRight: 40, marginTop: 0, marginBottom: 0 },
+  h1: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 5, paddingLeft: 0, paddingRight: 0 },
+  h2: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 5, paddingLeft: 0, paddingRight: 0 },
+  h3: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  h4: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  h5: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  h6: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  paragraph: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  bulletList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 0 },
+  orderedList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 0 },
+  todoList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  blockquote: { marginTop: 0, marginBottom: 16, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
+  hr: { marginTop: 24, marginBottom: 24, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  image: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  code: { marginTop: 0, marginBottom: 16, paddingTop: 16, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
+  table: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+};
 
 interface PreviewProps {
   markdown: string;
@@ -22,21 +42,16 @@ function generateSpacingHighlightCss(
 
   const isMargin = highlight.type === 'margin';
   const { side } = highlight;
+  const propKey = `${highlight.type}${side.charAt(0).toUpperCase() + side.slice(1)}`;
+  const defaults = HIGHLIGHT_DEFAULTS[highlight.element as EditableElement] || {};
 
-  // Get the explicit value
+  // Get the value (explicit → default)
   let value = 0;
   if (highlight.element === 'page') {
     value = globalPadding[side] || 0;
   } else {
     const style = elementStyles[highlight.element] || {};
-    if (isMargin) {
-      value = (side === 'top' ? style.marginTop : style.marginBottom) ?? 0;
-    } else {
-      if (side === 'top') value = style.paddingTop ?? 0;
-      else if (side === 'bottom') value = style.paddingBottom ?? 0;
-      else if (side === 'left') value = style.paddingLeft ?? 0;
-      else if (side === 'right') value = style.paddingRight ?? 0;
-    }
+    value = style[propKey] ?? defaults[propKey] ?? 0;
   }
 
   const color = isMargin ? 'rgba(255, 152, 0, 0.3)' : 'rgba(76, 175, 80, 0.3)';

@@ -18,6 +18,33 @@ const FONT_WEIGHT_OPTIONS = [
   { value: '800', label: 'Extra Bold' },
 ];
 
+/** Default spacing values (px) based on preview.css at 16px base */
+const SPACING_DEFAULTS: Record<EditableElement, {
+  marginTop: number;
+  marginBottom: number;
+  paddingTop: number;
+  paddingBottom: number;
+  paddingLeft: number;
+  paddingRight: number;
+}> = {
+  page: { marginTop: 0, marginBottom: 0, paddingTop: 40, paddingBottom: 40, paddingLeft: 40, paddingRight: 40 },
+  h1: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 5, paddingLeft: 0, paddingRight: 0 },
+  h2: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 5, paddingLeft: 0, paddingRight: 0 },
+  h3: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  h4: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  h5: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  h6: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  paragraph: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  bulletList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 0 },
+  orderedList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 0 },
+  todoList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  blockquote: { marginTop: 0, marginBottom: 16, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
+  hr: { marginTop: 24, marginBottom: 24, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  image: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  code: { marginTop: 0, marginBottom: 16, paddingTop: 16, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
+  table: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+};
+
 const ELEMENTS: { key: EditableElement; label: string }[] = [
   { key: 'page', label: 'Page' },
   { key: 'h1', label: 'H1' },
@@ -91,6 +118,7 @@ function SpacingGrid({
   fields: fieldOverride,
   onFieldFocus,
   onFieldBlur,
+  defaults,
 }: {
   values: { top?: number; bottom?: number; left?: number; right?: number };
   onChange: (field: string, value: number | undefined) => void;
@@ -98,6 +126,7 @@ function SpacingGrid({
   fields?: readonly { key: 'top' | 'bottom' | 'left' | 'right'; label: string }[];
   onFieldFocus?: (field: string) => void;
   onFieldBlur?: () => void;
+  defaults?: { top?: number; bottom?: number; left?: number; right?: number };
 }) {
   const fields = fieldOverride ?? [
     { key: 'top', label: 'Top' },
@@ -118,7 +147,7 @@ function SpacingGrid({
               onChange={(e) => onChange(key, e.target.value ? Number(e.target.value) : undefined)}
               onFocus={() => onFieldFocus?.(key)}
               onBlur={() => onFieldBlur?.()}
-              placeholder="auto"
+              placeholder={String(defaults?.[key] ?? 0)}
               className="w-full rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
               min={0}
               max={max}
@@ -380,6 +409,7 @@ export function ElementStyleEditor() {
                   if (field === 'bottom') handleStyleChange({ marginBottom: value });
                 }}
                 max={200}
+                defaults={{ top: SPACING_DEFAULTS[selectedElement].marginTop, bottom: SPACING_DEFAULTS[selectedElement].marginBottom }}
                 onFieldFocus={(field) => setSpacingHighlight({ element: selectedElement, type: 'margin', side: field as 'top' | 'bottom' })}
                 onFieldBlur={() => setSpacingHighlight(null)}
               />
@@ -398,6 +428,12 @@ export function ElementStyleEditor() {
                   onChange={(field, value) => {
                     const map: Record<string, string> = { top: 'paddingTop', bottom: 'paddingBottom', left: 'paddingLeft', right: 'paddingRight' };
                     handleStyleChange({ [map[field]]: value });
+                  }}
+                  defaults={{
+                    top: SPACING_DEFAULTS[selectedElement].paddingTop,
+                    bottom: SPACING_DEFAULTS[selectedElement].paddingBottom,
+                    left: SPACING_DEFAULTS[selectedElement].paddingLeft,
+                    right: SPACING_DEFAULTS[selectedElement].paddingRight,
                   }}
                   onFieldFocus={(field) => setSpacingHighlight({ element: selectedElement, type: 'padding', side: field as 'top' | 'bottom' | 'left' | 'right' })}
                   onFieldBlur={() => setSpacingHighlight(null)}

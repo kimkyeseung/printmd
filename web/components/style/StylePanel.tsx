@@ -31,7 +31,7 @@ function useTemporalCanUndoRedo() {
 }
 
 export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('preset');
+  const [activeTab, setActiveTab] = useState<Tab>('edit');
   const [confirmReset, setConfirmReset] = useState(false);
 
   const currentTheme = useStyleStore((state) => state.currentTheme);
