@@ -85,6 +85,8 @@ export function FolderTree({
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
   const [creatingInFolderId, setCreatingInFolderId] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDragOverRoot, setIsDragOverRoot] = useState(false);
 
   const toggleExpand = useCallback((folderId: string) => {
     setExpandedFolders((prev) => {
@@ -116,14 +118,16 @@ export function FolderTree({
         onDragStart={(e) => {
           e.dataTransfer.setData('application/x-doc-id', doc.id);
           e.dataTransfer.effectAllowed = 'move';
+          setIsDragging(true);
         }}
+        onDragEnd={() => { setIsDragging(false); setIsDragOverRoot(false); }}
         className={`group flex items-center gap-1 rounded px-2 py-1.5 cursor-pointer hover:bg-[var(--ui-bg-hover)] ${
           currentDocumentId === doc.id ? 'bg-[var(--ui-bg-hover)] font-medium' : ''
         }`}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
         onClick={() => !isRenaming && onDocumentSelect?.(doc)}
       >
-        <span className="w-4" />
+        <span className="w-3" />
         <svg
           className="w-4 h-4 text-blue-500"
           fill="none"
@@ -204,7 +208,9 @@ export function FolderTree({
           onDragStart={(e) => {
             e.dataTransfer.setData('application/x-folder-id', folder.id);
             e.dataTransfer.effectAllowed = 'move';
+            setIsDragging(true);
           }}
+          onDragEnd={() => { setIsDragging(false); setIsDragOverRoot(false); }}
           onDragOver={(e) => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
@@ -372,6 +378,20 @@ export function FolderTree({
   const rootSubfolders = getSubfolders(null);
   const rootDocuments = showDocuments ? getDocumentsInFolder('root') : [];
 
+  const handleRootDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverFolderId(null);
+    setIsDragOverRoot(false);
+    const docId = e.dataTransfer.getData('application/x-doc-id');
+    const folderId = e.dataTransfer.getData('application/x-folder-id');
+    if (docId && onMoveDocument) {
+      onMoveDocument(docId, 'root');
+    } else if (folderId && onMoveFolder) {
+      onMoveFolder(folderId, null);
+    }
+  };
+
   return (
     <div
       className="text-sm"
@@ -379,20 +399,38 @@ export function FolderTree({
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
       }}
-      onDrop={(e) => {
-        e.preventDefault();
-        setDragOverFolderId(null);
-        const docId = e.dataTransfer.getData('application/x-doc-id');
-        const folderId = e.dataTransfer.getData('application/x-folder-id');
-        if (docId && onMoveDocument) {
-          onMoveDocument(docId, 'root');
-        } else if (folderId && onMoveFolder) {
-          onMoveFolder(folderId, null);
-        }
-      }}
+      onDrop={handleRootDrop}
     >
       {rootSubfolders.map((subfolder) => renderFolder(subfolder, 0))}
       {rootDocuments.map((doc) => renderDocument(doc, 0))}
+
+      {/* Visible root drop zone during drag */}
+      {isDragging && (
+        <div
+          className={`mx-2 mt-1 flex items-center gap-1.5 rounded border border-dashed px-2 py-2 text-xs transition-colors ${
+            isDragOverRoot
+              ? 'border-blue-400 bg-blue-50/50 text-blue-600'
+              : 'border-[var(--ui-border)] text-[var(--ui-text-muted)]'
+          }`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.dataTransfer.dropEffect = 'move';
+            setIsDragOverRoot(true);
+          }}
+          onDragLeave={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+              setIsDragOverRoot(false);
+            }
+          }}
+          onDrop={handleRootDrop}
+        >
+          <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" />
+          </svg>
+          Move to root
+        </div>
+      )}
     </div>
   );
 }
