@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo, useDeferredValue, useRef, useEffect, useCallback } from 'react';
+import { memo, useMemo, useDeferredValue, useRef, useEffect, useCallback, useState } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { generateElementStylesCss, ELEMENT_SELECTORS } from '@/lib/themes';
@@ -33,8 +33,33 @@ interface PreviewProps {
   styles: GlobalStyles;
 }
 
+interface EditingState {
+  startLine: number;
+  endLine: number;
+  originalMarkdown: string;
+  isSingleLine: boolean;
+  position: { top: number; left: number; width: number; minHeight: number };
+}
+
+const INLINE_EDITOR_STYLE: React.CSSProperties = {
+  position: 'absolute',
+  zIndex: 50,
+  fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+  fontSize: '14px',
+  lineHeight: '1.5',
+  padding: '4px 8px',
+  border: '2px solid #3b82f6',
+  borderRadius: '4px',
+  backgroundColor: '#fff',
+  color: '#1e293b',
+  outline: 'none',
+  resize: 'vertical',
+  boxSizing: 'border-box',
+};
+
 function generateSpacingHighlightCss(
   highlight: { element: string; type: 'margin' | 'padding'; side: 'top' | 'bottom' | 'left' | 'right' },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   elementStyles: Record<string, any>,
   globalPadding: { top: number; right: number; bottom: number; left: number },
 ): string {
@@ -46,7 +71,7 @@ function generateSpacingHighlightCss(
   const propKey = `${highlight.type}${side.charAt(0).toUpperCase() + side.slice(1)}`;
   const defaults = HIGHLIGHT_DEFAULTS[highlight.element as EditableElement] || {};
 
-  // Get the value (explicit → default)
+  // Get the value (explicit -> default)
   let value = 0;
   if (highlight.element === 'page') {
     value = globalPadding[side] || 0;
@@ -86,12 +111,78 @@ function generateSpacingHighlightCss(
   }`;
 }
 
+function InlineEditor({
+  editing,
+  onConfirm,
+  onCancel,
+}: {
+  editing: EditingState;
+  onConfirm: (newText: string) => void;
+  onCancel: () => void;
+}) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const cancelledRef = useRef(false);
+
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.focus();
+    ta.select();
+  }, []);
+
+  const style: React.CSSProperties = {
+    ...INLINE_EDITOR_STYLE,
+    top: editing.position.top,
+    left: editing.position.left,
+    width: editing.position.width,
+    minHeight: editing.position.minHeight,
+  };
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        cancelledRef.current = true;
+        onCancel();
+      } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey || (editing.isSingleLine && !e.shiftKey))) {
+        e.preventDefault();
+        onConfirm(e.currentTarget.value);
+      }
+    },
+    [onCancel, onConfirm, editing.isSingleLine],
+  );
+
+  const handleBlur = useCallback(
+    (e: React.FocusEvent<HTMLTextAreaElement>) => {
+      if (cancelledRef.current) return;
+      onConfirm(e.currentTarget.value);
+    },
+    [onConfirm],
+  );
+
+  return (
+    <textarea
+      ref={textareaRef}
+      defaultValue={editing.originalMarkdown}
+      style={style}
+      onKeyDown={handleKeyDown}
+      onBlur={handleBlur}
+      rows={editing.originalMarkdown.split('\n').length}
+    />
+  );
+}
+
+/** Single-line block tags where Enter confirms the edit */
+const SINGLE_LINE_TAGS = new Set(['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HR']);
+
 export const Preview = memo(function Preview({ markdown, styles }: PreviewProps) {
   const deferredMarkdown = useDeferredValue(markdown);
   const elementStyles = useStyleStore((state) => state.elementStyles);
   const spacingHighlight = useUIStore((state) => state.spacingHighlight);
   const setContent = useEditorStore((state) => state.setContent);
   const articleRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [editing, setEditing] = useState<EditingState | null>(null);
 
   const elementStylesCss = useMemo(
     () => generateElementStylesCss(elementStyles),
@@ -107,6 +198,13 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
     const parsed = parseMarkdown(deferredMarkdown);
     return sanitizeHtml(parsed);
   }, [deferredMarkdown]);
+
+  // Reset editing state when html changes (React 19 pattern: reset during render)
+  const [prevHtml, setPrevHtml] = useState(html);
+  if (html !== prevHtml) {
+    setPrevHtml(html);
+    setEditing(null);
+  }
 
   // Update article innerHTML when html changes
   useEffect(() => {
@@ -142,12 +240,78 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
     setContent(lines.join('\n'));
   }, [setContent]);
 
+  // Handle double-click to start inline editing
+  const handleDblClick = useCallback((e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT') return;
+
+    const block = (target.closest('[data-line]') as HTMLElement) || null;
+    if (!block) return;
+
+    const startStr = block.getAttribute('data-line');
+    const endStr = block.getAttribute('data-line-end');
+    if (startStr === null || endStr === null) return;
+
+    const startLine = parseInt(startStr, 10);
+    const endLine = parseInt(endStr, 10);
+    if (isNaN(startLine) || isNaN(endLine)) return;
+
+    // Compute position relative to container (ref access in event handler is safe)
+    const container = containerRef.current;
+    if (!container) return;
+    const containerRect = container.getBoundingClientRect();
+    const elRect = block.getBoundingClientRect();
+
+    const content = useEditorStore.getState().content;
+    const lines = content.split('\n');
+    const sliced = lines.slice(startLine, endLine);
+    const originalMarkdown = sliced.join('\n');
+
+    setEditing({
+      startLine,
+      endLine,
+      originalMarkdown,
+      isSingleLine: SINGLE_LINE_TAGS.has(block.tagName),
+      position: {
+        top: elRect.top - containerRect.top + container.scrollTop,
+        left: elRect.left - containerRect.left + container.scrollLeft,
+        width: elRect.width,
+        minHeight: elRect.height,
+      },
+    });
+  }, []);
+
+  // Confirm edit: splice new lines into source
+  const handleConfirm = useCallback(
+    (newText: string) => {
+      if (!editing) return;
+      const trimmed = newText.replace(/\n$/, '');
+      if (trimmed !== editing.originalMarkdown) {
+        const content = useEditorStore.getState().content;
+        const lines = content.split('\n');
+        const newLines = trimmed.split('\n');
+        lines.splice(editing.startLine, editing.endLine - editing.startLine, ...newLines);
+        setContent(lines.join('\n'));
+      }
+      setEditing(null);
+    },
+    [editing, setContent],
+  );
+
+  const handleCancel = useCallback(() => {
+    setEditing(null);
+  }, []);
+
   useEffect(() => {
     const article = articleRef.current;
     if (!article) return;
     article.addEventListener('click', handleCheckboxClick);
-    return () => article.removeEventListener('click', handleCheckboxClick);
-  }, [handleCheckboxClick]);
+    article.addEventListener('dblclick', handleDblClick);
+    return () => {
+      article.removeEventListener('click', handleCheckboxClick);
+      article.removeEventListener('dblclick', handleDblClick);
+    };
+  }, [handleCheckboxClick, handleDblClick]);
 
   const cssVariables = useMemo(() => ({
     '--preview-font-size': `${styles.fontSize}px`,
@@ -166,8 +330,10 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
 
   return (
     <div
+      ref={containerRef}
       className="preview-container h-full overflow-auto"
       style={{
+        position: 'relative',
         backgroundColor: styles.backgroundColor,
         ...cssVariables,
       }}
@@ -191,6 +357,13 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
           color: styles.textColor,
         }}
       />
+      {editing && (
+        <InlineEditor
+          editing={editing}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+        />
+      )}
     </div>
   );
 });

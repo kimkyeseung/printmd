@@ -31,7 +31,7 @@ export function sanitizeHtml(html: string): string {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
     ALLOW_DATA_ATTR: false,
-    ADD_ATTR: ['data-line'],
+    ADD_ATTR: ['data-line', 'data-line-end'],
     FORBID_TAGS: ['script', 'style', 'iframe', 'form', 'object', 'embed'],
     FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'],
   });

@@ -153,6 +153,41 @@ function taskListPlugin(mdi: MarkdownIt) {
 
 md.use(taskListPlugin);
 
+// Line annotation plugin: adds data-line / data-line-end to every block element
+// so the preview can map rendered blocks back to source lines.
+function lineAnnotationPlugin(mdi: MarkdownIt) {
+  mdi.core.ruler.after('inline', 'line-annotation', (state) => {
+    for (const token of state.tokens) {
+      if (token.nesting >= 0 && token.map) {
+        token.attrSet('data-line', String(token.map[0]));
+        token.attrSet('data-line-end', String(token.map[1]));
+      }
+    }
+  });
+
+  // Fence blocks: the highlight function returns raw HTML so attrSet doesn't
+  // reach the <pre> tag. Override the fence renderer to inject the attributes.
+  const defaultFence =
+    mdi.renderer.rules.fence ||
+    function (tokens, idx, options, _env, self) {
+      return self.renderToken(tokens, idx, options);
+    };
+
+  mdi.renderer.rules.fence = function (tokens, idx, options, env, self) {
+    const token = tokens[idx];
+    const result = defaultFence(tokens, idx, options, env, self);
+    if (token.map) {
+      return result.replace(
+        '<pre',
+        `<pre data-line="${token.map[0]}" data-line-end="${token.map[1]}"`,
+      );
+    }
+    return result;
+  };
+}
+
+md.use(lineAnnotationPlugin);
+
 // Add target="_blank" to external links
 const defaultRender =
   md.renderer.rules.link_open ||
