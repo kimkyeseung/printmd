@@ -44,8 +44,10 @@ test.describe('Custom Preset Save / Load / Delete', () => {
     // Switch to default
     await page.getByText('기본 (Default)').click();
 
-    // Load the custom preset
-    await page.getByText('Dark Custom').click();
+    // Load the custom preset via "Load" button inside the Dark Custom card
+    const presetCard = page.locator('.flex.flex-col', { hasText: 'Dark Custom' }).first();
+    await presetCard.getByRole('button', { name: 'Load', exact: true }).click();
+    await page.waitForTimeout(300);
 
     // Verify via localStorage
     const stored = await page.evaluate((key) => {
@@ -61,7 +63,10 @@ test.describe('Custom Preset Save / Load / Delete', () => {
     await savePreset(page, 'To Delete');
     await expect(page.getByText('To Delete')).toBeVisible();
 
-    await page.getByRole('button', { name: 'To Delete delete' }).click();
+    // Click Delete then Confirm inside the preset card
+    const deleteCard = page.locator('.flex.flex-col', { hasText: 'To Delete' }).first();
+    await deleteCard.getByRole('button', { name: 'Delete', exact: true }).click();
+    await deleteCard.getByRole('button', { name: 'Confirm?', exact: true }).click();
     await expect(page.getByText('To Delete')).not.toBeVisible();
   });
 
