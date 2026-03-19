@@ -250,9 +250,9 @@ export default function HomeClient() {
         <AdKakaoBanner className="h-[90px] max-w-[728px] mx-auto flex items-center justify-center" />
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0">
         <DocumentSidebar />
-        <main id="main-content" className="flex-1 overflow-hidden" role="main">
+        <main id="main-content" className="relative flex-1 overflow-hidden" role="main">
           {renderedContent}
         </main>
         <aside className="hidden xl:flex flex-col w-[160px] shrink-0 border-l border-[var(--ui-border)]">
