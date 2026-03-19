@@ -33,10 +33,12 @@ function SidebarSection({
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="flex flex-col">
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--ui-text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--ui-bg-hover)]"
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(!open); } }}
+        className="flex items-center gap-2 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--ui-text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--ui-bg-hover)] cursor-pointer select-none"
       >
         <svg
           className={`h-3 w-3 shrink-0 transition-transform ${open ? 'rotate-90' : ''}`}
@@ -55,7 +57,7 @@ function SidebarSection({
             {actions}
           </span>
         )}
-      </button>
+      </div>
       {open && <div className="pb-1">{children}</div>}
     </div>
   );
