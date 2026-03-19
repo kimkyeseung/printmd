@@ -4,9 +4,11 @@ import type { NextConfig } from "next";
 const withSerwist = withSerwistInit({
   swSrc: "app/sw.ts",
   swDest: "public/sw.js",
+  disable: process.env.NODE_ENV !== "production",
 });
 
 const nextConfig: NextConfig = {
+  turbopack: {},
   // 이미지 최적화
   images: {
     formats: ["image/avif", "image/webp"],
