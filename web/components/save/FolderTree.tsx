@@ -12,6 +12,7 @@ interface FolderTreeProps {
   onDeleteDocument?: (id: string) => void;
   onDeleteFolder?: (id: string) => void;
   showDocuments?: boolean;
+  currentDocumentId?: string | null;
 }
 
 export function FolderTree({
@@ -23,6 +24,7 @@ export function FolderTree({
   onDeleteDocument,
   onDeleteFolder,
   showDocuments = false,
+  currentDocumentId,
 }: FolderTreeProps) {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
     new Set(['root'])
@@ -137,7 +139,9 @@ export function FolderTree({
               folderDocuments.map((doc) => (
                 <div
                   key={doc.id}
-                  className="group flex items-center gap-1 rounded px-2 py-1.5 cursor-pointer hover:bg-[var(--ui-bg-hover)]"
+                  className={`group flex items-center gap-1 rounded px-2 py-1.5 cursor-pointer hover:bg-[var(--ui-bg-hover)] ${
+                    currentDocumentId === doc.id ? 'bg-[var(--ui-bg-hover)] font-medium' : ''
+                  }`}
                   style={{ paddingLeft: `${(depth + 1) * 16 + 8}px` }}
                   onClick={() => onDocumentSelect?.(doc)}
                 >

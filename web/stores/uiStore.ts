@@ -13,6 +13,7 @@ export interface SpacingHighlight {
 export interface UIState {
   viewMode: ViewMode;
   isStylePanelOpen: boolean;
+  isSidebarOpen: boolean;
   isFullscreen: boolean;
   editorWidth: number;
   stylePanelWidth: number;
@@ -24,6 +25,9 @@ export interface UIActions {
   toggleStylePanel: () => void;
   openStylePanel: () => void;
   closeStylePanel: () => void;
+  toggleSidebar: () => void;
+  openSidebar: () => void;
+  closeSidebar: () => void;
   toggleFullscreen: () => void;
   setEditorWidth: (width: number) => void;
   setStylePanelWidth: (width: number) => void;
@@ -35,6 +39,7 @@ export type UIStore = UIState & UIActions;
 const initialState: UIState = {
   viewMode: 'split',
   isStylePanelOpen: false,
+  isSidebarOpen: false,
   isFullscreen: false,
   editorWidth: 50,
   stylePanelWidth: 320,
@@ -54,6 +59,13 @@ export const useUIStore = create<UIStore>()(
       openStylePanel: () => set({ isStylePanelOpen: true }),
 
       closeStylePanel: () => set({ isStylePanelOpen: false }),
+
+      toggleSidebar: () =>
+        set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
+
+      openSidebar: () => set({ isSidebarOpen: true }),
+
+      closeSidebar: () => set({ isSidebarOpen: false }),
 
       toggleFullscreen: () =>
         set((state) => {
@@ -78,6 +90,7 @@ export const useUIStore = create<UIStore>()(
       name: 'printmd-ui',
       partialize: (state) => ({
         viewMode: state.viewMode,
+        isSidebarOpen: state.isSidebarOpen,
         editorWidth: state.editorWidth,
         stylePanelWidth: state.stylePanelWidth,
       }),

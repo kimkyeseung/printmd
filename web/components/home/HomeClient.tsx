@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic';
 import { useExtensionReceiver, useKeyboardShortcuts, useFullscreen, useEditorOrchestrator, useDragDrop } from '@/hooks';
 import { DragDropOverlay } from './DragDropOverlay';
 import { CustomFontLoader } from '@/components/style/CustomFontLoader';
+import { DocumentSidebar } from '@/components/sidebar/DocumentSidebar';
 import '@/styles/editor.css';
 import '@/styles/preview.css';
 import '@/styles/print.css';
@@ -250,6 +251,7 @@ export default function HomeClient() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
+        <DocumentSidebar />
         <main id="main-content" className="flex-1 overflow-hidden" role="main">
           {renderedContent}
         </main>
