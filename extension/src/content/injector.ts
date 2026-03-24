@@ -1,9 +1,8 @@
 /**
- * Button injector for GitHub pages
+ * Button injector for all supported sites
  */
 
-import { type GitHubPageInfo } from './github';
-import { toRawUrl, fetchRawContent } from '../utils/github-api';
+import { type PageInfo } from './types';
 import { transferViaUrl, transferViaStorage, TransferError } from '../utils/transfer';
 import { addRecentFile } from '../utils/storage';
 
@@ -12,12 +11,12 @@ const BUTTON_ID = 'printmd-open-button';
 /**
  * Create the "Open in printmd" button element
  */
-function createButton(pageInfo: GitHubPageInfo): HTMLButtonElement {
+function createButton(pageInfo: PageInfo): HTMLButtonElement {
   const button = document.createElement('button');
   button.id = BUTTON_ID;
   button.className = 'printmd-button';
   button.type = 'button';
-  button.title = 'printmd에서 스타일링하고 PDF로 저장하기';
+  button.title = 'Style and save as PDF in printmd';
 
   // Icon SVG (document with arrow)
   const iconSvg = `
@@ -44,23 +43,29 @@ function createButton(pageInfo: GitHubPageInfo): HTMLButtonElement {
         title: pageInfo.fileName || 'Markdown file',
       });
 
-      if (pageInfo.type === 'issue-pr') {
-        // Extract markdown content from Issue/PR body
+      if (pageInfo.rawUrl) {
+        // Sites with raw URLs (GitHub, GitLab, Bitbucket file views)
+        transferViaUrl(pageInfo.rawUrl);
+      } else if (pageInfo.htmlContent) {
+        // Sites without raw URLs (npm, PyPI, Notion, Issue/PR pages)
+        transferViaStorage(pageInfo.htmlContent, pageInfo.url);
+      } else if (pageInfo.type === 'issue-pr') {
+        // GitHub Issue/PR fallback - extract from DOM
         const content = extractIssuePrContent();
         if (content) {
           transferViaStorage(content, pageInfo.url);
         } else {
-          showToast('마크다운 본문을 찾을 수 없습니다.', 'error');
+          showToast('Could not find markdown content.', 'error');
         }
-      } else if (pageInfo.rawUrl) {
-        transferViaUrl(pageInfo.rawUrl);
+      } else {
+        showToast('Could not find markdown content.', 'error');
       }
     } catch (error) {
       console.error('printmd: Failed to open file', error);
       if (error instanceof TransferError && error.code === 'POPUP_BLOCKED') {
-        showToast('팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.', 'error');
+        showToast('Popup blocked. Please allow popups and try again.', 'error');
       } else {
-        showToast('파일을 열 수 없습니다. 다시 시도해주세요.', 'error');
+        showToast('Could not open file. Please try again.', 'error');
       }
     } finally {
       button.disabled = false;
@@ -74,26 +79,21 @@ function createButton(pageInfo: GitHubPageInfo): HTMLButtonElement {
 /**
  * Inject the button into the page
  */
-export function injectButton(container: Element, pageInfo: GitHubPageInfo): void {
+export function injectButton(container: Element, pageInfo: PageInfo): void {
   // Remove existing button if any
   removeButton();
 
-  // Create and insert new button
   const button = createButton(pageInfo);
+  const wrapper = document.createElement('div');
 
-  // For file view, gist, or issue/PR, prepend to button group
-  if (pageInfo.type === 'markdown-file' || pageInfo.type === 'gist' || pageInfo.type === 'issue-pr') {
-    // Create a wrapper to match GitHub's button style
-    const wrapper = document.createElement('div');
-    wrapper.className = 'printmd-button-wrapper';
-    wrapper.appendChild(button);
-    container.prepend(wrapper);
-  } else {
-    // For README, append to header
-    const wrapper = document.createElement('div');
+  if (pageInfo.type === 'readme' || pageInfo.type === 'package-readme' || pageInfo.type === 'document') {
     wrapper.className = 'printmd-button-wrapper readme';
     wrapper.appendChild(button);
     container.appendChild(wrapper);
+  } else {
+    wrapper.className = 'printmd-button-wrapper';
+    wrapper.appendChild(button);
+    container.prepend(wrapper);
   }
 }
 
@@ -115,30 +115,17 @@ export function isButtonInjected(): boolean {
 }
 
 /**
- * Extract markdown content from GitHub Issue/PR page
- * Uses the rendered HTML and converts to a simple markdown representation
+ * Extract markdown content from GitHub Issue/PR page (legacy fallback)
  */
 function extractIssuePrContent(): string | null {
-  // Get the issue/PR title
   const titleEl = document.querySelector<HTMLElement>('.gh-header-title .js-issue-title');
   const title = titleEl?.textContent?.trim() || '';
-
-  // Get the issue/PR body (first comment)
   const bodyEl = document.querySelector<HTMLElement>('.comment-body .markdown-body');
   if (!bodyEl) return null;
 
-  // Get inner HTML and do a basic HTML-to-markdown conversion
-  const bodyHtml = bodyEl.innerHTML;
-
-  // Build markdown content with title
   let markdown = '';
-  if (title) {
-    markdown += `# ${title}\n\n`;
-  }
-
-  // Use the rendered HTML as-is (printmd can handle HTML in markdown)
-  markdown += bodyHtml;
-
+  if (title) markdown += `# ${title}\n\n`;
+  markdown += bodyEl.innerHTML;
   return markdown || null;
 }
 
@@ -146,7 +133,6 @@ function extractIssuePrContent(): string | null {
  * Show a toast notification on the page
  */
 function showToast(message: string, type: 'success' | 'error' = 'success'): void {
-  // Remove existing toast
   document.getElementById('printmd-toast')?.remove();
 
   const toast = document.createElement('div');
@@ -170,12 +156,10 @@ function showToast(message: string, type: 'success' | 'error' = 'success'): void
 
   document.body.appendChild(toast);
 
-  // Fade in
   requestAnimationFrame(() => {
     toast.style.opacity = '1';
   });
 
-  // Fade out and remove
   setTimeout(() => {
     toast.style.opacity = '0';
     setTimeout(() => toast.remove(), 300);

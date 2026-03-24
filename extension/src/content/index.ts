@@ -1,17 +1,24 @@
 /**
- * Content script entry point for GitHub pages
+ * Content script entry point - works across all supported sites
  */
 
-import { detectPage, findButtonInsertionPoint } from './github';
+import { getSiteDetector } from './sites';
 import { injectButton, removeButton, isButtonInjected } from './injector';
+import type { SiteDetector } from './types';
+
+let detector: SiteDetector | null = null;
 
 /**
  * Initialize the content script
  */
 function init(): void {
-  console.log('[printmd] init called');
-  const pageInfo = detectPage();
-  console.log('[printmd] pageInfo:', pageInfo);
+  if (!detector) {
+    detector = getSiteDetector();
+  }
+
+  if (!detector) return;
+
+  const pageInfo = detector.detectPage();
 
   // Only proceed if we're on a markdown page
   if (pageInfo.type === 'none') {
@@ -20,43 +27,37 @@ function init(): void {
   }
 
   // Find insertion point and inject button
-  const container = findButtonInsertionPoint();
-  console.log('[printmd] container:', container);
+  const container = detector.findButtonInsertionPoint();
   if (container && !isButtonInjected()) {
     injectButton(container, pageInfo);
-    console.log('[printmd] button injected');
   }
 }
 
 /**
  * Observe DOM changes for SPA navigation
- * GitHub uses pjax for navigation, so we need to re-inject on page changes
  */
 function setupObserver(): void {
-  // Debounce init calls
   let timeout: number | null = null;
   const debouncedInit = () => {
     if (timeout) clearTimeout(timeout);
     timeout = window.setTimeout(init, 200);
   };
 
-  // Observe for GitHub's pjax navigation
+  const selectors = detector?.getSignificantSelectors() || [];
+
   const observer = new MutationObserver((mutations) => {
-    // Check if there were significant DOM changes
     const hasSignificantChanges = mutations.some((mutation) => {
-      // Check for added nodes that might indicate page change
       if (mutation.addedNodes.length > 0) {
         for (const node of mutation.addedNodes) {
           if (node instanceof HTMLElement) {
-            // GitHub content container changes
-            if (
-              node.id === 'repo-content-turbo-frame' ||
-              node.classList.contains('repository-content') ||
-              node.classList.contains('markdown-body') ||
-              node.querySelector('article') ||
-              node.querySelector('article.markdown-body') ||
-              node.querySelector('.file-header')
-            ) {
+            // Check site-specific selectors
+            for (const selector of selectors) {
+              if (node.matches?.(selector) || node.querySelector?.(selector)) {
+                return true;
+              }
+            }
+            // Generic markdown content changes
+            if (node.querySelector?.('article') || node.classList?.contains('markdown-body')) {
               return true;
             }
           }
@@ -70,7 +71,6 @@ function setupObserver(): void {
     }
   });
 
-  // Start observing
   observer.observe(document.body, {
     childList: true,
     subtree: true,
@@ -92,19 +92,37 @@ function setupPopstateHandler(): void {
 }
 
 /**
- * Handle messages from popup
+ * Handle messages from popup and service worker
  */
 function setupMessageHandler(): void {
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (!detector) detector = getSiteDetector();
+    const pageInfo = detector?.detectPage() || null;
+
     if (message.type === 'GET_PAGE_INFO') {
-      const pageInfo = detectPage();
       sendResponse(pageInfo);
     }
-    return true; // Keep the message channel open for async response
+
+    if (message.type === 'CONTEXT_MENU_OPEN') {
+      // Respond with page info so service worker can open printmd
+      if (pageInfo && pageInfo.type !== 'none') {
+        sendResponse({
+          rawUrl: pageInfo.rawUrl,
+          htmlContent: pageInfo.htmlContent || null,
+          fileName: pageInfo.fileName,
+        });
+      } else {
+        sendResponse(null);
+      }
+    }
+
+    return true;
   });
 }
 
 // Run on load
+detector = getSiteDetector();
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     init();

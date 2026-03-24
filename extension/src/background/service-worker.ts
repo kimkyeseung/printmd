@@ -2,13 +2,50 @@
  * Background service worker for printmd extension
  */
 
-// Helper: convert GitHub URL to raw URL
+// All supported site URL patterns for context menus
+const SUPPORTED_SITE_PATTERNS = [
+  '*://github.com/*',
+  '*://gist.github.com/*',
+  '*://gitlab.com/*',
+  '*://bitbucket.org/*',
+  '*://www.npmjs.com/package/*',
+  '*://pypi.org/project/*',
+  '*://notion.so/*',
+  '*://*.notion.site/*',
+];
+
+// Markdown link patterns (for right-clicking links)
+const MARKDOWN_LINK_PATTERNS = [
+  '*://github.com/*/*.md',
+  '*://github.com/*/*.markdown',
+  '*://gist.github.com/*',
+  '*://raw.githubusercontent.com/*/*.md',
+  '*://raw.githubusercontent.com/*/*.markdown',
+  '*://gitlab.com/*/*.md',
+  '*://gitlab.com/*/*.markdown',
+  '*://bitbucket.org/*/*.md',
+  '*://bitbucket.org/*/*.markdown',
+];
+
+// Helper: convert various site URLs to raw URLs
 function toRawUrl(url: string): string {
+  // GitHub blob -> raw
   if (url.includes('github.com') && url.includes('/blob/')) {
     return url
       .replace('github.com', 'raw.githubusercontent.com')
       .replace('/blob/', '/');
   }
+
+  // GitLab blob -> raw
+  if (url.includes('gitlab.com') && url.includes('/-/blob/')) {
+    return url.replace('/-/blob/', '/-/raw/');
+  }
+
+  // Bitbucket src -> raw
+  if (url.includes('bitbucket.org') && url.includes('/src/')) {
+    return url.replace('/src/', '/raw/');
+  }
+
   return url;
 }
 
@@ -24,34 +61,20 @@ chrome.runtime.onInstalled.addListener((details) => {
 
   // Create context menus (runs on install AND update)
   chrome.contextMenus.removeAll(() => {
+    // Link context menu - for markdown file links
     chrome.contextMenus.create({
       id: 'open-in-printmd-link',
-      title: 'Open in printmd',
+      title: 'Edit in printmd',
       contexts: ['link'],
-      targetUrlPatterns: [
-        '*://github.com/*/*.md',
-        '*://github.com/*/*.markdown',
-        '*://gist.github.com/*',
-        '*://raw.githubusercontent.com/*/*.md',
-        '*://raw.githubusercontent.com/*/*.markdown',
-      ],
+      targetUrlPatterns: MARKDOWN_LINK_PATTERNS,
     });
 
+    // Page context menu - for all supported sites
     chrome.contextMenus.create({
       id: 'open-in-printmd-page',
-      title: 'Open in printmd',
+      title: 'Edit in printmd',
       contexts: ['page'],
-      documentUrlPatterns: [
-        '*://github.com/*/*.md',
-        '*://github.com/*/*.markdown',
-        '*://github.com/*/*.mdown',
-        '*://github.com/*/*.mkd',
-        '*://github.com/*/*.mkdn',
-        '*://github.com/*/*/README*',
-        '*://gist.github.com/*',
-        '*://raw.githubusercontent.com/*/*.md',
-        '*://raw.githubusercontent.com/*/*.markdown',
-      ],
+      documentUrlPatterns: SUPPORTED_SITE_PATTERNS,
     });
   });
 });
@@ -91,11 +114,47 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     });
   }
 
-  if (info.menuItemId === 'open-in-printmd-page' && tab?.url) {
-    const rawUrl = toRawUrl(tab.url);
-    const encodedUrl = encodeURIComponent(rawUrl);
-    chrome.tabs.create({
-      url: `https://printmd.app/?src=${encodedUrl}`,
+  if (info.menuItemId === 'open-in-printmd-page' && tab?.id) {
+    // Ask content script to detect and handle the page
+    chrome.tabs.sendMessage(tab.id, { type: 'CONTEXT_MENU_OPEN' }, (response) => {
+      if (chrome.runtime.lastError) {
+        // Content script not available, try URL-based fallback
+        if (tab.url) {
+          const rawUrl = toRawUrl(tab.url);
+          const encodedUrl = encodeURIComponent(rawUrl);
+          chrome.tabs.create({
+            url: `https://printmd.app/?src=${encodedUrl}`,
+          });
+        }
+        return;
+      }
+
+      if (response?.rawUrl) {
+        const encodedUrl = encodeURIComponent(response.rawUrl);
+        chrome.tabs.create({
+          url: `https://printmd.app/?src=${encodedUrl}`,
+        });
+      } else if (response?.htmlContent) {
+        // For sites without raw URLs, open printmd and pass content
+        chrome.tabs.create({
+          url: 'https://printmd.app/',
+        }, (newTab) => {
+          if (newTab?.id) {
+            const tabId = newTab.id;
+            const listener = (updatedTabId: number, changeInfo: chrome.tabs.TabChangeInfo) => {
+              if (updatedTabId === tabId && changeInfo.status === 'complete') {
+                chrome.tabs.onUpdated.removeListener(listener);
+                chrome.tabs.sendMessage(tabId, {
+                  type: 'PRINTMD_CONTENT',
+                  content: response.htmlContent,
+                  sourceUrl: tab.url,
+                });
+              }
+            };
+            chrome.tabs.onUpdated.addListener(listener);
+          }
+        });
+      }
     });
   }
 });
@@ -104,11 +163,26 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 chrome.commands?.onCommand?.addListener((command) => {
   if (command === 'open-in-printmd') {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-      if (tab?.url) {
-        const rawUrl = toRawUrl(tab.url);
-        const encodedUrl = encodeURIComponent(rawUrl);
-        chrome.tabs.create({
-          url: `https://printmd.app/?src=${encodedUrl}`,
+      if (tab?.id) {
+        // Try content script first
+        chrome.tabs.sendMessage(tab.id, { type: 'CONTEXT_MENU_OPEN' }, (response) => {
+          if (chrome.runtime.lastError || !response) {
+            if (tab.url) {
+              const rawUrl = toRawUrl(tab.url);
+              const encodedUrl = encodeURIComponent(rawUrl);
+              chrome.tabs.create({
+                url: `https://printmd.app/?src=${encodedUrl}`,
+              });
+            }
+            return;
+          }
+
+          if (response.rawUrl) {
+            const encodedUrl = encodeURIComponent(response.rawUrl);
+            chrome.tabs.create({
+              url: `https://printmd.app/?src=${encodedUrl}`,
+            });
+          }
         });
       }
     });

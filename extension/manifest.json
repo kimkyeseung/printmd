@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "printmd - Markdown to PDF",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Open markdown files in printmd for styling and PDF export",
   "icons": {
     "16": "icons/icon16.png",
@@ -17,11 +17,26 @@
     "https://github.com/*",
     "https://gist.github.com/*",
     "https://raw.githubusercontent.com/*",
-    "https://gist.githubusercontent.com/*"
+    "https://gist.githubusercontent.com/*",
+    "https://gitlab.com/*",
+    "https://bitbucket.org/*",
+    "https://www.npmjs.com/*",
+    "https://pypi.org/*",
+    "https://notion.so/*",
+    "https://*.notion.site/*"
   ],
   "content_scripts": [
     {
-      "matches": ["https://github.com/*", "https://gist.github.com/*"],
+      "matches": [
+        "https://github.com/*",
+        "https://gist.github.com/*",
+        "https://gitlab.com/*",
+        "https://bitbucket.org/*",
+        "https://www.npmjs.com/*",
+        "https://pypi.org/*",
+        "https://notion.so/*",
+        "https://*.notion.site/*"
+      ],
       "js": ["src/content/index.ts"],
       "css": ["src/content/styles.css"],
       "run_at": "document_idle"
