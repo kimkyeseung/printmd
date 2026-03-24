@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import "./globals.css";
@@ -360,6 +361,7 @@ export default async function RootLayout({
           />
         )}
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
