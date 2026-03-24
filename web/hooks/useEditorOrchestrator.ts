@@ -123,7 +123,11 @@ print(list(fibonacci(10)))
 
 ## 이미지
 
+마크다운 문법과 HTML 태그 모두 지원합니다:
+
 ![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png" width="100" alt="크기 조절 예시">
 
 ---
 
@@ -248,7 +252,11 @@ Below are examples of h3 through h6 headings:
 
 ## Image
 
+Both Markdown syntax and HTML tags are supported:
+
 ![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png" width="100" alt="Resized example">
 
 ---
 

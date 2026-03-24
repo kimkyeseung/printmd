@@ -2,7 +2,7 @@ import MarkdownIt from 'markdown-it';
 import { hljs } from './hljs';
 
 const md = new MarkdownIt({
-  html: false,
+  html: true,
   linkify: true,
   typographer: true,
   breaks: true,
