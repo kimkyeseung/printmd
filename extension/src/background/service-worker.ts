@@ -64,7 +64,7 @@ chrome.runtime.onInstalled.addListener((details) => {
     // Link context menu - for markdown file links
     chrome.contextMenus.create({
       id: 'open-in-printmd-link',
-      title: 'Edit in printmd',
+      title: chrome.i18n.getMessage('contextMenuEdit'),
       contexts: ['link'],
       targetUrlPatterns: MARKDOWN_LINK_PATTERNS,
     });
@@ -72,7 +72,7 @@ chrome.runtime.onInstalled.addListener((details) => {
     // Page context menu - for all supported sites
     chrome.contextMenus.create({
       id: 'open-in-printmd-page',
-      title: 'Edit in printmd',
+      title: chrome.i18n.getMessage('contextMenuEdit'),
       contexts: ['page'],
       documentUrlPatterns: SUPPORTED_SITE_PATTERNS,
     });
@@ -139,6 +139,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         chrome.tabs.create({
           url: 'https://printmd.app/',
         }, (newTab) => {
+          // Wait for tab to load then send content
           if (newTab?.id) {
             const tabId = newTab.id;
             const listener = (updatedTabId: number, changeInfo: chrome.tabs.TabChangeInfo) => {
@@ -167,6 +168,7 @@ chrome.commands?.onCommand?.addListener((command) => {
         // Try content script first
         chrome.tabs.sendMessage(tab.id, { type: 'CONTEXT_MENU_OPEN' }, (response) => {
           if (chrome.runtime.lastError || !response) {
+            // Fallback to URL
             if (tab.url) {
               const rawUrl = toRawUrl(tab.url);
               const encodedUrl = encodeURIComponent(rawUrl);

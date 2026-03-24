@@ -19,35 +19,33 @@
 
     <main class="content">
       <div id="page-info" class="page-info">
-        <p class="detecting">Detecting markdown...</p>
+        <p class="detecting" data-i18n="popupDetecting"></p>
       </div>
 
       <div id="action-section" class="action-section hidden">
-        <button id="open-button" class="primary-button">
-          Open in printmd
-        </button>
+        <button id="open-button" class="primary-button" data-i18n="popupOpenButton"></button>
       </div>
 
       <div id="no-markdown" class="no-markdown hidden">
-        <p>No markdown file detected on this page.</p>
-        <p class="hint">Visit a GitHub markdown file or README to use printmd.</p>
+        <p data-i18n="popupNoMarkdown"></p>
+        <p class="hint" data-i18n="popupNoMarkdownHint"></p>
       </div>
 
       <div class="divider"></div>
 
       <div class="recent-section">
         <div class="recent-header">
-          <h3>Recent Files</h3>
-          <button id="clear-recent" class="clear-btn hidden">Clear all</button>
+          <h3 data-i18n="popupRecentFiles"></h3>
+          <button id="clear-recent" class="clear-btn hidden" data-i18n="popupClearAll"></button>
         </div>
         <ul id="recent-list" class="recent-list">
-          <li class="empty">No recent files</li>
+          <li class="empty" data-i18n="popupNoRecentFiles"></li>
         </ul>
       </div>
     </main>
 
     <footer class="footer">
-      <a href="https://printmd.app" target="_blank" rel="noopener">Open printmd.app</a>
+      <a href="https://printmd.app" target="_blank" rel="noopener" data-i18n="popupOpenPrintmd"></a>
     </footer>
   </div>
 

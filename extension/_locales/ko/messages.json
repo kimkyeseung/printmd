@@ -1,0 +1,62 @@
+{
+  "extName": {
+    "message": "printmd - 마크다운을 PDF로"
+  },
+  "extDescription": {
+    "message": "마크다운 파일을 printmd에서 스타일링하고 PDF로 내보내기"
+  },
+  "contextMenuEdit": {
+    "message": "printmd로 편집하기"
+  },
+  "buttonLabel": {
+    "message": "Open in printmd"
+  },
+  "buttonTitle": {
+    "message": "printmd에서 스타일링하고 PDF로 저장하기"
+  },
+  "toastNoMarkdownBody": {
+    "message": "마크다운 본문을 찾을 수 없습니다."
+  },
+  "toastNoMarkdownContent": {
+    "message": "마크다운 콘텐츠를 찾을 수 없습니다."
+  },
+  "toastPopupBlocked": {
+    "message": "팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요."
+  },
+  "toastOpenFailed": {
+    "message": "파일을 열 수 없습니다. 다시 시도해주세요."
+  },
+  "popupDetecting": {
+    "message": "마크다운 감지 중..."
+  },
+  "popupOpenButton": {
+    "message": "printmd에서 열기"
+  },
+  "popupNoMarkdown": {
+    "message": "이 페이지에서 마크다운 파일을 찾을 수 없습니다."
+  },
+  "popupNoMarkdownHint": {
+    "message": "마크다운 파일이나 README 페이지에서 printmd를 사용해보세요."
+  },
+  "popupRecentFiles": {
+    "message": "최근 파일"
+  },
+  "popupClearAll": {
+    "message": "모두 지우기"
+  },
+  "popupNoRecentFiles": {
+    "message": "최근 파일 없음"
+  },
+  "popupMarkdownFile": {
+    "message": "마크다운 파일"
+  },
+  "popupFileType": {
+    "message": "마크다운"
+  },
+  "popupOpenPrintmd": {
+    "message": "printmd.app 열기"
+  },
+  "popupRemove": {
+    "message": "삭제"
+  }
+}

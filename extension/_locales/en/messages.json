@@ -1,0 +1,62 @@
+{
+  "extName": {
+    "message": "printmd - Markdown to PDF"
+  },
+  "extDescription": {
+    "message": "Open markdown files in printmd for styling and PDF export"
+  },
+  "contextMenuEdit": {
+    "message": "Edit in printmd"
+  },
+  "buttonLabel": {
+    "message": "Open in printmd"
+  },
+  "buttonTitle": {
+    "message": "Style and save as PDF in printmd"
+  },
+  "toastNoMarkdownBody": {
+    "message": "Could not find markdown content."
+  },
+  "toastNoMarkdownContent": {
+    "message": "Could not find markdown content."
+  },
+  "toastPopupBlocked": {
+    "message": "Popup blocked. Please allow popups and try again."
+  },
+  "toastOpenFailed": {
+    "message": "Could not open file. Please try again."
+  },
+  "popupDetecting": {
+    "message": "Detecting markdown..."
+  },
+  "popupOpenButton": {
+    "message": "Open in printmd"
+  },
+  "popupNoMarkdown": {
+    "message": "No markdown file detected on this page."
+  },
+  "popupNoMarkdownHint": {
+    "message": "Visit a markdown file or README to use printmd."
+  },
+  "popupRecentFiles": {
+    "message": "Recent Files"
+  },
+  "popupClearAll": {
+    "message": "Clear all"
+  },
+  "popupNoRecentFiles": {
+    "message": "No recent files"
+  },
+  "popupMarkdownFile": {
+    "message": "Markdown file"
+  },
+  "popupFileType": {
+    "message": "Markdown"
+  },
+  "popupOpenPrintmd": {
+    "message": "Open printmd.app"
+  },
+  "popupRemove": {
+    "message": "Remove"
+  }
+}

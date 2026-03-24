@@ -5,6 +5,8 @@
 import { getRecentFiles, removeRecentFile, clearRecentFiles, type RecentFile } from '../utils/storage';
 import { toRawUrl } from '../utils/github-api';
 
+const msg = chrome.i18n.getMessage.bind(chrome.i18n);
+
 interface TabInfo {
   url: string;
   title: string;
@@ -13,23 +15,36 @@ interface TabInfo {
   fileName: string | null;
 }
 
-interface GitHubPageInfo {
-  type: 'markdown-file' | 'readme' | 'gist' | 'issue-pr' | 'none';
+interface PageInfoResponse {
+  type: string;
   url: string;
   rawUrl: string | null;
   fileName: string | null;
 }
 
 /**
+ * Apply i18n to all elements with data-i18n attribute
+ */
+function applyI18n(): void {
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    const key = el.getAttribute('data-i18n')!;
+    const message = msg(key);
+    if (message) {
+      el.textContent = message;
+    }
+  });
+}
+
+/**
  * Get page info from content script
  */
-async function getPageInfoFromContentScript(tabId: number): Promise<GitHubPageInfo | null> {
+async function getPageInfoFromContentScript(tabId: number): Promise<PageInfoResponse | null> {
   return new Promise((resolve) => {
     chrome.tabs.sendMessage(tabId, { type: 'GET_PAGE_INFO' }, (response) => {
       if (chrome.runtime.lastError) {
         resolve(null);
       } else {
-        resolve(response as GitHubPageInfo);
+        resolve(response as PageInfoResponse);
       }
     });
   });
@@ -70,14 +85,15 @@ function updatePageInfo(info: TabInfo): void {
 
   if (info.isMarkdown && info.rawUrl) {
     pageInfoEl.innerHTML = `
-      <p class="file-name">${info.fileName || 'Markdown file'}</p>
-      <p class="file-type">GitHub Markdown</p>
+      <p class="file-name">${info.fileName || msg('popupMarkdownFile')}</p>
+      <p class="file-type">${msg('popupFileType')}</p>
     `;
     actionSection.classList.remove('hidden');
     noMarkdown.classList.add('hidden');
 
     // Setup button click
     const openButton = document.getElementById('open-button')!;
+    openButton.textContent = msg('popupOpenButton');
     openButton.addEventListener('click', () => {
       const encodedUrl = encodeURIComponent(info.rawUrl!);
       chrome.tabs.create({
@@ -101,7 +117,7 @@ async function updateRecentFiles(): Promise<void> {
   const recentFiles = await getRecentFiles();
 
   if (recentFiles.length === 0) {
-    recentList.innerHTML = '<li class="empty">No recent files</li>';
+    recentList.innerHTML = `<li class="empty">${msg('popupNoRecentFiles')}</li>`;
     clearButton.classList.add('hidden');
     return;
   }
@@ -110,14 +126,21 @@ async function updateRecentFiles(): Promise<void> {
 
   recentList.innerHTML = recentFiles
     .map((file) => {
-      const shortUrl = file.url.replace('https://github.com/', '').replace('https://gist.github.com/', 'gist:');
+      const shortUrl = file.url
+        .replace('https://github.com/', '')
+        .replace('https://gist.github.com/', 'gist:')
+        .replace('https://gitlab.com/', '')
+        .replace('https://bitbucket.org/', '')
+        .replace('https://www.npmjs.com/', 'npm:')
+        .replace('https://pypi.org/', 'pypi:')
+        .replace('https://notion.so/', 'notion:');
       return `
         <li data-url="${encodeURIComponent(file.url)}">
           <div class="recent-item-content">
             <div class="file-title">${file.title}</div>
             <div class="file-url">${shortUrl}</div>
           </div>
-          <button class="remove-btn" data-remove-url="${encodeURIComponent(file.url)}" title="Remove">
+          <button class="remove-btn" data-remove-url="${encodeURIComponent(file.url)}" title="${msg('popupRemove')}">
             <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
               <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06z"/>
             </svg>
@@ -130,7 +153,6 @@ async function updateRecentFiles(): Promise<void> {
   // Add click handlers for opening files
   recentList.querySelectorAll('li[data-url]').forEach((li) => {
     li.addEventListener('click', (e) => {
-      // Don't open if clicking the remove button
       if ((e.target as HTMLElement).closest('.remove-btn')) return;
 
       const url = decodeURIComponent(li.getAttribute('data-url')!);
@@ -166,6 +188,9 @@ async function updateRecentFiles(): Promise<void> {
  * Initialize popup
  */
 async function init(): Promise<void> {
+  // Apply i18n to static elements
+  applyI18n();
+
   // Get current tab info
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 

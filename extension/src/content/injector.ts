@@ -16,7 +16,7 @@ function createButton(pageInfo: PageInfo): HTMLButtonElement {
   button.id = BUTTON_ID;
   button.className = 'printmd-button';
   button.type = 'button';
-  button.title = 'Style and save as PDF in printmd';
+  button.title = chrome.i18n.getMessage('buttonTitle');
 
   // Icon SVG (document with arrow)
   const iconSvg = `
@@ -26,7 +26,7 @@ function createButton(pageInfo: PageInfo): HTMLButtonElement {
     </svg>
   `;
 
-  button.innerHTML = `${iconSvg}<span>Open in printmd</span>`;
+  button.innerHTML = `${iconSvg}<span>${chrome.i18n.getMessage('buttonLabel')}</span>`;
 
   // Click handler
   button.addEventListener('click', async (e) => {
@@ -40,7 +40,7 @@ function createButton(pageInfo: PageInfo): HTMLButtonElement {
       // Add to recent files
       await addRecentFile({
         url: pageInfo.url,
-        title: pageInfo.fileName || 'Markdown file',
+        title: pageInfo.fileName || chrome.i18n.getMessage('popupMarkdownFile'),
       });
 
       if (pageInfo.rawUrl) {
@@ -55,17 +55,17 @@ function createButton(pageInfo: PageInfo): HTMLButtonElement {
         if (content) {
           transferViaStorage(content, pageInfo.url);
         } else {
-          showToast('Could not find markdown content.', 'error');
+          showToast(chrome.i18n.getMessage('toastNoMarkdownBody'), 'error');
         }
       } else {
-        showToast('Could not find markdown content.', 'error');
+        showToast(chrome.i18n.getMessage('toastNoMarkdownContent'), 'error');
       }
     } catch (error) {
       console.error('printmd: Failed to open file', error);
       if (error instanceof TransferError && error.code === 'POPUP_BLOCKED') {
-        showToast('Popup blocked. Please allow popups and try again.', 'error');
+        showToast(chrome.i18n.getMessage('toastPopupBlocked'), 'error');
       } else {
-        showToast('Could not open file. Please try again.', 'error');
+        showToast(chrome.i18n.getMessage('toastOpenFailed'), 'error');
       }
     } finally {
       button.disabled = false;
