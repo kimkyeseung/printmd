@@ -101,7 +101,7 @@ export default async function GitHubPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="h-screen overflow-y-auto bg-gradient-to-b from-gray-50 to-white">
         {/* Hero Section */}
         <header className="px-4 py-16 text-center sm:px-6 lg:px-8">
         <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">

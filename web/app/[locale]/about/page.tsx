@@ -65,7 +65,7 @@ export default async function AboutPage({
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="h-screen overflow-y-auto bg-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -43,7 +43,7 @@ export default async function PrivacyPage({
   const { locale: localeParam } = await params;
   const locale = isValidLocale(localeParam) ? localeParam : 'en';
   return (
-    <div className="min-h-screen bg-white">
+    <div className="h-screen overflow-y-auto bg-white">
       {/* Header */}
       <header className="border-b border-gray-200 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
