@@ -69,7 +69,7 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
 
   return (
     <aside
-      className="relative flex h-full flex-col border-l border-[var(--ui-border)] bg-[var(--background)]"
+      className="relative flex h-full w-full flex-col border-l border-[var(--ui-border)] bg-[var(--background)] md:w-auto"
       aria-labelledby="style-panel-title"
     >
       {/* Header */}

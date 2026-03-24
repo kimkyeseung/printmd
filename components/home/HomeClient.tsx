@@ -185,18 +185,26 @@ export default function HomeClient() {
   // Render content based on view mode and style panel state
   const renderedContent = useMemo(() => {
     if (isStylePanelOpen) {
-      // Style panel open → Preview(left) + StylePanel(right) regardless of viewMode
+      // Style panel open
+      // Mobile: full-screen overlay | Desktop: Preview(left) + StylePanel(right)
       return (
         <div className="flex h-full w-full">
-          <div className="flex-1 min-w-0 overflow-hidden">
+          <div className="hidden md:flex flex-1 min-w-0 overflow-hidden">
             {previewElement}
           </div>
-          <StylePanelResizer
-            width={stylePanelWidth}
-            onWidthChange={setStylePanelWidth}
-          >
+          {/* Mobile: full width overlay */}
+          <div className="flex md:hidden h-full w-full">
             <StylePanel onClose={closeStylePanel} />
-          </StylePanelResizer>
+          </div>
+          {/* Desktop: resizable sidebar */}
+          <div className="hidden md:flex">
+            <StylePanelResizer
+              width={stylePanelWidth}
+              onWidthChange={setStylePanelWidth}
+            >
+              <StylePanel onClose={closeStylePanel} />
+            </StylePanelResizer>
+          </div>
         </div>
       );
     }
