@@ -1,21 +1,9 @@
 import { ImageResponse } from 'next/og';
-import { getPostBySlug, getPostSlugs } from '@/lib/blog/index';
-import { locales } from '@/lib/i18n/config';
+import { getPostBySlug } from '@/lib/blog/index';
 
-export const runtime = 'edge';
 export const alt = 'printmd Blog';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
-
-export function generateStaticParams() {
-  const params: { locale: string; slug: string }[] = [];
-  for (const locale of locales) {
-    for (const slug of getPostSlugs(locale)) {
-      params.push({ locale, slug });
-    }
-  }
-  return params;
-}
 
 export default async function Image({
   params,
