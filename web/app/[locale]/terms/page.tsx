@@ -49,8 +49,21 @@ export default async function TermsPage({
   const dict = await getDictionary(locale);
   const t = dict.terms;
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'printmd', item: `https://printmd.app/${locale}` },
+      { '@type': 'ListItem', position: 2, name: t.title, item: `https://printmd.app/${locale}/terms` },
+    ],
+  };
+
   return (
     <div className="h-screen overflow-y-auto bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <header className="border-b border-gray-200 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <Link

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { locales } from '@/lib/i18n/config';
-import { getPostSlugs } from '@/lib/blog';
+import { getAllPosts } from '@/lib/blog';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://printmd.app';
@@ -39,23 +39,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  // Add blog post pages (only include alternates for slugs that exist in both locales)
-  const slugsByLocale = Object.fromEntries(
-    locales.map((locale) => [locale, new Set(getPostSlugs(locale))])
+  // Add blog post pages with actual publish dates
+  const postsByLocale = Object.fromEntries(
+    locales.map((locale) => [
+      locale,
+      new Map(getAllPosts(locale).map((p) => [p.slug, p.date])),
+    ])
   );
 
   for (const locale of locales) {
-    for (const slug of slugsByLocale[locale]) {
+    for (const [slug, date] of postsByLocale[locale]) {
       const languages: Record<string, string> = {};
       for (const altLocale of locales) {
-        if (slugsByLocale[altLocale].has(slug)) {
+        if (postsByLocale[altLocale].has(slug)) {
           languages[altLocale] = `${baseUrl}/${altLocale}/blog/${slug}`;
         }
       }
 
       sitemapEntries.push({
         url: `${baseUrl}/${locale}/blog/${slug}`,
-        lastModified,
+        lastModified: date ? new Date(date) : lastModified,
         changeFrequency: 'monthly' as const,
         priority: 0.6,
         alternates: { languages },

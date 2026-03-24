@@ -49,20 +49,30 @@ export default async function AboutPage({
   const dict = await getDictionary(locale);
   const t = dict.about;
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'AboutPage',
-    name: t.title,
-    description: t.description,
-    url: `https://printmd.app/${locale}/about`,
-    mainEntity: {
-      '@type': 'SoftwareApplication',
-      name: 'printmd',
-      applicationCategory: 'Utility',
-      operatingSystem: 'Web',
-      url: 'https://printmd.app',
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'AboutPage',
+      name: t.title,
+      description: t.description,
+      url: `https://printmd.app/${locale}/about`,
+      mainEntity: {
+        '@type': 'SoftwareApplication',
+        name: 'printmd',
+        applicationCategory: 'Utility',
+        operatingSystem: 'Web',
+        url: 'https://printmd.app',
+      },
     },
-  };
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'printmd', item: `https://printmd.app/${locale}` },
+        { '@type': 'ListItem', position: 2, name: t.title, item: `https://printmd.app/${locale}/about` },
+      ],
+    },
+  ];
 
   return (
     <div className="h-screen overflow-y-auto bg-white">

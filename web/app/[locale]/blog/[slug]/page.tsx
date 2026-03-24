@@ -88,15 +88,25 @@ export default async function BlogPostPage({
       description: post.description,
       datePublished: post.date,
       dateModified: post.date,
+      keywords: post.tags,
+      image: `https://printmd.app/${locale}/blog/${slug}/opengraph-image`,
       author: {
         '@type': 'Organization',
         name: 'printmd',
         url: 'https://printmd.app',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://printmd.app/icon-192.png',
+        },
       },
       publisher: {
         '@type': 'Organization',
         name: 'printmd',
         url: 'https://printmd.app',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://printmd.app/icon-192.png',
+        },
       },
       mainEntityOfPage: {
         '@type': 'WebPage',

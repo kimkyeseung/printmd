@@ -44,6 +44,19 @@ export default async function PrivacyPage({
   const locale = isValidLocale(localeParam) ? localeParam : 'en';
   return (
     <div className="h-screen overflow-y-auto bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'printmd', item: `https://printmd.app/${locale}` },
+              { '@type': 'ListItem', position: 2, name: 'Privacy Policy', item: `https://printmd.app/${locale}/privacy` },
+            ],
+          }),
+        }}
+      />
       {/* Header */}
       <header className="border-b border-gray-200 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">

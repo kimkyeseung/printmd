@@ -126,22 +126,32 @@ export default async function PresetsPage({
   const dict = await getDictionary(locale);
   const t = dict.presets;
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: t.title,
-    description: t.description,
-    url: `https://printmd.app/${locale}/presets`,
-    mainEntity: {
-      '@type': 'ItemList',
-      itemListElement: presetKeys.map((key, i) => ({
-        '@type': 'ListItem',
-        position: i + 1,
-        name: THEME_NAMES[key],
-        description: THEME_DESCRIPTIONS[key],
-      })),
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: t.title,
+      description: t.description,
+      url: `https://printmd.app/${locale}/presets`,
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListElement: presetKeys.map((key, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: THEME_NAMES[key],
+          description: THEME_DESCRIPTIONS[key],
+        })),
+      },
     },
-  };
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'printmd', item: `https://printmd.app/${locale}` },
+        { '@type': 'ListItem', position: 2, name: t.title, item: `https://printmd.app/${locale}/presets` },
+      ],
+    },
+  ];
 
   return (
     <div className="h-screen overflow-y-auto bg-white">
