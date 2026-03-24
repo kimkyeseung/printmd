@@ -40,6 +40,10 @@ Thumbs.db
 # Vercel
 .vercel/
 
+# Serwist (service worker)
+public/sw*
+public/swe-worker*
+
 # TypeScript cache
 *.tsbuildinfo
 next-env.d.ts

@@ -68,14 +68,14 @@ export const Header = memo(function Header({
 
   return (
     <header
-      className="flex h-11 items-center justify-between border-b border-[var(--ui-border)] px-2 sm:px-4"
+      className="flex h-11 min-w-0 items-center justify-between border-b border-[var(--ui-border)] px-1.5 sm:px-4"
       role="banner"
     >
       {/* Logo */}
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex min-w-0 items-center gap-1.5 sm:gap-4">
         <div className="flex items-center gap-1.5">
           <Image src="/icon.svg" alt="printmd logo" width={24} height={24} className="rounded" />
-          <span className="text-base font-semibold sm:text-lg">printmd</span>
+          <span className="hidden text-base font-semibold sm:inline sm:text-lg">printmd</span>
         </div>
 
         {/* View mode toggle */}
@@ -393,19 +393,21 @@ export const Header = memo(function Header({
         {/* Style button (preview document styling) */}
         <button
           onClick={onStylePanelToggle}
-          className="rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:from-purple-600 hover:to-indigo-600 sm:px-4"
+          className="rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 px-2 py-1.5 text-xs font-medium text-white shadow-sm hover:from-purple-600 hover:to-indigo-600 sm:px-4 sm:py-2 sm:text-sm"
           aria-label="Open style settings (Ctrl+Shift+S)"
           title="Style settings (⌘⇧S)"
         >
-          🎨 Style
+          <span className="sm:hidden">🎨</span>
+          <span className="hidden sm:inline">🎨 Style</span>
         </button>
         <button
           onClick={onPrintClick}
-          className="rounded-lg bg-[var(--foreground)] px-3 py-2 text-sm font-medium text-[var(--background)] hover:opacity-90 sm:px-4"
+          className="rounded-lg bg-[var(--foreground)] px-2 py-1.5 text-xs font-medium text-[var(--background)] hover:opacity-90 sm:px-4 sm:py-2 sm:text-sm"
           aria-label="Print or export to PDF (Ctrl+P)"
           title="Print / PDF (⌘P)"
         >
-          🖨️ Print
+          <span className="sm:hidden">🖨️</span>
+          <span className="hidden sm:inline">🖨️ Print</span>
         </button>
       </div>
     </header>
