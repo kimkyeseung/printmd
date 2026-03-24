@@ -1,0 +1,40 @@
+printmd - Markdown to PDF
+
+The official browser extension for https://printmd.app — open markdown files directly in printmd's editor for styling and PDF export. Works on GitHub, GitLab, Bitbucket, npm, PyPI, and Notion.
+
+🚀 HOW IT WORKS
+1. Visit a markdown file, README, or documentation page
+2. Click the "Open in printmd" button (or right-click → "Edit in printmd")
+3. The file opens in printmd.app where you can choose themes and customize styles
+4. Export to PDF or print directly
+
+✨ FEATURES
+• One-click button on markdown files, READMEs, and package pages
+• Right-click context menu on all supported sites
+• Keyboard shortcut (Ctrl+Shift+P / Cmd+Shift+P)
+• 5 beautiful preset themes (Default, Dark, Document, Blog, Minimal)
+• Custom styling: fonts, colors, margins, line-height
+• Print-optimized output with page breaks
+• No account required - works instantly
+
+🔒 PRIVACY FIRST
+• No data sent to external servers
+• All processing happens in your browser
+• We don't track your browsing history
+• Minimal permissions required
+
+📄 SUPPORTED SITES
+• GitHub - markdown files, READMEs, Issues, Pull Requests, Gists
+• GitLab - markdown files, READMEs, Issues, Merge Requests
+• Bitbucket - markdown files, READMEs, Pull Requests
+• npm - package README pages
+• PyPI - project description pages
+• Notion - public pages
+
+💡 PERFECT FOR
+• Developers exporting documentation
+• Job seekers printing markdown resumes
+• Students converting notes to PDF
+• Anyone who needs beautiful markdown output
+
+🌐 You can also use https://printmd.app directly — drag and drop any markdown file, no extension needed.

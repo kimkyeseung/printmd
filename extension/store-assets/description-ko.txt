@@ -1,0 +1,40 @@
+printmd - 마크다운을 PDF로
+
+https://printmd.app 의 공식 브라우저 확장 프로그램 — 마크다운 파일을 printmd 에디터에서 바로 열어 스타일링하고 PDF로 내보내세요. GitHub, GitLab, Bitbucket, npm, PyPI, Notion을 지원합니다.
+
+🚀 사용 방법
+1. 마크다운 파일, README, 또는 문서 페이지 방문
+2. "Open in printmd" 버튼 클릭 (또는 우클릭 → "printmd로 편집하기")
+3. printmd.app에서 파일이 열리면 테마 선택 및 스타일 커스터마이징
+4. PDF로 내보내기 또는 바로 인쇄
+
+✨ 주요 기능
+• 마크다운 파일, README, 패키지 페이지에 원클릭 버튼 자동 삽입
+• 지원하는 모든 사이트에서 우클릭 메뉴 지원
+• 키보드 단축키 (Ctrl+Shift+P / Cmd+Shift+P)
+• 5가지 프리셋 테마 (기본, 다크, 문서형, 블로그, 미니멀)
+• 폰트, 색상, 여백, 행간 커스터마이징
+• 페이지 나눔이 적용된 인쇄 최적화 출력
+• 계정 불필요 - 바로 사용 가능
+
+🔒 개인정보 보호
+• 외부 서버로 데이터 전송 없음
+• 모든 처리는 브라우저 내에서 수행
+• 브라우징 기록 추적 없음
+• 최소한의 권한만 요청
+
+📄 지원 사이트
+• GitHub - 마크다운 파일, README, Issue, Pull Request, Gist
+• GitLab - 마크다운 파일, README, Issue, Merge Request
+• Bitbucket - 마크다운 파일, README, Pull Request
+• npm - 패키지 README 페이지
+• PyPI - 프로젝트 설명 페이지
+• Notion - 퍼블릭 페이지
+
+💡 이런 분들께 추천
+• 문서를 PDF로 내보내야 하는 개발자
+• 마크다운 이력서를 인쇄해야 하는 취준생
+• 노트를 PDF로 변환하려는 학생
+• 예쁜 마크다운 출력이 필요한 모든 분
+
+🌐 https://printmd.app 에서 직접 사용할 수도 있습니다 — 마크다운 파일을 드래그앤드롭하세요. 확장 프로그램 없이도 가능합니다.
