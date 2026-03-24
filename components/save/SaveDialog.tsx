@@ -154,32 +154,34 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
 
           {/* New folder creation */}
           {isCreatingFolder ? (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <input
                 type="text"
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
                 onKeyDown={handleFolderKeyDown}
                 placeholder="Folder name"
-                className="flex-1 rounded border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+                className="min-w-0 flex-1 rounded border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
                 autoFocus
               />
-              <button
-                onClick={handleCreateFolder}
-                disabled={!newFolderName.trim()}
-                className="rounded bg-blue-500 px-3 py-2 text-sm text-white hover:bg-blue-600 disabled:opacity-50"
-              >
-                Create
-              </button>
-              <button
-                onClick={() => {
-                  setIsCreatingFolder(false);
-                  setNewFolderName('');
-                }}
-                className="rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)]"
-              >
-                Cancel
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCreateFolder}
+                  disabled={!newFolderName.trim()}
+                  className="rounded bg-blue-500 px-3 py-2 text-sm text-white hover:bg-blue-600 disabled:opacity-50"
+                >
+                  Create
+                </button>
+                <button
+                  onClick={() => {
+                    setIsCreatingFolder(false);
+                    setNewFolderName('');
+                  }}
+                  className="rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)]"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           ) : (
             <button

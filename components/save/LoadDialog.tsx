@@ -149,7 +149,7 @@ export function LoadDialog({ isOpen, onClose, onLoad }: LoadDialogProps) {
               <p className="mt-1 text-xs">Save a document to see it here</p>
             </div>
           ) : (
-            <div className="border border-[var(--ui-border)] rounded-md max-h-72 overflow-y-auto">
+            <div className="border border-[var(--ui-border)] rounded-md max-h-56 overflow-y-auto sm:max-h-72">
               <FolderTree
                 folders={folders}
                 documents={documents}
