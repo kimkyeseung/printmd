@@ -9,6 +9,10 @@ export default function robots(): MetadataRoute.Robots {
         disallow: '/api/',
       },
       {
+        userAgent: 'Yeti',
+        allow: '/',
+      },
+      {
         userAgent: 'GPTBot',
         allow: '/',
       },

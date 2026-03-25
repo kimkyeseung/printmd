@@ -86,16 +86,14 @@ export default async function Home({
   const seo = dict.home.seo;
 
   return (
-    <>
+    <div className="flex flex-col">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Client-side editor UI */}
-      <HomeClient />
 
-      {/* SSR SEO content — visible below the editor on scroll */}
-      <section className="mx-auto max-w-4xl px-6 py-16">
+      {/* SSR SEO content — first in DOM for crawlers, visually after editor */}
+      <section className="order-2 mx-auto max-w-4xl px-6 py-16">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {seo.heading}
         </h1>
@@ -161,6 +159,11 @@ export default async function Home({
           </Link>
         </p>
       </section>
-    </>
+
+      {/* Client-side editor UI — visually first */}
+      <div className="order-1">
+        <HomeClient />
+      </div>
+    </div>
   );
 }
