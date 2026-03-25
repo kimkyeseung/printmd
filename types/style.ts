@@ -128,7 +128,10 @@ export interface StyleActions {
 
 export type StyleStore = StyleState & StyleActions;
 
-export type ThemePreset = 'default' | 'dark' | 'document' | 'blog' | 'minimal';
+export type ThemePreset =
+  | 'default' | 'dark' | 'document' | 'blog' | 'minimal'
+  | 'sepia' | 'ocean' | 'forest' | 'sunset' | 'newspaper'
+  | 'academic' | 'notebook' | 'terminal' | 'elegant' | 'pastel';
 
 export interface StylePanelProps {
   isOpen: boolean;

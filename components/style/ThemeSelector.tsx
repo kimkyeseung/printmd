@@ -18,7 +18,11 @@ interface ThemeSelectorProps {
   elementStyles: ElementStyles;
 }
 
-const themes: ThemePreset[] = ['default', 'dark', 'document', 'blog', 'minimal'];
+const themes: ThemePreset[] = [
+  'default', 'dark', 'document', 'blog', 'minimal',
+  'sepia', 'ocean', 'forest', 'sunset', 'newspaper',
+  'academic', 'notebook', 'terminal', 'elegant', 'pastel',
+];
 
 function ColorSwatches({ globalStyles }: { globalStyles: GlobalStyles }) {
   const colors = [
