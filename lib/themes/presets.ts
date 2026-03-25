@@ -1,4 +1,4 @@
-import type { GlobalStyles, ThemePreset } from '@/types/style';
+import type { GlobalStyles, ElementStyles, ThemePreset } from '@/types/style';
 
 const defaultGlobalStyles: GlobalStyles = {
   fontSize: 16,
@@ -167,6 +167,84 @@ export const themePresets: Record<ThemePreset, GlobalStyles> = {
     codeBackground: '#f3e8ff',
     maxWidth: 760,
     padding: { top: 44, right: 44, bottom: 44, left: 44 },
+  },
+};
+
+export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
+  default: {
+    h1: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.15)' },
+    h2: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.15)' },
+    code: { borderRadius: 6 },
+  },
+  dark: {
+    h1: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.15)' },
+    h2: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.15)' },
+    code: { borderRadius: 6 },
+  },
+  document: {
+    h1: { borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#333333' },
+    h2: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#cccccc' },
+    code: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#e0e0e0' },
+  },
+  blog: {
+    h1: { borderBottomStyle: 'none' },
+    h2: { borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#0070f3' },
+    code: { borderRadius: 8 },
+  },
+  minimal: {
+    h1: { borderBottomStyle: 'none' },
+    h2: { borderBottomStyle: 'none' },
+    code: { borderRadius: 0 },
+  },
+  sepia: {
+    h1: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#c4a882' },
+    h2: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#d4c4a8' },
+    code: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#c4a882' },
+  },
+  ocean: {
+    h1: { borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#48cae4' },
+    h2: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: 'rgba(72,202,228,0.4)' },
+    code: { borderRadius: 6, borderStyle: 'solid', borderWidth: 1, borderColor: '#1b3a4b' },
+  },
+  forest: {
+    h1: { borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#2e7d32' },
+    h2: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#a5d6a7' },
+    code: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#c8e6c9' },
+  },
+  sunset: {
+    h1: { borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#ff9a56' },
+    h2: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: 'rgba(255,154,86,0.4)' },
+    code: { borderRadius: 6, borderStyle: 'solid', borderWidth: 1, borderColor: '#4a2850' },
+  },
+  newspaper: {
+    h1: { borderBottomStyle: 'double', borderBottomWidth: 3, borderBottomColor: '#1a1a1a' },
+    h2: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#999999' },
+    code: { borderRadius: 0, borderStyle: 'solid', borderWidth: 1, borderColor: '#cccccc' },
+  },
+  academic: {
+    h1: { borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#222222' },
+    h2: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#999999' },
+    code: { borderRadius: 2, borderStyle: 'solid', borderWidth: 1, borderColor: '#d0d0d0' },
+  },
+  notebook: {
+    h1: { borderBottomStyle: 'dashed', borderBottomWidth: 1, borderBottomColor: '#b0b0a0' },
+    h2: { borderBottomStyle: 'dashed', borderBottomWidth: 1, borderBottomColor: '#c8c8b8' },
+    code: { borderRadius: 4 },
+  },
+  terminal: {
+    h1: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#00ff00' },
+    h2: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#005500' },
+    code: { borderRadius: 0, borderStyle: 'solid', borderWidth: 1, borderColor: '#333333' },
+  },
+  elegant: {
+    h1: { borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#8b6914' },
+    h2: { borderBottomStyle: 'none' },
+    code: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#ddd5c4' },
+  },
+  pastel: {
+    h1: { borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#c084fc' },
+    h2: { borderBottomStyle: 'none' },
+    code: { borderRadius: 8 },
   },
 };
 

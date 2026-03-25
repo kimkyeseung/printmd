@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { temporal } from 'zundo';
 import type { StyleStore, ThemePreset, GlobalStyles, ListStyles, HeadingStyles, CustomTheme, EditableElement, ElementStyle, ElementStyles, CustomFont, ColorPreset } from '@/types/style';
-import { themePresets, defaultStyles } from '@/lib/themes/presets';
+import { themePresets, themeElementStyles, defaultStyles } from '@/lib/themes/presets';
 
 const defaultGlobalStyles = defaultStyles;
 
@@ -27,7 +27,7 @@ export const useStyleStore = create<StyleStore>()(
           set({
             currentTheme: theme,
             globalStyles: { ...themePresets[theme] },
-            elementStyles: {},
+            elementStyles: themeElementStyles[theme] ? { ...themeElementStyles[theme] } : {},
           }),
 
         updateGlobalStyles: (styles: Partial<GlobalStyles>) =>
