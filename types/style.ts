@@ -18,6 +18,9 @@ export interface ElementStyle {
   paddingBottom?: number;
   paddingLeft?: number;
   textIndent?: number;
+  borderBottomWidth?: number;
+  borderBottomColor?: string;
+  borderBottomStyle?: string;
 }
 
 export type EditableElement =

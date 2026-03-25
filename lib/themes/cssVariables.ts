@@ -136,6 +136,9 @@ export function generateElementStylesCss(styles: ElementStyles): string {
       style.paddingBottom !== undefined && `padding-bottom: ${style.paddingBottom}px`,
       style.paddingLeft !== undefined && `padding-left: ${style.paddingLeft}px`,
       style.textIndent !== undefined && `text-indent: ${style.textIndent}px`,
+      style.borderBottomWidth !== undefined && `border-bottom-width: ${style.borderBottomWidth}px`,
+      style.borderBottomColor && `border-bottom-color: ${sanitizeCssValue(style.borderBottomColor)}`,
+      style.borderBottomStyle && `border-bottom-style: ${sanitizeCssValue(style.borderBottomStyle)}`,
     ].filter(Boolean).join('; ');
 
     if (props) rules.push(`${selector} { ${props} }`);

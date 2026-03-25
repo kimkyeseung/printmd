@@ -210,6 +210,7 @@ export function ElementStyleEditor() {
 
   const isNonTypographyElement = (['hr', 'image'] as EditableElement[]).includes(selectedElement);
   const isTextElement = (['paragraph', 'bulletList', 'orderedList', 'todoList', 'todoChecked', 'blockquote'] as EditableElement[]).includes(selectedElement);
+  const isHeadingElement = (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as EditableElement[]).includes(selectedElement);
 
   return (
     <div className="flex flex-col gap-3">
@@ -458,6 +459,44 @@ export function ElementStyleEditor() {
                     max={100}
                   />
                   <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
+                </div>
+              </Section>
+            )}
+
+            {/* Border Bottom */}
+            {isHeadingElement && (
+              <Section title="Border Bottom" defaultOpen={false}>
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
+                    <select
+                      value={currentStyle.borderBottomStyle || ''}
+                      onChange={(e) => handleStyleChange({ borderBottomStyle: e.target.value || undefined })}
+                      className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                    >
+                      <option value="">Default</option>
+                      <option value="none">None</option>
+                      <option value="solid">Solid</option>
+                      <option value="dashed">Dashed</option>
+                      <option value="dotted">Dotted</option>
+                      <option value="double">Double</option>
+                    </select>
+                  </div>
+
+                  <Slider
+                    label="Width"
+                    value={currentStyle.borderBottomWidth ?? 1}
+                    onChange={(borderBottomWidth) => handleStyleChange({ borderBottomWidth })}
+                    min={0}
+                    max={10}
+                    unit="px"
+                  />
+
+                  <ColorPicker
+                    label="Color"
+                    value={currentStyle.borderBottomColor || 'rgba(0,0,0,0.15)'}
+                    onChange={(borderBottomColor) => handleStyleChange({ borderBottomColor })}
+                  />
                 </div>
               </Section>
             )}
