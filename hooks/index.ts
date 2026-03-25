@@ -4,3 +4,5 @@ export { useExtensionReceiver } from './useExtensionReceiver';
 export { useKeyboardShortcuts, useFullscreen } from './useKeyboardShortcuts';
 export { useEditorOrchestrator } from './useEditorOrchestrator';
 export { useDragDrop } from './useDragDrop';
+export { useSharedPreset } from './useSharedPreset';
+export { useSlideMode } from './useSlideMode';

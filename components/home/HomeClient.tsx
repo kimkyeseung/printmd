@@ -9,7 +9,9 @@ import { TabBar } from '@/components/layout/TabBar';
 import { EditorPanel } from '@/components/editor/EditorPanel';
 import { PreviewPanel } from '@/components/preview/PreviewPanel';
 import dynamic from 'next/dynamic';
-import { useExtensionReceiver, useKeyboardShortcuts, useFullscreen, useEditorOrchestrator, useDragDrop } from '@/hooks';
+import { useExtensionReceiver, useKeyboardShortcuts, useFullscreen, useEditorOrchestrator, useDragDrop, useSharedPreset, useSlideMode } from '@/hooks';
+import { buildDocumentShareUrl } from '@/lib/share/documentUrl';
+import { showToast } from '@/components/ui/Toast';
 import { DragDropOverlay } from './DragDropOverlay';
 import { CustomFontLoader } from '@/components/style/CustomFontLoader';
 import { DocumentSidebar } from '@/components/sidebar/DocumentSidebar';
@@ -92,6 +94,7 @@ const ExtensionBanner = dynamic(
   () => import('@/components/extension/ExtensionBanner').then((m) => m.ExtensionBanner),
   { ssr: false },
 );
+const SlideView = dynamic(() => import('@/components/preview/SlideView'), { ssr: false });
 
 export default function HomeClient() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -100,6 +103,7 @@ export default function HomeClient() {
 
   // Custom hooks
   useExtensionReceiver();
+  useSharedPreset();
   const { toggleFullscreen } = useFullscreen();
   const { isDragging } = useDragDrop();
   const {
@@ -114,6 +118,7 @@ export default function HomeClient() {
     handleDownloadMd,
     handleNewTab,
   } = useEditorOrchestrator();
+  const slideMode = useSlideMode(displayContent || '');
 
   // Store selectors
   const globalStyles = useStyleStore(useShallow((state) => state.globalStyles));
@@ -158,6 +163,27 @@ export default function HomeClient() {
   const handleLoad = useCallback(() => setIsLoadDialogOpen(true), []);
   const handleOpenFile = useCallback(() => fileInputRef.current?.click(), []);
   const handleDownloadPdf = useCallback(() => openPrintPreview(), [openPrintPreview]);
+
+  const handleShare = useCallback(async () => {
+    const content = displayContent || '';
+    const result = await buildDocumentShareUrl(content);
+
+    if ('error' in result) {
+      if (result.error === 'empty') {
+        showToast('Nothing to share - document is empty.', 'info');
+      } else if (result.error === 'too_large') {
+        showToast('Document is too large to share via URL.', 'error');
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(result.url);
+      showToast('Share link copied to clipboard!', 'success');
+    } catch {
+      showToast('Failed to copy link to clipboard.', 'error');
+    }
+  }, [displayContent]);
 
   // Keyboard shortcuts
   const handleEscape = useCallback(() => {
@@ -252,7 +278,10 @@ export default function HomeClient() {
         onOpenFileClick={handleOpenFile}
         onDownloadMd={handleDownloadMd}
         onDownloadPdf={handleDownloadPdf}
+        onShareClick={handleShare}
+        onSlideMode={slideMode.toggleSlideMode}
         hasCurrentDocument={!!currentDocumentId}
+        hasSlides={slideMode.hasSlides}
       />
 
       <TabBar />
@@ -293,6 +322,19 @@ export default function HomeClient() {
       <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[var(--background)] border-t border-[var(--ui-border)] h-[50px] overflow-hidden">
         <AdKakaoMobile className="h-[50px] flex items-center justify-center" />
       </div>
+
+      {slideMode.isSlideMode && (
+        <SlideView
+          slides={slideMode.slides}
+          currentSlide={slideMode.currentSlide}
+          totalSlides={slideMode.totalSlides}
+          styles={globalStyles}
+          onNext={slideMode.nextSlide}
+          onPrev={slideMode.prevSlide}
+          onExit={slideMode.exitSlideMode}
+          onGoToSlide={slideMode.goToSlide}
+        />
+      )}
 
       {isDragging && <DragDropOverlay />}
       <CustomFontLoader />

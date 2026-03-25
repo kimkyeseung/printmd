@@ -367,5 +367,21 @@
     "privacyLink": "View Privacy Policy",
     "contactTitle": "10. Contact",
     "contactDesc": "If you have questions about these Terms of Service, please contact us at"
+  },
+  "cheatsheet": {
+    "title": "Markdown Cheatsheet",
+    "subtitle": "Quick Reference Guide",
+    "description": "Markdown syntax cheatsheet. Quickly find headings, text formatting, links, images, lists, code blocks, tables, and more. Copy syntax or try it directly in the editor.",
+    "keywords": "markdown cheatsheet,markdown syntax,markdown reference,markdown quick guide,markdown formatting,how to write markdown,markdown basics,markdown cheat sheet",
+    "backLink": "← Back to printmd",
+    "heading": "Markdown Cheatsheet",
+    "subheading": "Quick reference for common Markdown syntax",
+    "toc": "Table of Contents",
+    "copy": "Copy",
+    "tryInEditor": "Try in Editor",
+    "source": "Markdown",
+    "ctaTitle": "Convert your Markdown to PDF",
+    "ctaSubtitle": "Try the syntax from this cheatsheet directly in printmd",
+    "ctaButton": "Start printmd"
   }
 }

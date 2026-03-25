@@ -367,5 +367,21 @@
     "privacyLink": "개인정보처리방침 보기",
     "contactTitle": "10. 연락처",
     "contactDesc": "본 이용약관에 대한 질문이 있으시면 연락해 주세요:"
+  },
+  "cheatsheet": {
+    "title": "마크다운 치트시트",
+    "subtitle": "마크다운 문법 한눈에 보기",
+    "description": "마크다운(Markdown) 문법 치트시트. 제목, 텍스트 서식, 링크, 이미지, 목록, 코드 블록, 테이블 등 자주 쓰는 마크다운 문법을 한눈에 확인하고 에디터에서 바로 사용해보세요.",
+    "keywords": "마크다운 문법,마크다운 치트시트,markdown cheatsheet,markdown syntax,마크다운 사용법,마크다운 기본 문법,마크다운 작성법,markdown 문법 정리",
+    "backLink": "← printmd로 돌아가기",
+    "heading": "마크다운 치트시트",
+    "subheading": "자주 쓰는 마크다운 문법을 한눈에 확인하세요",
+    "toc": "목차",
+    "copy": "복사",
+    "tryInEditor": "에디터에서 열기",
+    "source": "마크다운",
+    "ctaTitle": "마크다운을 PDF로 변환해보세요",
+    "ctaSubtitle": "치트시트에서 배운 문법을 printmd에서 바로 사용해보세요",
+    "ctaButton": "printmd 시작하기"
   }
 }

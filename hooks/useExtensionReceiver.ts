@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useEditorStore, useTabsStore } from '@/stores';
+import { decodeDocumentFromUrl } from '@/lib/share/documentUrl';
 
 interface ExtensionMessage {
   type: 'PRINTMD_CONTENT';
@@ -9,7 +10,7 @@ interface ExtensionMessage {
 
 /**
  * Hook to receive content from the Chrome extension
- * Handles both URL parameter and postMessage methods
+ * Handles URL parameters (?src=, ?doc=) and postMessage methods
  */
 export function useExtensionReceiver() {
   const setSourceUrl = useEditorStore((state) => state.setSourceUrl);
@@ -20,6 +21,23 @@ export function useExtensionReceiver() {
     const handleUrlParam = async () => {
       const params = new URLSearchParams(window.location.search);
       const srcUrl = params.get('src');
+      const docParam = params.get('doc');
+
+      // Handle shared document (?doc=)
+      if (docParam) {
+        try {
+          const content = await decodeDocumentFromUrl(docParam);
+          if (content) {
+            addTab({ content, title: 'Shared Document' });
+          }
+          // Clean URL without reload
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, '', cleanUrl);
+        } catch (error) {
+          console.error('Failed to decode shared document:', error);
+        }
+        return;
+      }
 
       if (srcUrl) {
         try {

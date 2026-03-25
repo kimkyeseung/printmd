@@ -5,6 +5,8 @@ import type { ThemePreset, CustomTheme, ElementStyles, GlobalStyles } from '@/ty
 import { THEME_NAMES, THEME_DESCRIPTIONS } from '@/types/theme';
 import { themePresets } from '@/stores/styleStore';
 import { showToast } from '@/components/ui/Toast';
+import { useStyleStore } from '@/stores/styleStore';
+import { buildShareUrl } from '@/lib/share/presetUrl';
 
 interface ThemeSelectorProps {
   currentTheme: ThemePreset;
@@ -64,7 +66,21 @@ export function ThemeSelector({
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const globalStyles = useStyleStore((s) => s.globalStyles);
+  const listStyles = useStyleStore((s) => s.listStyles);
+  const headingStyles = useStyleStore((s) => s.headingStyles);
+
   const hasElementStyles = Object.keys(elementStyles).length > 0;
+
+  const handleShare = async () => {
+    try {
+      const url = buildShareUrl(globalStyles, elementStyles, listStyles, headingStyles);
+      await navigator.clipboard.writeText(url);
+      showToast('Link copied!', 'success');
+    } catch {
+      showToast('Failed to copy link.', 'error');
+    }
+  };
 
   const handleSave = () => {
     const trimmed = newName.trim();
@@ -325,6 +341,16 @@ export function ThemeSelector({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
               Import
+            </button>
+            <button
+              onClick={handleShare}
+              className="flex items-center gap-1.5 rounded-lg border border-dashed border-[var(--ui-border)] px-3 py-3 text-sm text-[var(--ui-text-muted)] transition-colors hover:border-[var(--ui-border-hover)] hover:bg-[var(--ui-bg-hover)]"
+              title="Share current style as URL"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              Share
             </button>
             <input
               ref={fileInputRef}

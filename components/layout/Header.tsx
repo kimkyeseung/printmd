@@ -16,7 +16,10 @@ interface HeaderProps {
   onOpenFileClick: () => void;
   onDownloadMd: () => void;
   onDownloadPdf: () => void;
+  onShareClick: () => void;
+  onSlideMode?: () => void;
   hasCurrentDocument?: boolean;
+  hasSlides?: boolean;
 }
 
 function ThemeIcon({ theme }: { theme: string | undefined }) {
@@ -52,7 +55,10 @@ export const Header = memo(function Header({
   onOpenFileClick,
   onDownloadMd,
   onDownloadPdf,
+  onShareClick,
+  onSlideMode,
   hasCurrentDocument = false,
+  hasSlides = false,
 }: HeaderProps) {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showDownload, setShowDownload] = useState(false);
@@ -319,6 +325,19 @@ export const Header = memo(function Header({
           )}
         </div>
 
+        {/* Share button */}
+        <button
+          onClick={onShareClick}
+          className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
+          aria-label="Share document"
+          title="Share document URL"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+          <span className="hidden sm:inline">Share</span>
+        </button>
+
         <div className="mx-0.5 h-5 w-px bg-[var(--ui-border)] sm:mx-1" aria-hidden="true" />
 
         {/* Theme dropdown (app UI theme) */}
@@ -389,6 +408,22 @@ export const Header = memo(function Header({
             </div>
           )}
         </div>
+
+        {/* Slide mode button - only show when content has slides */}
+        {hasSlides && (
+          <button
+            onClick={onSlideMode}
+            className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
+            aria-label="Start presentation mode"
+            title="Presentation mode"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5l7 5-7 5V5z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v14H3z" />
+            </svg>
+            <span className="hidden sm:inline">Slides</span>
+          </button>
+        )}
 
         {/* Style button (preview document styling) */}
         <button
