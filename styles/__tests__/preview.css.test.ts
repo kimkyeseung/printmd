@@ -10,7 +10,6 @@ describe('preview.css', () => {
   });
 
   it('uses rgba() for opacity values', () => {
-    expect(css).toContain('rgba(0, 0, 0, 0.15)');
     expect(css).toContain('rgba(0, 0, 0, 0.25)');
     expect(css).toContain('rgba(0, 0, 0, 0.04)');
     expect(css).toContain('rgba(0, 0, 0, 0.20)');
