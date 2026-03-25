@@ -73,7 +73,7 @@ export default async function Image() {
             maxWidth: "800px",
           }}
         >
-          마크다운을 스타일을 골라 바로 PDF로 변환
+          마크다운을 원하는 스타일대로 PDF로 변환
         </p>
       </div>
     ),
