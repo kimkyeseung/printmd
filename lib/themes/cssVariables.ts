@@ -139,6 +139,12 @@ export function generateElementStylesCss(styles: ElementStyles): string {
       style.borderBottomWidth !== undefined && `border-bottom-width: ${style.borderBottomWidth}px`,
       style.borderBottomColor && `border-bottom-color: ${sanitizeCssValue(style.borderBottomColor)}`,
       style.borderBottomStyle && `border-bottom-style: ${sanitizeCssValue(style.borderBottomStyle)}`,
+      style.imageWidth && `width: ${style.imageWidth}`,
+      style.borderWidth !== undefined && `border-width: ${style.borderWidth}px`,
+      style.borderColor && `border-color: ${sanitizeCssValue(style.borderColor)}`,
+      style.borderStyle && `border-style: ${sanitizeCssValue(style.borderStyle)}`,
+      style.borderRadius !== undefined && `border-radius: ${style.borderRadius}px`,
+      style.lineHeight !== undefined && `line-height: ${style.lineHeight}`,
     ].filter(Boolean).join('; ');
 
     if (props) rules.push(`${selector} { ${props} }`);

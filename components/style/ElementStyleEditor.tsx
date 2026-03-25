@@ -403,6 +403,68 @@ export function ElementStyleEditor() {
               </Section>
             )}
 
+            {/* Image-specific controls */}
+            {selectedElement === 'image' && (
+              <>
+                <Section title="Size">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs text-[var(--ui-text-muted)]">Width</label>
+                    <select
+                      value={currentStyle.imageWidth || ''}
+                      onChange={(e) => handleStyleChange({ imageWidth: (e.target.value || undefined) as 'auto' | '100%' | undefined })}
+                      className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                    >
+                      <option value="">Default (max 100%)</option>
+                      <option value="auto">Original Size</option>
+                      <option value="100%">Full Width (100%)</option>
+                    </select>
+                  </div>
+                </Section>
+
+                <Section title="Border" defaultOpen={false}>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
+                      <select
+                        value={currentStyle.borderStyle || ''}
+                        onChange={(e) => handleStyleChange({ borderStyle: e.target.value || undefined })}
+                        className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                      >
+                        <option value="">None</option>
+                        <option value="solid">Solid</option>
+                        <option value="dashed">Dashed</option>
+                        <option value="dotted">Dotted</option>
+                      </select>
+                    </div>
+
+                    <Slider
+                      label="Width"
+                      value={currentStyle.borderWidth ?? 1}
+                      onChange={(borderWidth) => handleStyleChange({ borderWidth })}
+                      min={0}
+                      max={10}
+                      unit="px"
+                    />
+
+                    <ColorPicker
+                      label="Color"
+                      value={currentStyle.borderColor || '#d0d0d0'}
+                      onChange={(borderColor) => handleStyleChange({ borderColor })}
+                    />
+
+                    <Slider
+                      label="Radius"
+                      value={currentStyle.borderRadius ?? 4}
+                      onChange={(borderRadius) => handleStyleChange({ borderRadius })}
+                      min={0}
+                      max={50}
+                      unit="px"
+                    />
+                  </div>
+                </Section>
+              </>
+            )}
+
             {/* Margin */}
             <Section title="Margin">
               <SpacingGrid
@@ -461,6 +523,64 @@ export function ElementStyleEditor() {
                   <span className="text-xs text-[var(--ui-text-muted)] shrink-0">px</span>
                 </div>
               </Section>
+            )}
+
+            {/* Code Block */}
+            {selectedElement === 'code' && (
+              <>
+                <Section title="Code Style">
+                  <Slider
+                    label="Line Height"
+                    value={currentStyle.lineHeight ?? 1.5}
+                    onChange={(lineHeight) => handleStyleChange({ lineHeight })}
+                    min={1.0}
+                    max={2.5}
+                    step={0.1}
+                  />
+                </Section>
+
+                <Section title="Border" defaultOpen={false}>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
+                      <select
+                        value={currentStyle.borderStyle || ''}
+                        onChange={(e) => handleStyleChange({ borderStyle: e.target.value || undefined })}
+                        className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                      >
+                        <option value="">None</option>
+                        <option value="solid">Solid</option>
+                        <option value="dashed">Dashed</option>
+                        <option value="dotted">Dotted</option>
+                      </select>
+                    </div>
+
+                    <Slider
+                      label="Width"
+                      value={currentStyle.borderWidth ?? 1}
+                      onChange={(borderWidth) => handleStyleChange({ borderWidth })}
+                      min={0}
+                      max={5}
+                      unit="px"
+                    />
+
+                    <ColorPicker
+                      label="Color"
+                      value={currentStyle.borderColor || '#d0d0d0'}
+                      onChange={(borderColor) => handleStyleChange({ borderColor })}
+                    />
+
+                    <Slider
+                      label="Radius"
+                      value={currentStyle.borderRadius ?? 6}
+                      onChange={(borderRadius) => handleStyleChange({ borderRadius })}
+                      min={0}
+                      max={24}
+                      unit="px"
+                    />
+                  </div>
+                </Section>
+              </>
             )}
 
             {/* Border Bottom */}

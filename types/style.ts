@@ -21,6 +21,12 @@ export interface ElementStyle {
   borderBottomWidth?: number;
   borderBottomColor?: string;
   borderBottomStyle?: string;
+  imageWidth?: 'auto' | '100%';
+  borderWidth?: number;
+  borderColor?: string;
+  borderStyle?: string;
+  borderRadius?: number;
+  lineHeight?: number;
 }
 
 export type EditableElement =
