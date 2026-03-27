@@ -208,9 +208,10 @@ export function ElementStyleEditor() {
     }
   }, [confirmReset, resetElementStyle, selectedElement]);
 
-  const isNonTypographyElement = (['hr', 'image'] as EditableElement[]).includes(selectedElement);
+  const isNonTypographyElement = (['hr', 'image', 'table'] as EditableElement[]).includes(selectedElement);
   const isTextElement = (['paragraph', 'bulletList', 'orderedList', 'todoList', 'todoChecked', 'blockquote'] as EditableElement[]).includes(selectedElement);
   const isHeadingElement = (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as EditableElement[]).includes(selectedElement);
+  const isTableElement = selectedElement === 'table';
 
   return (
     <div className="flex flex-col gap-3">
@@ -480,6 +481,52 @@ export function ElementStyleEditor() {
                 onFieldBlur={() => setSpacingHighlight(null)}
               />
             </Section>
+
+            {/* Table-specific controls */}
+            {isTableElement && (
+              <Section title="Border">
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
+                    <select
+                      value={currentStyle.borderStyle || ''}
+                      onChange={(e) => handleStyleChange({ borderStyle: e.target.value || undefined })}
+                      className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                    >
+                      <option value="">Default</option>
+                      <option value="solid">Solid</option>
+                      <option value="dashed">Dashed</option>
+                      <option value="dotted">Dotted</option>
+                      <option value="none">None</option>
+                    </select>
+                  </div>
+
+                  <Slider
+                    label="Width"
+                    value={currentStyle.borderWidth ?? 1}
+                    onChange={(borderWidth) => handleStyleChange({ borderWidth })}
+                    min={0}
+                    max={5}
+                    unit="px"
+                  />
+
+                  <ColorPicker
+                    label="Color"
+                    value={currentStyle.borderColor || 'rgba(0,0,0,0.20)'}
+                    onChange={(borderColor) => handleStyleChange({ borderColor })}
+                  />
+
+                  <Slider
+                    label="Radius"
+                    value={currentStyle.borderRadius ?? 0}
+                    onChange={(borderRadius) => handleStyleChange({ borderRadius })}
+                    min={0}
+                    max={16}
+                    unit="px"
+                  />
+                </div>
+              </Section>
+            )}
 
             {/* Padding */}
             {!isNonTypographyElement && (
