@@ -1,7 +1,16 @@
 'use client';
 
 import { useCallback, useEffect, useState, useRef } from 'react';
+import { RgbaColorPicker } from 'react-colorful';
 import { useStyleStore } from '@/stores';
+import { COLOR_ROLES, getRoleColor } from '@/lib/themes/colorRoles';
+
+interface RgbaColor {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
 
 interface ColorPickerProps {
   label: string;
@@ -9,122 +18,196 @@ interface ColorPickerProps {
   onChange: (value: string) => void;
 }
 
+/** Parse any CSS color string into RgbaColor */
+function parseToRgba(color: string): RgbaColor {
+  const rgbaMatch = color.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+))?\s*\)$/);
+  if (rgbaMatch) {
+    return {
+      r: parseInt(rgbaMatch[1]),
+      g: parseInt(rgbaMatch[2]),
+      b: parseInt(rgbaMatch[3]),
+      a: rgbaMatch[4] !== undefined ? parseFloat(rgbaMatch[4]) : 1,
+    };
+  }
+  let hex = color;
+  if (/^#[0-9A-Fa-f]{3}$/.test(hex)) {
+    hex = `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`;
+  }
+  if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+    return {
+      r: parseInt(hex.slice(1, 3), 16),
+      g: parseInt(hex.slice(3, 5), 16),
+      b: parseInt(hex.slice(5, 7), 16),
+      a: 1,
+    };
+  }
+  return { r: 0, g: 0, b: 0, a: 1 };
+}
+
+/** Convert RgbaColor to CSS string */
+function rgbaToCss(c: RgbaColor): string {
+  if (c.a >= 1) {
+    return `#${c.r.toString(16).padStart(2, '0')}${c.g.toString(16).padStart(2, '0')}${c.b.toString(16).padStart(2, '0')}`;
+  }
+  return `rgba(${c.r},${c.g},${c.b},${c.a})`;
+}
+
+/** Format display string */
+function formatDisplay(c: RgbaColor): string {
+  if (c.a >= 1) {
+    return `#${c.r.toString(16).padStart(2, '0')}${c.g.toString(16).padStart(2, '0')}${c.b.toString(16).padStart(2, '0')}`;
+  }
+  return `rgba(${c.r},${c.g},${c.b},${parseFloat(c.a.toFixed(2))})`;
+}
+
 export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
+  const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value);
-  const [showPresets, setShowPresets] = useState(false);
-  const popoverRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const colorPresets = useStyleStore((state) => state.colorPresets);
+  const globalStyles = useStyleStore((state) => state.globalStyles);
+  const elementStyles = useStyleStore((state) => state.elementStyles);
+
+  const rgba = parseToRgba(value);
 
   useEffect(() => {
-    setInputValue(value);
+    setInputValue(formatDisplay(parseToRgba(value)));
   }, [value]);
 
-  // Close popover on outside click
+  // Close on outside click
   useEffect(() => {
-    if (!showPresets) return;
+    if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
-        setShowPresets(false);
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [showPresets]);
+  }, [open]);
+
+  const handlePickerChange = useCallback((c: RgbaColor) => {
+    const css = rgbaToCss(c);
+    setInputValue(formatDisplay(c));
+    onChange(css);
+  }, [onChange]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-    if (/^#[0-9A-Fa-f]{6}$/.test(newValue)) {
-      onChange(newValue);
+    const v = e.target.value;
+    setInputValue(v);
+    if (/^#[0-9A-Fa-f]{6}$/.test(v) || /^#[0-9A-Fa-f]{3}$/.test(v) || /^rgba?\(/.test(v)) {
+      const parsed = parseToRgba(v);
+      if (parsed.r || parsed.g || parsed.b || parsed.a < 1 || v.includes('0,0,0')) {
+        onChange(rgbaToCss(parsed));
+      }
     }
   }, [onChange]);
 
-  const handleColorChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-    onChange(newValue);
+  const handleInputBlur = useCallback(() => {
+    setInputValue(formatDisplay(rgba));
+  }, [rgba]);
+
+  const handleSwatchSelect = useCallback((color: string) => {
+    const parsed = parseToRgba(color);
+    setInputValue(formatDisplay(parsed));
+    onChange(rgbaToCss(parsed));
   }, [onChange]);
 
-  const handlePresetSelect = useCallback((color: string) => {
-    setInputValue(color);
-    onChange(color);
-    setShowPresets(false);
-  }, [onChange]);
+  // Build role swatches from current styles
+  const roleSwatches = COLOR_ROLES.map((r) => ({
+    name: r.role,
+    color: getRoleColor(r, globalStyles, elementStyles),
+  }));
+
+  // Custom presets (non-role)
+  const roleNameSet = new Set(COLOR_ROLES.map((r) => r.role));
+  const customSwatches = colorPresets.filter((p) => !roleNameSet.has(p.name));
 
   return (
-    <div className="flex items-center justify-between gap-2">
-      <label className="text-sm text-[var(--ui-text-muted)]">{label}</label>
-      <div className="relative flex items-center gap-1.5" ref={popoverRef}>
-        {/* Preset toggle button */}
-        {colorPresets.length > 0 && (
+    <div className="flex flex-col gap-1" ref={wrapperRef}>
+      <div className="flex items-center justify-between gap-2">
+        <label className="text-sm text-[var(--ui-text-muted)]">{label}</label>
+        <div className="flex items-center gap-1.5">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            onBlur={handleInputBlur}
+            className="w-28 rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-xs font-mono"
+          />
           <button
             type="button"
-            onClick={() => setShowPresets(!showPresets)}
-            className={`flex items-center gap-0.5 rounded border px-1.5 py-1 text-xs transition-colors ${
-              showPresets
-                ? 'border-[var(--printmd-link-color)] text-[var(--printmd-link-color)]'
-                : 'border-[var(--ui-border)] text-[var(--ui-text-muted)] hover:border-[var(--ui-border-hover)]'
-            }`}
-            title="Color presets"
-          >
-            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-            </svg>
-          </button>
-        )}
+            onClick={() => setOpen(!open)}
+            className="h-7 w-7 shrink-0 cursor-pointer rounded border border-[var(--ui-border)] p-0.5"
+            style={{ backgroundColor: value }}
+            aria-label="Open color picker"
+          />
+        </div>
+      </div>
 
-        <input
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          className="w-20 rounded border border-[var(--ui-border)] bg-transparent px-2 py-1 text-xs font-mono"
-          placeholder="#000000"
-        />
-        <input
-          type="color"
-          value={value}
-          onChange={handleColorChange}
-          className="h-7 w-7 cursor-pointer rounded border border-[var(--ui-border)] bg-transparent p-0.5"
-        />
+      {open && (
+        <div className="rounded-lg border border-[var(--ui-border)] bg-[var(--background)] p-3 shadow-lg flex flex-col gap-3">
+          {/* react-colorful picker */}
+          <RgbaColorPicker
+            color={rgba}
+            onChange={handlePickerChange}
+            style={{ width: '100%', height: 150 }}
+          />
 
-        {/* Preset popover */}
-        {showPresets && colorPresets.length > 0 && (
-          <div
-            className="absolute right-0 top-full z-10 mt-1 rounded-lg border border-[var(--ui-border)] bg-[var(--background)] p-2 shadow-lg"
-            style={{ minWidth: '200px' }}
-          >
-            <div className="flex flex-col gap-1">
-              {colorPresets.map((preset) => {
-                const isSelected = value.toLowerCase() === preset.color.toLowerCase();
+          {/* Role swatches */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-medium text-[var(--ui-text-muted)] uppercase">Color Roles</span>
+            <div className="flex flex-wrap gap-1">
+              {roleSwatches.map((s) => {
+                const isActive = rgbaToCss(rgba).toLowerCase() === rgbaToCss(parseToRgba(s.color)).toLowerCase();
                 return (
                   <button
-                    key={preset.name}
-                    onClick={() => handlePresetSelect(preset.color)}
-                    className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs transition-colors ${
-                      isSelected
-                        ? 'bg-[var(--ui-bg-hover)] font-medium'
-                        : 'hover:bg-[var(--ui-bg-hover)]'
+                    key={s.name}
+                    type="button"
+                    onClick={() => handleSwatchSelect(s.color)}
+                    className={`flex items-center gap-1 rounded border px-1.5 py-1 text-[10px] transition-colors ${
+                      isActive
+                        ? 'border-[var(--printmd-link-color)] font-medium'
+                        : 'border-[var(--ui-border)] hover:border-[var(--ui-border-hover)]'
                     }`}
+                    title={s.color}
                   >
                     <span
-                      className={`h-5 w-5 shrink-0 rounded-md border ${
-                        isSelected
-                          ? 'border-[var(--printmd-link-color)] ring-1 ring-[var(--printmd-link-color)]'
-                          : 'border-[var(--ui-border)]'
-                      }`}
-                      style={{ backgroundColor: preset.color }}
+                      className="h-3 w-3 shrink-0 rounded-sm border border-[var(--ui-border)]"
+                      style={{ backgroundColor: s.color }}
                     />
-                    <span className="flex-1 truncate">{preset.name}</span>
-                    <span className="font-mono text-[10px] text-[var(--ui-text-muted)]">
-                      {preset.color}
-                    </span>
+                    {s.name}
                   </button>
                 );
               })}
             </div>
           </div>
-        )}
-      </div>
+
+          {/* Custom preset swatches */}
+          {customSwatches.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-medium text-[var(--ui-text-muted)] uppercase">Custom</span>
+              <div className="flex flex-wrap gap-1">
+                {customSwatches.map((s) => (
+                  <button
+                    key={s.name}
+                    type="button"
+                    onClick={() => handleSwatchSelect(s.color)}
+                    className="flex items-center gap-1 rounded border border-[var(--ui-border)] px-1.5 py-1 text-[10px] hover:border-[var(--ui-border-hover)]"
+                    title={s.color}
+                  >
+                    <span
+                      className="h-3 w-3 shrink-0 rounded-sm border border-[var(--ui-border)]"
+                      style={{ backgroundColor: s.color }}
+                    />
+                    {s.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
