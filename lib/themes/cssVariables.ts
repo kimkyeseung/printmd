@@ -115,6 +115,7 @@ export const ELEMENT_SELECTORS: Record<EditableElement, string> = {
   table: '.preview-content table',
   tableHeader: '.preview-content table th',
   tableCell: '.preview-content table td',
+  tableEvenRow: '.preview-content table tr:nth-child(even)',
   strong: '.preview-content strong',
 };
 

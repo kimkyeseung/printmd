@@ -46,6 +46,7 @@ const SPACING_DEFAULTS: Record<EditableElement, {
   table: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
   tableHeader: { marginTop: 0, marginBottom: 0, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
   tableCell: { marginTop: 0, marginBottom: 0, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
+  tableEvenRow: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
   strong: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
 };
 
@@ -531,6 +532,37 @@ export function ElementStyleEditor() {
                       value={tdStyle.color || ''}
                       onChange={(color) => handleSubElementStyleChange('tableCell', { color: color || undefined })}
                     />
+                  </Section>
+
+                  <Section title="Striped Rows">
+                    {(() => {
+                      const evenRowStyle = elementStyles['tableEvenRow'] || {};
+                      const hasStripe = evenRowStyle.backgroundColor !== 'transparent';
+                      return (
+                        <div className="flex flex-col gap-2">
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={hasStripe}
+                              onChange={(e) => {
+                                handleSubElementStyleChange('tableEvenRow', {
+                                  backgroundColor: e.target.checked ? 'rgba(0,0,0,0.03)' : 'transparent',
+                                });
+                              }}
+                              className="accent-[var(--printmd-link-color)]"
+                            />
+                            <span className="text-sm">Enable alternating row color</span>
+                          </label>
+                          {hasStripe && (
+                            <ColorPicker
+                              label="Even Row Color"
+                              value={evenRowStyle.backgroundColor || 'rgba(0,0,0,0.03)'}
+                              onChange={(backgroundColor) => handleSubElementStyleChange('tableEvenRow', { backgroundColor })}
+                            />
+                          )}
+                        </div>
+                      );
+                    })()}
                   </Section>
 
                   <Section title="Border">
