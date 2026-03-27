@@ -537,34 +537,52 @@ export function ElementStyleEditor() {
                     <div className="flex flex-col gap-2">
                       <div className="flex flex-col gap-1">
                         <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
-                        <select
-                          value={thStyle.borderStyle || ''}
-                          onChange={(e) => {
-                            const v = e.target.value || undefined;
-                            handleSubElementStyleChange('tableHeader', { borderStyle: v });
-                            handleSubElementStyleChange('tableCell', { borderStyle: v });
-                          }}
-                          className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
-                        >
-                          <option value="">Default</option>
-                          <option value="solid">Solid</option>
-                          <option value="dashed">Dashed</option>
-                          <option value="dotted">Dotted</option>
-                          <option value="none">None</option>
-                        </select>
+                        <div className="flex gap-1" role="radiogroup">
+                          {[
+                            { value: '', label: 'Default' },
+                            { value: 'solid', label: 'Solid' },
+                            { value: 'dashed', label: 'Dashed' },
+                            { value: 'dotted', label: 'Dotted' },
+                            { value: 'none', label: 'None' },
+                          ].map((opt) => {
+                            const active = (thStyle.borderStyle || '') === opt.value;
+                            return (
+                              <button
+                                key={opt.value}
+                                type="button"
+                                role="radio"
+                                aria-checked={active}
+                                onClick={() => {
+                                  const v = opt.value || undefined;
+                                  handleSubElementStyleChange('tableHeader', { borderStyle: v });
+                                  handleSubElementStyleChange('tableCell', { borderStyle: v });
+                                }}
+                                className={`flex-1 rounded border px-2 py-1.5 text-xs transition-colors ${
+                                  active
+                                    ? 'border-[var(--printmd-link-color)] bg-[var(--ui-bg-hover)] font-medium'
+                                    : 'border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)]'
+                                }`}
+                              >
+                                {opt.label}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
 
-                      <Slider
-                        label="Width"
-                        value={thStyle.borderWidth ?? 1}
-                        onChange={(borderWidth) => {
-                          handleSubElementStyleChange('tableHeader', { borderWidth });
-                          handleSubElementStyleChange('tableCell', { borderWidth });
-                        }}
-                        min={0}
-                        max={5}
-                        unit="px"
-                      />
+                      {thStyle.borderStyle !== 'none' && (
+                        <Slider
+                          label="Width"
+                          value={thStyle.borderWidth ?? 1}
+                          onChange={(borderWidth) => {
+                            handleSubElementStyleChange('tableHeader', { borderWidth });
+                            handleSubElementStyleChange('tableCell', { borderWidth });
+                          }}
+                          min={0}
+                          max={5}
+                          unit="px"
+                        />
+                      )}
 
                       <ColorPicker
                         label="Color"
@@ -573,15 +591,6 @@ export function ElementStyleEditor() {
                           handleSubElementStyleChange('tableHeader', { borderColor });
                           handleSubElementStyleChange('tableCell', { borderColor });
                         }}
-                      />
-
-                      <Slider
-                        label="Radius"
-                        value={currentStyle.borderRadius ?? 0}
-                        onChange={(borderRadius) => handleStyleChange({ borderRadius })}
-                        min={0}
-                        max={16}
-                        unit="px"
                       />
                     </div>
                   </Section>
