@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { temporal } from 'zundo';
 import type { StyleStore, ThemePreset, GlobalStyles, ListStyles, HeadingStyles, CustomTheme, EditableElement, ElementStyle, ElementStyles, CustomFont, ColorPreset } from '@/types/style';
 import { themePresets, themeElementStyles, defaultStyles } from '@/lib/themes/presets';
+import { deriveColorRolesFromStyles } from '@/lib/themes/colorRoles';
 
 const defaultGlobalStyles = defaultStyles;
 
@@ -23,12 +24,16 @@ export const useStyleStore = create<StyleStore>()(
       (set, get) => ({
         ...initialState,
 
-        setTheme: (theme: ThemePreset) =>
+        setTheme: (theme: ThemePreset) => {
+          const gs = themePresets[theme];
+          const es = themeElementStyles[theme] ? { ...themeElementStyles[theme] } : {};
           set({
             currentTheme: theme,
-            globalStyles: { ...themePresets[theme] },
-            elementStyles: themeElementStyles[theme] ? { ...themeElementStyles[theme] } : {},
-          }),
+            globalStyles: { ...gs },
+            elementStyles: es,
+            colorPresets: deriveColorRolesFromStyles(gs, es),
+          });
+        },
 
         updateGlobalStyles: (styles: Partial<GlobalStyles>) =>
           set((state) => ({

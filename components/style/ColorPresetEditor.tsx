@@ -3,113 +3,74 @@
 import { useState, useCallback } from 'react';
 import { useStyleStore } from '@/stores';
 import { showToast } from '@/components/ui/Toast';
-import type { ColorPreset } from '@/types/style';
-
-/** Standard design system color roles */
-const COLOR_ROLES = [
-  { role: 'Primary', desc: 'Main brand / action color' },
-  { role: 'Secondary', desc: 'Supporting accent' },
-  { role: 'Accent', desc: 'Highlight / emphasis' },
-  { role: 'Neutral', desc: 'Text / borders / background' },
-  { role: 'Success', desc: 'Positive feedback' },
-  { role: 'Warning', desc: 'Caution indicator' },
-  { role: 'Error', desc: 'Error / destructive' },
-] as const;
-
-/** Built-in palette sets — each fills all 7 roles at once */
-const PALETTE_SETS: { name: string; colors: Record<string, string> }[] = [
-  {
-    name: 'Ocean',
-    colors: {
-      Primary: '#0066cc',
-      Secondary: '#4d94ff',
-      Accent: '#00b4d8',
-      Neutral: '#475569',
-      Success: '#10b981',
-      Warning: '#f59e0b',
-      Error: '#ef4444',
-    },
-  },
-  {
-    name: 'Forest',
-    colors: {
-      Primary: '#166534',
-      Secondary: '#4ade80',
-      Accent: '#a3e635',
-      Neutral: '#44403c',
-      Success: '#22c55e',
-      Warning: '#eab308',
-      Error: '#dc2626',
-    },
-  },
-  {
-    name: 'Sunset',
-    colors: {
-      Primary: '#dc2626',
-      Secondary: '#f97316',
-      Accent: '#fbbf24',
-      Neutral: '#57534e',
-      Success: '#16a34a',
-      Warning: '#ea580c',
-      Error: '#be123c',
-    },
-  },
-  {
-    name: 'Midnight',
-    colors: {
-      Primary: '#6366f1',
-      Secondary: '#8b5cf6',
-      Accent: '#c084fc',
-      Neutral: '#94a3b8',
-      Success: '#34d399',
-      Warning: '#fbbf24',
-      Error: '#f87171',
-    },
-  },
-  {
-    name: 'Monochrome',
-    colors: {
-      Primary: '#171717',
-      Secondary: '#404040',
-      Accent: '#737373',
-      Neutral: '#a3a3a3',
-      Success: '#22c55e',
-      Warning: '#eab308',
-      Error: '#ef4444',
-    },
-  },
-];
+import type { GlobalStyles, EditableElement, ElementStyle } from '@/types/style';
+import { COLOR_ROLES, getRoleColor, deriveColorRolesFromStyles } from '@/lib/themes/colorRoles';
+import type { ColorRole } from '@/lib/themes/colorRoles';
 
 export function ColorPresetEditor() {
   const colorPresets = useStyleStore((state) => state.colorPresets);
   const addColorPreset = useStyleStore((state) => state.addColorPreset);
   const removeColorPreset = useStyleStore((state) => state.removeColorPreset);
   const updateColorPreset = useStyleStore((state) => state.updateColorPreset);
+  const globalStyles = useStyleStore((state) => state.globalStyles);
+  const elementStyles = useStyleStore((state) => state.elementStyles);
+  const updateGlobalStyles = useStyleStore((state) => state.updateGlobalStyles);
+  const updateElementStyle = useStyleStore((state) => state.updateElementStyle);
 
   const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState('');
   const [newColor, setNewColor] = useState('#3b82f6');
   const [confirmDeleteName, setConfirmDeleteName] = useState<string | null>(null);
 
-  // Apply a full palette set — replaces existing role slots, keeps custom extras
-  const applyPaletteSet = useCallback((paletteColors: Record<string, string>) => {
-    // Remove existing role-based presets
-    const roleNames = new Set<string>(COLOR_ROLES.map((r) => r.role));
-    const customOnly = colorPresets.filter((p) => !roleNames.has(p.name));
+  const roleNameSet = new Set(COLOR_ROLES.map((r) => r.role));
 
-    // Build new array: roles first, then custom
-    const rolePresets: ColorPreset[] = COLOR_ROLES.map((r) => ({
-      name: r.role,
-      color: paletteColors[r.role] || '#000000',
-    }));
+  /** Apply a single role color change to the actual styles */
+  const applyRoleColor = useCallback((role: ColorRole, color: string) => {
+    if (role.source === 'global' && role.styleKey) {
+      updateGlobalStyles({ [role.styleKey]: color } as Partial<GlobalStyles>);
+    } else if (role.source === 'element' && role.elementKey && role.elementProp) {
+      const key = role.elementKey as EditableElement;
+      const update = { [role.elementProp]: color } as Partial<ElementStyle>;
+      updateElementStyle(key, update);
+      // For heading: apply to all h1–h6
+      if (role.elementKey === 'h1') {
+        (['h2', 'h3', 'h4', 'h5', 'h6'] as EditableElement[]).forEach((h) =>
+          updateElementStyle(h, update)
+        );
+      }
+    }
+  }, [updateGlobalStyles, updateElementStyle]);
 
-    // Replace all presets at once via store
-    // Remove all then add back
-    colorPresets.forEach((p) => removeColorPreset(p.name));
-    [...rolePresets, ...customOnly].forEach((p) => addColorPreset(p));
+  /** Handle color role change — auto-init palette if empty */
+  const handleRoleChange = useCallback((role: ColorRole, color: string) => {
+    const hasAnyRole = colorPresets.some((p) => roleNameSet.has(p.name));
 
-    showToast('Palette applied.', 'success');
-  }, [colorPresets, addColorPreset, removeColorPreset]);
+    if (!hasAnyRole) {
+      const derived = deriveColorRolesFromStyles(globalStyles, elementStyles);
+      derived.forEach((p) => {
+        addColorPreset({ name: p.name, color: p.name === role.role ? color : p.color });
+      });
+    } else {
+      const existing = colorPresets.find((p) => p.name === role.role);
+      if (existing) {
+        updateColorPreset(role.role, { color });
+      } else {
+        addColorPreset({ name: role.role, color });
+      }
+    }
+
+    applyRoleColor(role, color);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- roleNameSet is stable
+  }, [colorPresets, globalStyles, elementStyles, addColorPreset, updateColorPreset, applyRoleColor]);
+
+  // Build role list with current values from styles (source of truth)
+  const rolePresets = COLOR_ROLES.map((r) => ({
+    ...r,
+    currentColor: getRoleColor(r, globalStyles, elementStyles),
+    preset: colorPresets.find((p) => p.name === r.role),
+  }));
+
+  const customPresets = colorPresets.filter((p) => !roleNameSet.has(p.name));
 
   const handleAdd = useCallback(() => {
     const trimmed = newName.trim();
@@ -141,91 +102,29 @@ export function ColorPresetEditor() {
     }
   };
 
-  // Separate role-based presets from custom extras
-  const roleNames = new Set<string>(COLOR_ROLES.map((r) => r.role));
-  const rolePresets = COLOR_ROLES.map((r) => ({
-    ...r,
-    preset: colorPresets.find((p) => p.name === r.role),
-  }));
-  const customPresets = colorPresets.filter((p) => !roleNames.has(p.name));
-
-  // Check which palette set is currently active
-  const activePalette = PALETTE_SETS.find((ps) =>
-    COLOR_ROLES.every((r) => {
-      const preset = colorPresets.find((p) => p.name === r.role);
-      return preset && preset.color === ps.colors[r.role];
-    })
-  );
-
   return (
     <div className="flex flex-col gap-4">
-      {/* Palette Sets */}
-      <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-medium border-b border-[var(--ui-border)] pb-2">Palette</h3>
-        <div className="grid grid-cols-1 gap-2">
-          {PALETTE_SETS.map((ps) => {
-            const isActive = activePalette?.name === ps.name;
-            return (
-              <button
-                key={ps.name}
-                onClick={() => applyPaletteSet(ps.colors)}
-                className={`flex items-center justify-between rounded-lg border p-3 text-left transition-colors ${
-                  isActive
-                    ? 'border-[var(--printmd-link-color)] bg-[var(--ui-bg-hover)]'
-                    : 'border-[var(--ui-border)] hover:border-[var(--ui-border-hover)] hover:bg-[var(--ui-bg-hover)]'
-                }`}
-              >
-                <span className="text-sm font-medium">{ps.name}</span>
-                <div className="flex gap-1">
-                  {COLOR_ROLES.map((r) => (
-                    <span
-                      key={r.role}
-                      className="h-5 w-5 rounded-full border border-[var(--ui-border)]"
-                      style={{ backgroundColor: ps.colors[r.role] }}
-                      title={r.role}
-                    />
-                  ))}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <hr className="border-[var(--ui-border)]" />
-
-      {/* Role Slots */}
+      {/* Color Roles */}
       <div className="flex flex-col gap-2">
         <h3 className="text-sm font-medium border-b border-[var(--ui-border)] pb-2">Color Roles</h3>
         <div className="flex flex-col gap-1.5">
-          {rolePresets.map(({ role, desc, preset }) => (
+          {rolePresets.map((rp) => (
             <div
-              key={role}
+              key={rp.role}
               className="flex items-center gap-2 rounded-lg border border-[var(--ui-border)] px-3 py-2"
             >
-              {/* Color picker */}
               <input
                 type="color"
-                value={preset?.color || '#cccccc'}
-                onChange={(e) => {
-                  if (preset) {
-                    updateColorPreset(role, { color: e.target.value });
-                  } else {
-                    addColorPreset({ name: role, color: e.target.value });
-                  }
-                }}
+                value={rp.currentColor}
+                onChange={(e) => handleRoleChange(rp, e.target.value)}
                 className="h-7 w-7 cursor-pointer rounded border border-[var(--ui-border)] bg-transparent p-0.5 shrink-0"
               />
-
-              {/* Role name + desc */}
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium">{role}</div>
-                <div className="text-[10px] text-[var(--ui-text-muted)] truncate">{desc}</div>
+                <div className="text-sm font-medium">{rp.role}</div>
+                <div className="text-[10px] text-[var(--ui-text-muted)] truncate">{rp.desc}</div>
               </div>
-
-              {/* Hex */}
               <span className="text-xs font-mono text-[var(--ui-text-muted)] shrink-0">
-                {preset?.color || '—'}
+                {rp.currentColor}
               </span>
             </div>
           ))}
@@ -234,7 +133,7 @@ export function ColorPresetEditor() {
 
       <hr className="border-[var(--ui-border)]" />
 
-      {/* Custom Extras */}
+      {/* Custom Colors */}
       <div className="flex flex-col gap-2">
         <h3 className="text-sm font-medium border-b border-[var(--ui-border)] pb-2">Custom Colors</h3>
 
@@ -270,7 +169,6 @@ export function ColorPresetEditor() {
           </div>
         )}
 
-        {/* Add custom */}
         {isAdding ? (
           <div className="flex items-center gap-2 rounded-lg border border-[var(--ui-border)] p-3">
             <input
