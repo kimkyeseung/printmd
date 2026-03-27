@@ -72,7 +72,10 @@ export function ThemeSelector({
   const listStyles = useStyleStore((s) => s.listStyles);
   const headingStyles = useStyleStore((s) => s.headingStyles);
 
-  const hasElementStyles = Object.keys(elementStyles).length > 0;
+  const hasModifiedStyles = (() => {
+    const presetEs = themeElementStyles[currentTheme] || {};
+    return JSON.stringify(elementStyles) !== JSON.stringify(presetEs);
+  })();
 
   const handleShare = async () => {
     try {
@@ -201,7 +204,7 @@ export function ThemeSelector({
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">
                     {THEME_NAMES[theme]}
-                    {isActive && hasElementStyles && (
+                    {isActive && hasModifiedStyles && (
                       <span className="ml-1.5 inline-block rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
                         Modified
                       </span>
