@@ -573,5 +573,12 @@
       "added": "\"{{name}}\" font added.",
       "removed": "\"{{name}}\" font removed."
     }
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "about": "About",
+    "contact": "Contact",
+    "allRights": "All rights reserved."
   }
 }

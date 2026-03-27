@@ -573,5 +573,12 @@
       "added": "\"{{name}}\" 폰트가 추가되었습니다.",
       "removed": "\"{{name}}\" 폰트가 삭제되었습니다."
     }
+  },
+  "footer": {
+    "privacy": "개인정보처리방침",
+    "terms": "이용약관",
+    "about": "소개",
+    "contact": "문의",
+    "allRights": "All rights reserved."
   }
 }

@@ -317,19 +317,6 @@ ___`}
           </aside>
         </div>
       </div>
-
-        {/* Footer */}
-        <footer className="border-t border-gray-200 px-4 py-8 text-center text-sm text-gray-500">
-          <p>&copy; {new Date().getFullYear()} printmd. All rights reserved.</p>
-          <a
-            href="https://buymeacoffee.com/kimkyeseung"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1 text-gray-400 hover:text-[#FFDD00] transition-colors"
-          >
-            ☕ Buy me a coffee
-          </a>
-        </footer>
       </div>
     </>
   );
