@@ -67,15 +67,19 @@ export default async function BlogPostPage({
   const dict = await getDictionary(locale);
   const headings = extractHeadings(post.content);
 
+  const idCount = new Map<string, number>();
   const contentWithIds = post.content.replace(
     /<h([2-3])([^>]*)>(.*?)<\/h\1>/gi,
     (_match, level, attrs, text) => {
       const plainText = text.replace(/<[^>]*>/g, '');
-      const id = plainText
+      let id = plainText
         .toLowerCase()
         .replace(/[^a-z0-9가-힣\s-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
+      const count = idCount.get(id) || 0;
+      idCount.set(id, count + 1);
+      if (count > 0) id = `${id}-${count}`;
       return `<h${level}${attrs} id="${id}">${text}</h${level}>`;
     }
   );

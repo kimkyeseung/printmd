@@ -42,7 +42,7 @@ npm install -g @marp-team/marp-cli
 
 **Basic slide syntax:**
 
-```markdown
+````markdown
 ---
 marp: true
 theme: default
@@ -90,7 +90,7 @@ query {
   }
 }
 ```
-```
+````
 
 In Marp, slides are separated by `---` (horizontal rules). The first `---` block contains YAML frontmatter for configuration.
 
@@ -122,7 +122,7 @@ npm init slidev@latest
 
 **Basic slide syntax:**
 
-```markdown
+````markdown
 ---
 theme: seriph
 background: https://source.unsplash.com/1920x1080/?nature
@@ -163,7 +163,7 @@ def fibonacci(n):
             a, b = b, a + b
     return b
 ```
-```
+````
 
 Slidev supports step-by-step animations with `<v-click>`, line highlighting in code blocks with `{2-3|5-6}` syntax, and Vue components directly in slides.
 

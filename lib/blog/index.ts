@@ -106,15 +106,19 @@ export function getAllPosts(locale: string): BlogPostMeta[] {
 
 export function extractHeadings(html: string): { id: string; text: string; level: number }[] {
   const headings: { id: string; text: string; level: number }[] = [];
+  const idCount = new Map<string, number>();
   const regex = /<h([2-3])[^>]*>(.*?)<\/h\1>/gi;
   let match;
   while ((match = regex.exec(html)) !== null) {
     const text = match[2].replace(/<[^>]*>/g, '');
-    const id = text
+    let id = text
       .toLowerCase()
       .replace(/[^a-z0-9가-힣\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-');
+    const count = idCount.get(id) || 0;
+    idCount.set(id, count + 1);
+    if (count > 0) id = `${id}-${count}`;
     headings.push({ id, text, level: parseInt(match[1]) });
   }
   return headings;

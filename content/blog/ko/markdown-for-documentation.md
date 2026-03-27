@@ -236,7 +236,7 @@ npx vitepress dev docs
 
 ### 2. 예제를 충분히 넣어라
 
-```markdown
+````markdown
 <!-- 나쁜 예: 설명만 있음 -->
 `format` 옵션으로 출력 형식을 지정할 수 있습니다.
 
@@ -248,7 +248,7 @@ const result = convert(markdown, {
   format: 'pdf',  // 'html', 'pdf', 'epub' 중 선택
 });
 ```
-```
+````
 
 ### 3. 경고와 참고를 명확히 표시하라
 

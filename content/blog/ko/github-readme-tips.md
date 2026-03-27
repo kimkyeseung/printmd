@@ -80,7 +80,7 @@ GIF를 활용하면 동적인 기능을 보여줄 수 있습니다. 단, 파일 
 
 명확하고 따라하기 쉬운 설치 안내를 제공합니다.
 
-```markdown
+````markdown
 ## 설치
 
 ### 필수 조건
@@ -97,13 +97,13 @@ npm install my-package
 # 또는 yarn으로 설치
 yarn add my-package
 ```
-```
+````
 
 ### 6. 사용법
 
 설치 후 어떻게 사용하는지 구체적인 예시를 보여줍니다.
 
-```markdown
+````markdown
 ## 사용법
 
 ### 기본 사용
@@ -126,7 +126,7 @@ const options = {
 
 const result = convert(content, options);
 ```
-```
+````
 
 코드 예시는 복사-붙여넣기만으로 바로 실행할 수 있도록 작성하는 것이 좋습니다.
 

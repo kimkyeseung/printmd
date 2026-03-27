@@ -35,6 +35,23 @@ export function BlogLayout({
 }: BlogLayoutProps) {
   return (
     <div className="h-screen overflow-y-auto bg-white">
+      <style dangerouslySetInnerHTML={{ __html: `
+        article pre.hljs { background-color: #f8f9fa; color: #24292e; }
+        article pre.hljs code { color: #24292e; }
+        article pre.hljs .hljs-comment { color: #6a737d; }
+        article pre.hljs .hljs-keyword,
+        article pre.hljs .hljs-selector-tag { color: #d73a49; }
+        article pre.hljs .hljs-string,
+        article pre.hljs .hljs-attr { color: #032f62; }
+        article pre.hljs .hljs-number,
+        article pre.hljs .hljs-literal { color: #005cc5; }
+        article pre.hljs .hljs-function,
+        article pre.hljs .hljs-title { color: #6f42c1; }
+        article pre.hljs .hljs-built_in { color: #e36209; }
+        article pre.hljs .hljs-section { color: #005cc5; }
+        article pre.hljs .hljs-bullet { color: #e36209; }
+        article pre.hljs .hljs-code { color: #6f42c1; }
+      `}} />
       <header className="border-b border-gray-200 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <Link

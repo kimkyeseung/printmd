@@ -107,7 +107,7 @@ Use relative paths for internal links. This ensures links work both in the docum
 
 Technical documentation lives or dies by its code examples. Every concept should have a working example:
 
-```markdown
+````markdown
 ### Creating a Client
 
 ```python
@@ -123,7 +123,7 @@ print(response.json())
 
 > **Note**: Never commit real API keys. Use environment
 > variables in production.
-```
+````
 
 Make code examples:
 

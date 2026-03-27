@@ -191,7 +191,7 @@ Every function documentation block should answer:
 
 The README is the entry point for anyone encountering your project. For detailed guidance, see our article on [writing a great GitHub README](/blog/en/github-readme-tips), but here is a summary of the essential sections:
 
-```markdown
+````markdown
 # Project Name
 
 One-paragraph description of what the project does.
@@ -222,7 +222,7 @@ Link to CONTRIBUTING.md.
 ## License
 
 MIT
-```
+````
 
 Every project, no matter how small, should have a README. A three-line README is better than no README.
 
@@ -232,7 +232,7 @@ Every project, no matter how small, should have a README. A three-line README is
 
 For REST APIs, document each endpoint with:
 
-```markdown
+````markdown
 ## Create User
 
 `POST /api/v1/users`
@@ -278,7 +278,7 @@ Creates a new user account.
   "message": "Email is already in use"
 }
 ```
-```
+````
 
 ### Auto-Generated API Docs
 

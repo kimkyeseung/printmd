@@ -40,7 +40,7 @@ This article provides an honest comparison to help you choose the right tool for
 
 If you are writing documentation that lives alongside code, Markdown is the clear winner. It integrates seamlessly with Git, renders natively on GitHub and GitLab, and can be processed by static site generators like MkDocs, Docusaurus, and VitePress.
 
-```markdown
+````markdown
 ## API Endpoints
 
 ### GET /api/users
@@ -51,7 +51,7 @@ Returns a list of all users.
 curl https://api.example.com/users \
   -H "Authorization: Bearer TOKEN"
 ```
-```
+````
 
 Try putting that in a Word document and tracking changes through Git. It does not work well.
 

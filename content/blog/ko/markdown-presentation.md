@@ -417,7 +417,7 @@ http://localhost:8000/?print-pdf
 
 ### 3. 코드는 핵심만 보여줘라
 
-```markdown
+````markdown
 ---
 
 ## 전체 코드 (X)
@@ -441,7 +441,7 @@ function getData(key: string) {
 ```
 
 ---
-```
+````
 
 ### 4. 데모를 준비하라
 

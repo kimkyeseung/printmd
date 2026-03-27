@@ -74,7 +74,7 @@ For command-line tools, consider using terminal recording tools like asciinema o
 
 Provide clear, copy-pasteable installation instructions for every supported method:
 
-```markdown
+````markdown
 ## Installation
 
 ### npm
@@ -94,7 +94,7 @@ yarn add printmd
 ```bash
 brew install printmd
 ```
-```
+````
 
 Include system requirements if they exist. Do not make users guess. If your project requires Node.js 18+, Python 3.9+, or a specific operating system, say so explicitly.
 
@@ -102,7 +102,7 @@ Include system requirements if they exist. Do not make users guess. If your proj
 
 Show the simplest possible usage example. Get the user from installation to a working result in as few steps as possible:
 
-```markdown
+````markdown
 ## Quick Start
 
 ```bash
@@ -112,11 +112,11 @@ printmd convert document.md
 # With custom options
 printmd convert document.md --output report.pdf --theme professional
 ```
-```
+````
 
 After the quick start, you can provide more detailed usage examples:
 
-```markdown
+````markdown
 ## Usage
 
 ### Basic Conversion
@@ -136,7 +136,7 @@ fs.writeFileSync('output.pdf', pdf);
 | fontSize  | number  | 12      | Base font size in points |
 | margin    | string  | 1in     | Page margins             |
 | pageSize  | string  | A4      | Page size (A4, Letter)   |
-```
+````
 
 ### API Reference
 
@@ -244,7 +244,7 @@ GitHub automatically generates anchor links for headings, so these links will wo
 
 Use HTML details tags for content that is important but not needed by every reader:
 
-```markdown
+````markdown
 <details>
 <summary>Advanced Configuration</summary>
 
@@ -260,7 +260,7 @@ in your project root:
 ```
 
 </details>
-```
+````
 
 ### Multiple Language Support
 
