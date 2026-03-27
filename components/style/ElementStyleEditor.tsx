@@ -44,6 +44,9 @@ const SPACING_DEFAULTS: Record<EditableElement, {
   image: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
   code: { marginTop: 0, marginBottom: 16, paddingTop: 16, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
   table: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  tableHeader: { marginTop: 0, marginBottom: 0, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
+  tableCell: { marginTop: 0, marginBottom: 0, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
+  strong: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
 };
 
 const ELEMENTS: { key: EditableElement; label: string }[] = [
@@ -194,6 +197,10 @@ export function ElementStyleEditor() {
 
   const handleStyleChange = (style: Partial<ElementStyle>) => {
     updateElementStyle(selectedElement, style);
+  };
+
+  const handleSubElementStyleChange = (element: EditableElement, style: Partial<ElementStyle>) => {
+    updateElementStyle(element, style);
   };
 
   const handleReset = useCallback(() => {
@@ -483,50 +490,85 @@ export function ElementStyleEditor() {
             </Section>
 
             {/* Table-specific controls */}
-            {isTableElement && (
-              <Section title="Border">
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
-                    <select
-                      value={currentStyle.borderStyle || ''}
-                      onChange={(e) => handleStyleChange({ borderStyle: e.target.value || undefined })}
-                      className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
-                    >
-                      <option value="">Default</option>
-                      <option value="solid">Solid</option>
-                      <option value="dashed">Dashed</option>
-                      <option value="dotted">Dotted</option>
-                      <option value="none">None</option>
-                    </select>
-                  </div>
+            {isTableElement && (() => {
+              const thStyle = elementStyles['tableHeader'] || {};
+              const tdStyle = elementStyles['tableCell'] || {};
+              return (
+                <>
+                  <Section title="Header (th)">
+                    <ColorPicker
+                      label="Background"
+                      value={thStyle.backgroundColor || 'rgba(0,0,0,0.06)'}
+                      onChange={(backgroundColor) => handleSubElementStyleChange('tableHeader', { backgroundColor })}
+                    />
+                    <ColorPicker
+                      label="Text Color"
+                      value={thStyle.color || ''}
+                      onChange={(color) => handleSubElementStyleChange('tableHeader', { color: color || undefined })}
+                    />
+                    <div className="flex flex-col gap-1">
+                      <label className="text-sm text-[var(--ui-text-muted)]">Font Weight</label>
+                      <select
+                        value={thStyle.fontWeight || ''}
+                        onChange={(e) => handleSubElementStyleChange('tableHeader', { fontWeight: e.target.value || undefined })}
+                        className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                      >
+                        {FONT_WEIGHT_OPTIONS.map((fw) => (
+                          <option key={fw.value} value={fw.value}>{fw.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </Section>
 
-                  <Slider
-                    label="Width"
-                    value={currentStyle.borderWidth ?? 1}
-                    onChange={(borderWidth) => handleStyleChange({ borderWidth })}
-                    min={0}
-                    max={5}
-                    unit="px"
-                  />
+                  <Section title="Cell (td)">
+                    <ColorPicker
+                      label="Background"
+                      value={tdStyle.backgroundColor || ''}
+                      onChange={(backgroundColor) => handleSubElementStyleChange('tableCell', { backgroundColor: backgroundColor || undefined })}
+                    />
+                    <ColorPicker
+                      label="Text Color"
+                      value={tdStyle.color || ''}
+                      onChange={(color) => handleSubElementStyleChange('tableCell', { color: color || undefined })}
+                    />
+                  </Section>
 
-                  <ColorPicker
-                    label="Color"
-                    value={currentStyle.borderColor || 'rgba(0,0,0,0.20)'}
-                    onChange={(borderColor) => handleStyleChange({ borderColor })}
-                  />
+                  <Section title="Border">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
+                        <select
+                          value={currentStyle.borderStyle || ''}
+                          onChange={(e) => handleStyleChange({ borderStyle: e.target.value || undefined })}
+                          className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                        >
+                          <option value="">Default</option>
+                          <option value="solid">Solid</option>
+                          <option value="dashed">Dashed</option>
+                          <option value="dotted">Dotted</option>
+                          <option value="none">None</option>
+                        </select>
+                      </div>
 
-                  <Slider
-                    label="Radius"
-                    value={currentStyle.borderRadius ?? 0}
-                    onChange={(borderRadius) => handleStyleChange({ borderRadius })}
-                    min={0}
-                    max={16}
-                    unit="px"
-                  />
-                </div>
-              </Section>
-            )}
+                      <ColorPicker
+                        label="Color"
+                        value={currentStyle.borderColor || 'rgba(0,0,0,0.20)'}
+                        onChange={(borderColor) => handleStyleChange({ borderColor })}
+                      />
+
+                      <Slider
+                        label="Radius"
+                        value={currentStyle.borderRadius ?? 0}
+                        onChange={(borderRadius) => handleStyleChange({ borderRadius })}
+                        min={0}
+                        max={16}
+                        unit="px"
+                      />
+                    </div>
+                  </Section>
+                </>
+              );
+            })()}
 
             {/* Padding */}
             {!isNonTypographyElement && (

@@ -32,7 +32,8 @@ export interface ElementStyle {
 export type EditableElement =
   | 'page' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   | 'paragraph' | 'bulletList' | 'orderedList' | 'todoList' | 'todoChecked'
-  | 'blockquote' | 'hr' | 'image' | 'code' | 'table' | 'strong';
+  | 'blockquote' | 'hr' | 'image' | 'code' | 'table' | 'tableHeader' | 'tableCell'
+  | 'strong';
 
 export type ElementStyles = Partial<Record<EditableElement, ElementStyle>>;
 

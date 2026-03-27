@@ -113,6 +113,8 @@ export const ELEMENT_SELECTORS: Record<EditableElement, string> = {
   image: '.preview-content img',
   code: '.preview-content pre, .preview-content code',
   table: '.preview-content table',
+  tableHeader: '.preview-content table th',
+  tableCell: '.preview-content table td',
   strong: '.preview-content strong',
 };
 
