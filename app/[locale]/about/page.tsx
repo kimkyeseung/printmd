@@ -150,6 +150,27 @@ export default async function AboutPage({
             </p>
           </section>
 
+          {/* Support */}
+          <section className="mb-12 text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {locale === 'ko' ? '응원하기' : 'Support'}
+            </h2>
+            <p className="text-gray-600 mb-6">
+              {locale === 'ko'
+                ? 'printmd가 도움이 되셨다면, 커피 한 잔으로 응원해 주세요.'
+                : 'If printmd has been helpful, consider buying me a coffee.'}
+            </p>
+            <a
+              href="https://buymeacoffee.com/kimkyeseung"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#FFDD00] px-6 py-3 font-medium text-gray-900 shadow-sm transition-colors hover:bg-[#ffca00]"
+            >
+              <span className="text-xl">☕</span>
+              Buy me a coffee
+            </a>
+          </section>
+
           {/* CTA */}
           <section className="text-center py-8 border-t border-gray-200">
             <p className="text-gray-600 mb-4">{t.ctaText}</p>

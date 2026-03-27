@@ -301,7 +301,18 @@ export default function HomeClient() {
           {renderedContent}
         </main>
         <aside className="hidden xl:flex flex-col w-[160px] shrink-0 border-l border-[var(--ui-border)]">
-          <AdKakaoSidebar className="sticky top-0 w-[160px] h-[600px]" />
+          <div className="sticky top-0 flex flex-col items-center">
+            <AdKakaoSidebar className="w-[160px] h-[600px]" />
+            <a
+              href="https://buymeacoffee.com/kimkyeseung"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 flex flex-col items-center gap-1 text-xs text-[var(--ui-text-muted)] hover:text-[#FFDD00] transition-colors"
+            >
+              <span className="text-2xl">☕</span>
+              <span>Buy me a coffee</span>
+            </a>
+          </div>
         </aside>
       </div>
 
