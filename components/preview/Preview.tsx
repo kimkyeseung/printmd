@@ -6,31 +6,7 @@ import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { generateElementStylesCss, ELEMENT_SELECTORS } from '@/lib/themes';
 import { useStyleStore, useUIStore, useTabsStore } from '@/stores';
 import type { GlobalStyles, EditableElement } from '@/types/style';
-
-/** Default spacing values (px) matching preview.css at 16px base */
-const HIGHLIGHT_DEFAULTS: Record<EditableElement, Record<string, number>> = {
-  page: { paddingTop: 40, paddingBottom: 40, paddingLeft: 40, paddingRight: 40, marginTop: 0, marginBottom: 0 },
-  h1: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 5, paddingLeft: 0, paddingRight: 0 },
-  h2: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 5, paddingLeft: 0, paddingRight: 0 },
-  h3: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-  h4: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-  h5: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-  h6: { marginTop: 24, marginBottom: 8, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-  paragraph: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-  bulletList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 0 },
-  orderedList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 32, paddingRight: 0 },
-  todoList: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-  todoChecked: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-  blockquote: { marginTop: 0, marginBottom: 16, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
-  hr: { marginTop: 24, marginBottom: 24, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-  image: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-  code: { marginTop: 0, marginBottom: 16, paddingTop: 16, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
-  table: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-  tableHeader: { marginTop: 0, marginBottom: 0, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
-  tableCell: { marginTop: 0, marginBottom: 0, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
-  tableEvenRow: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-  strong: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
-};
+import { SPACING_DEFAULTS } from '@/lib/styles/spacingDefaults';
 
 interface PreviewProps {
   markdown: string;
@@ -73,7 +49,7 @@ function generateSpacingHighlightCss(
   const isMargin = highlight.type === 'margin';
   const { side } = highlight;
   const propKey = `${highlight.type}${side.charAt(0).toUpperCase() + side.slice(1)}`;
-  const defaults = HIGHLIGHT_DEFAULTS[highlight.element as EditableElement] || {};
+  const defaults = SPACING_DEFAULTS[highlight.element as EditableElement] || {};
 
   // Get the value (explicit -> default)
   let value = 0;
