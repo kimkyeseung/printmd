@@ -123,6 +123,12 @@ export function generateElementStylesCss(styles: ElementStyles): string {
     const selector = ELEMENT_SELECTORS[element];
     if (!selector) return;
 
+    // Build border-bottom as shorthand to avoid rendering artifacts from individual properties
+    const hasBorderBottom = style.borderBottomStyle && style.borderBottomStyle !== 'none';
+    const borderBottomShorthand = hasBorderBottom
+      ? `border-bottom: ${style.borderBottomWidth ?? 1}px ${sanitizeCssValue(style.borderBottomStyle!)} ${style.borderBottomColor ? sanitizeCssValue(style.borderBottomColor) : 'currentColor'}`
+      : style.borderBottomStyle === 'none' ? 'border-bottom: none' : undefined;
+
     const props = [
       style.color && `color: ${sanitizeCssValue(style.color)}`,
       style.fontFamily && `font-family: ${sanitizeFontFamily(style.fontFamily)}`,
@@ -133,12 +139,11 @@ export function generateElementStylesCss(styles: ElementStyles): string {
       style.marginBottom !== undefined && `margin-bottom: ${style.marginBottom}px`,
       style.paddingTop !== undefined && `padding-top: ${style.paddingTop}px`,
       style.paddingRight !== undefined && `padding-right: ${style.paddingRight}px`,
-      style.paddingBottom !== undefined && `padding-bottom: ${style.paddingBottom}px`,
+      style.paddingBottom !== undefined ? `padding-bottom: ${style.paddingBottom}px`
+        : hasBorderBottom ? 'padding-bottom: 0.3em' : undefined,
       style.paddingLeft !== undefined && `padding-left: ${style.paddingLeft}px`,
       style.textIndent !== undefined && `text-indent: ${style.textIndent}px`,
-      style.borderBottomWidth !== undefined && `border-bottom-width: ${style.borderBottomWidth}px`,
-      style.borderBottomColor && `border-bottom-color: ${sanitizeCssValue(style.borderBottomColor)}`,
-      style.borderBottomStyle && `border-bottom-style: ${sanitizeCssValue(style.borderBottomStyle)}`,
+      borderBottomShorthand,
       style.imageWidth && `width: ${style.imageWidth}`,
       style.borderWidth !== undefined && `border-width: ${style.borderWidth}px`,
       style.borderColor && `border-color: ${sanitizeCssValue(style.borderColor)}`,
