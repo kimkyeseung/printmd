@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import type { ThemePreset, CustomTheme, ElementStyles, GlobalStyles } from '@/types/style';
 import { THEME_NAMES, THEME_DESCRIPTIONS } from '@/types/theme';
 import { themePresets } from '@/stores/styleStore';
+import { themeElementStyles } from '@/lib/themes/presets';
 import { showToast } from '@/components/ui/Toast';
 import { useStyleStore } from '@/stores/styleStore';
 import { buildShareUrl } from '@/lib/share/presetUrl';
@@ -26,10 +27,11 @@ const themes: ThemePreset[] = [
   'academic', 'notebook', 'terminal', 'elegant', 'pastel',
 ];
 
-function ColorSwatches({ globalStyles }: { globalStyles: GlobalStyles }) {
+function ColorSwatches({ globalStyles, headingColor }: { globalStyles: GlobalStyles; headingColor?: string }) {
   const colors = [
     { color: globalStyles.backgroundColor, label: 'BG' },
     { color: globalStyles.textColor, label: 'Text' },
+    { color: headingColor || globalStyles.textColor, label: 'Heading' },
     { color: globalStyles.linkColor, label: 'Link' },
   ];
   return (
@@ -209,7 +211,7 @@ export function ThemeSelector({
                     {THEME_DESCRIPTIONS[theme]}
                   </span>
                 </div>
-                <ColorSwatches globalStyles={themePresets[theme]} />
+                <ColorSwatches globalStyles={themePresets[theme]} headingColor={themeElementStyles[theme]?.h1?.color} />
               </button>
             );
           })}
@@ -262,7 +264,7 @@ export function ThemeSelector({
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-[var(--ui-text-muted)]">{formatDate(theme.createdAt)}</span>
-                    <ColorSwatches globalStyles={theme.globalStyles} />
+                    <ColorSwatches globalStyles={theme.globalStyles} headingColor={theme.elementStyles?.h1?.color} />
                   </div>
                 </div>
 
