@@ -538,8 +538,12 @@ export function ElementStyleEditor() {
                       <div className="flex flex-col gap-1">
                         <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
                         <select
-                          value={currentStyle.borderStyle || ''}
-                          onChange={(e) => handleStyleChange({ borderStyle: e.target.value || undefined })}
+                          value={thStyle.borderStyle || ''}
+                          onChange={(e) => {
+                            const v = e.target.value || undefined;
+                            handleSubElementStyleChange('tableHeader', { borderStyle: v });
+                            handleSubElementStyleChange('tableCell', { borderStyle: v });
+                          }}
                           className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
                         >
                           <option value="">Default</option>
@@ -550,10 +554,25 @@ export function ElementStyleEditor() {
                         </select>
                       </div>
 
+                      <Slider
+                        label="Width"
+                        value={thStyle.borderWidth ?? 1}
+                        onChange={(borderWidth) => {
+                          handleSubElementStyleChange('tableHeader', { borderWidth });
+                          handleSubElementStyleChange('tableCell', { borderWidth });
+                        }}
+                        min={0}
+                        max={5}
+                        unit="px"
+                      />
+
                       <ColorPicker
                         label="Color"
-                        value={currentStyle.borderColor || 'rgba(0,0,0,0.20)'}
-                        onChange={(borderColor) => handleStyleChange({ borderColor })}
+                        value={thStyle.borderColor || 'rgba(0,0,0,0.20)'}
+                        onChange={(borderColor) => {
+                          handleSubElementStyleChange('tableHeader', { borderColor });
+                          handleSubElementStyleChange('tableCell', { borderColor });
+                        }}
                       />
 
                       <Slider
