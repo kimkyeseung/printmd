@@ -5,8 +5,10 @@ import { useStyleStore } from '@/stores';
 import { sanitizeFontName } from '@/lib/sanitize/cssValue';
 import { FONT_OPTIONS as DEFAULT_FONTS } from '@/lib/fonts/constants';
 import { showToast } from '@/components/ui/Toast';
+import { useClientDictionary } from '@/hooks/useClientLocale';
 
 export function FontManager() {
+  const t = useClientDictionary().stylePanel;
   const customFonts = useStyleStore((state) => state.customFonts);
   const addCustomFont = useStyleStore((state) => state.addCustomFont);
   const removeCustomFont = useStyleStore((state) => state.removeCustomFont);
@@ -20,7 +22,7 @@ export function FontManager() {
     const name = sanitizeFontName(file.name.replace(/\.(woff2?|ttf|otf)$/i, ''));
 
     if (customFonts.some((f) => f.name === name)) {
-      showToast(`"${name}" is already registered.`, 'error');
+      showToast(t.fontToast.alreadyRegistered.replace('{{name}}', name), 'error');
       return;
     }
 
@@ -28,7 +30,7 @@ export function FontManager() {
     reader.onload = () => {
       const url = reader.result as string;
       addCustomFont({ name, url });
-      showToast(`"${name}" font added.`, 'success');
+      showToast(t.fontToast.added.replace('{{name}}', name), 'success');
     };
     reader.readAsDataURL(file);
 
@@ -43,7 +45,7 @@ export function FontManager() {
       if (el) el.remove();
       removeCustomFont(fontName);
       setConfirmDeleteName(null);
-      showToast(`"${fontName}" font removed.`, 'success');
+      showToast(t.fontToast.removed.replace('{{name}}', fontName), 'success');
     } else {
       setConfirmDeleteName(fontName);
       setTimeout(() => setConfirmDeleteName(null), 3000);
@@ -54,7 +56,7 @@ export function FontManager() {
     <div className="flex flex-col gap-4">
       {/* Default fonts */}
       <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-medium border-b border-[var(--ui-border)] pb-2">Default Fonts</h3>
+        <h3 className="text-sm font-medium border-b border-[var(--ui-border)] pb-2">{t.defaultFonts}</h3>
         <div className="flex flex-col gap-1">
           {DEFAULT_FONTS.map((font) => (
             <div
@@ -77,9 +79,9 @@ export function FontManager() {
 
       {/* Custom fonts */}
       <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-medium border-b border-[var(--ui-border)] pb-2">Custom Fonts</h3>
+        <h3 className="text-sm font-medium border-b border-[var(--ui-border)] pb-2">{t.customFonts}</h3>
         {customFonts.length === 0 ? (
-          <p className="text-sm text-[var(--ui-text-muted)] py-2">No custom fonts registered.</p>
+          <p className="text-sm text-[var(--ui-text-muted)] py-2">{t.noCustomFonts}</p>
         ) : (
           <div className="flex flex-col gap-1.5">
             {customFonts.map((font) => (
@@ -103,9 +105,9 @@ export function FontManager() {
                       ? 'bg-red-50 text-red-600 border border-red-300'
                       : 'text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)] hover:text-red-500'
                   }`}
-                  aria-label={`Delete ${font.name}`}
+                  aria-label={`${t.delete} ${font.name}`}
                 >
-                  {confirmDeleteName === font.name ? 'Confirm?' : 'Delete'}
+                  {confirmDeleteName === font.name ? t.confirmDelete : t.delete}
                 </button>
               </div>
             ))}
@@ -129,7 +131,7 @@ export function FontManager() {
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Upload Font (.woff, .woff2, .ttf, .otf)
+            {t.uploadFont}
           </button>
         </div>
       </div>

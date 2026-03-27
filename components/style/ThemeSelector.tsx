@@ -2,12 +2,12 @@
 
 import { useState, useRef, useCallback } from 'react';
 import type { ThemePreset, CustomTheme, ElementStyles, GlobalStyles } from '@/types/style';
-import { THEME_NAMES, THEME_DESCRIPTIONS } from '@/types/theme';
 import { themePresets } from '@/stores/styleStore';
 import { themeElementStyles } from '@/lib/themes/presets';
 import { showToast } from '@/components/ui/Toast';
 import { useStyleStore } from '@/stores/styleStore';
 import { buildShareUrl } from '@/lib/share/presetUrl';
+import { useClientDictionary } from '@/hooks/useClientLocale';
 
 interface ThemeSelectorProps {
   currentTheme: ThemePreset;
@@ -61,6 +61,7 @@ export function ThemeSelector({
   onImportCustom,
   elementStyles,
 }: ThemeSelectorProps) {
+  const t = useClientDictionary().stylePanel;
   const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -81,9 +82,9 @@ export function ThemeSelector({
     try {
       const url = buildShareUrl(globalStyles, elementStyles, listStyles, headingStyles);
       await navigator.clipboard.writeText(url);
-      showToast('Link copied!', 'success');
+      showToast(t.toast.linkCopied, 'success');
     } catch {
-      showToast('Failed to copy link.', 'error');
+      showToast(t.toast.linkCopyFailed, 'error');
     }
   };
 
@@ -93,7 +94,7 @@ export function ThemeSelector({
     onSaveCustom(trimmed);
     setNewName('');
     setIsAdding(false);
-    showToast('프리셋이 저장되었습니다.', 'success');
+    showToast(t.toast.presetSaved, 'success');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -112,7 +113,7 @@ export function ThemeSelector({
   const handleRenameConfirm = () => {
     if (editingId && editName.trim()) {
       onRenameCustom(editingId, editName.trim());
-      showToast('이름이 변경되었습니다.', 'success');
+      showToast(t.toast.presetRenamed, 'success');
     }
     setEditingId(null);
     setEditName('');
@@ -130,7 +131,7 @@ export function ThemeSelector({
     if (confirmDeleteId === id) {
       onDeleteCustom(id);
       setConfirmDeleteId(null);
-      showToast('프리셋이 삭제되었습니다.', 'success');
+      showToast(t.toast.presetDeleted, 'success');
     } else {
       setConfirmDeleteId(id);
       setTimeout(() => setConfirmDeleteId(null), 3000);
@@ -146,12 +147,12 @@ export function ThemeSelector({
     a.download = `${theme.name.replace(/\s+/g, '-')}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('프리셋을 내보냈습니다.', 'success');
+    showToast(t.toast.presetExported, 'success');
   };
 
   const handleLoad = (id: string) => {
     onLoadCustom(id);
-    showToast('프리셋을 불러왔습니다.', 'success');
+    showToast(t.toast.presetLoaded, 'success');
   };
 
   const handleImport = useCallback(
@@ -163,19 +164,19 @@ export function ThemeSelector({
         try {
           const parsed = JSON.parse(reader.result as string);
           if (!parsed.name || !parsed.globalStyles) {
-            showToast('유효하지 않은 프리셋 파일입니다.', 'error');
+            showToast(t.toast.invalidPreset, 'error');
             return;
           }
           onImportCustom(parsed as CustomTheme);
-          showToast('프리셋을 가져왔습니다.', 'success');
+          showToast(t.toast.presetImported, 'success');
         } catch {
-          showToast('JSON 파일을 읽을 수 없습니다.', 'error');
+          showToast(t.toast.cannotReadJson, 'error');
         }
       };
       reader.readAsText(file);
       e.target.value = '';
     },
-    [onImportCustom]
+    [onImportCustom, t]
   );
 
   const formatDate = (iso: string) => {
@@ -183,11 +184,14 @@ export function ThemeSelector({
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   };
 
+  const themeNames = t.themeNames as Record<ThemePreset, string>;
+  const themeDescs = t.themeDescriptions as Record<ThemePreset, string>;
+
   return (
     <div className="flex flex-col gap-4">
       {/* Built-in presets */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Theme Preset</label>
+        <label className="text-sm font-medium">{t.themePreset}</label>
         <div className="grid grid-cols-1 gap-2">
           {themes.map((theme) => {
             const isActive = currentTheme === theme;
@@ -203,15 +207,15 @@ export function ThemeSelector({
               >
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">
-                    {THEME_NAMES[theme]}
+                    {themeNames[theme]}
                     {isActive && hasModifiedStyles && (
                       <span className="ml-1.5 inline-block rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
-                        Modified
+                        {t.modified}
                       </span>
                     )}
                   </span>
                   <span className="text-xs text-[var(--ui-text-muted)]">
-                    {THEME_DESCRIPTIONS[theme]}
+                    {themeDescs[theme]}
                   </span>
                 </div>
                 <ColorSwatches globalStyles={themePresets[theme]} headingColor={themeElementStyles[theme]?.h1?.color} />
@@ -226,7 +230,7 @@ export function ThemeSelector({
 
       {/* Custom presets */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Custom Preset</label>
+        <label className="text-sm font-medium">{t.customPreset}</label>
 
         {customThemes.length > 0 && (
           <div className="grid grid-cols-1 gap-2">
@@ -255,8 +259,8 @@ export function ThemeSelector({
                         <button
                           onClick={() => handleRenameStart(theme)}
                           className="shrink-0 rounded p-1 text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)] hover:text-[var(--foreground)]"
-                          aria-label={`${theme.name} 이름 변경`}
-                          title="이름 변경"
+                          aria-label={t.renameLabel}
+                          title={t.renameLabel}
                         >
                           <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -277,13 +281,13 @@ export function ThemeSelector({
                     onClick={() => handleLoad(theme.id)}
                     className="flex-1 rounded border border-[var(--ui-border)] px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)]"
                   >
-                    Load
+                    {t.load}
                   </button>
                   <button
                     onClick={() => handleExport(theme)}
                     className="flex-1 rounded border border-[var(--ui-border)] px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)]"
                   >
-                    Export
+                    {t.export}
                   </button>
                   <button
                     onClick={() => handleDelete(theme.id)}
@@ -293,7 +297,7 @@ export function ThemeSelector({
                         : 'border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)] hover:text-red-500'
                     }`}
                   >
-                    {confirmDeleteId === theme.id ? 'Confirm?' : 'Delete'}
+                    {confirmDeleteId === theme.id ? t.confirmDelete : t.delete}
                   </button>
                 </div>
               </div>
@@ -308,7 +312,7 @@ export function ThemeSelector({
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Preset name"
+              placeholder={t.presetName}
               className="flex-1 rounded border border-[var(--ui-border)] bg-transparent px-3 py-2 text-sm outline-none focus:border-[var(--printmd-link-color)]"
               autoFocus
             />
@@ -317,13 +321,13 @@ export function ThemeSelector({
               disabled={!newName.trim()}
               className="rounded bg-[var(--foreground)] px-3 py-2 text-sm text-[var(--background)] disabled:opacity-40"
             >
-              Save
+              {t.save}
             </button>
             <button
               onClick={() => { setIsAdding(false); setNewName(''); }}
               className="rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)]"
             >
-              Cancel
+              {t.cancel}
             </button>
           </div>
         ) : (
@@ -335,27 +339,27 @@ export function ThemeSelector({
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Save Current Style
+              {t.saveCurrentStyle}
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
               className="flex items-center gap-1.5 rounded-lg border border-dashed border-[var(--ui-border)] px-3 py-3 text-sm text-[var(--ui-text-muted)] transition-colors hover:border-[var(--ui-border-hover)] hover:bg-[var(--ui-bg-hover)]"
-              title="Import Preset (.json)"
+              title={t.importPresetJson}
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
-              Import
+              {t.import}
             </button>
             <button
               onClick={handleShare}
               className="flex items-center gap-1.5 rounded-lg border border-dashed border-[var(--ui-border)] px-3 py-3 text-sm text-[var(--ui-text-muted)] transition-colors hover:border-[var(--ui-border-hover)] hover:bg-[var(--ui-bg-hover)]"
-              title="Share current style as URL"
+              title={t.shareTooltip}
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
               </svg>
-              Share
+              {t.share}
             </button>
             <input
               ref={fileInputRef}

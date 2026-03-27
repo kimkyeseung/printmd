@@ -8,36 +8,12 @@ import { FONT_OPTIONS_WITH_DEFAULT as FONT_OPTIONS } from '@/lib/fonts/constants
 import { showToast } from '@/components/ui/Toast';
 import type { EditableElement, ElementStyle } from '@/types/style';
 import { SPACING_DEFAULTS } from '@/lib/styles/spacingDefaults';
+import { useClientDictionary } from '@/hooks/useClientLocale';
 
-const FONT_WEIGHT_OPTIONS = [
-  { value: '', label: 'Default' },
-  { value: '300', label: 'Light' },
-  { value: '400', label: 'Normal' },
-  { value: '500', label: 'Medium' },
-  { value: '600', label: 'Semi Bold' },
-  { value: '700', label: 'Bold' },
-  { value: '800', label: 'Extra Bold' },
-];
-
-
-const ELEMENTS: { key: EditableElement; label: string }[] = [
-  { key: 'page', label: 'Page' },
-  { key: 'h1', label: 'H1' },
-  { key: 'h2', label: 'H2' },
-  { key: 'h3', label: 'H3' },
-  { key: 'h4', label: 'H4' },
-  { key: 'h5', label: 'H5' },
-  { key: 'h6', label: 'H6' },
-  { key: 'paragraph', label: 'Text' },
-  { key: 'bulletList', label: 'Bullet List' },
-  { key: 'orderedList', label: 'Ordered List' },
-  { key: 'todoList', label: 'Todo List' },
-  { key: 'todoChecked', label: 'Todo (checked)' },
-  { key: 'blockquote', label: 'Quote' },
-  { key: 'hr', label: 'Divider' },
-  { key: 'image', label: 'Image' },
-  { key: 'code', label: 'Code' },
-  { key: 'table', label: 'Table' },
+const ELEMENT_KEYS: EditableElement[] = [
+  'page', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+  'paragraph', 'bulletList', 'orderedList', 'todoList', 'todoChecked',
+  'blockquote', 'hr', 'image', 'code', 'table',
 ];
 
 function detectUsedElements(markdown: string): Set<EditableElement> {
@@ -96,6 +72,7 @@ function SpacingGrid({
   onFieldFocus,
   onFieldBlur,
   defaults,
+  labels,
 }: {
   values: { top?: number; bottom?: number; left?: number; right?: number };
   onChange: (field: string, value: number | undefined) => void;
@@ -104,12 +81,13 @@ function SpacingGrid({
   onFieldFocus?: (field: string) => void;
   onFieldBlur?: () => void;
   defaults?: { top?: number; bottom?: number; left?: number; right?: number };
+  labels?: { top: string; bottom: string; left: string; right: string };
 }) {
   const fields = fieldOverride ?? [
-    { key: 'top', label: 'Top' },
-    { key: 'bottom', label: 'Bottom' },
-    { key: 'left', label: 'Left' },
-    { key: 'right', label: 'Right' },
+    { key: 'top', label: labels?.top ?? 'Top' },
+    { key: 'bottom', label: labels?.bottom ?? 'Bottom' },
+    { key: 'left', label: labels?.left ?? 'Left' },
+    { key: 'right', label: labels?.right ?? 'Right' },
   ] as const;
 
   return (
@@ -141,6 +119,7 @@ export function ElementStyleEditor() {
   const [selectedElement, setSelectedElement] = useState<EditableElement>('page');
   const [showAll, setShowAll] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+  const t = useClientDictionary().stylePanel;
 
   const content = useTabsStore((state) => state.getActiveTab()?.content ?? '');
   const elementStyles = useStyleStore((state) => state.elementStyles);
@@ -153,13 +132,27 @@ export function ElementStyleEditor() {
 
   const usedElements = useMemo(() => detectUsedElements(content), [content]);
 
-  const visibleElements = showAll
-    ? ELEMENTS
-    : ELEMENTS.filter((e) => usedElements.has(e.key));
+  const elementLabels = t.elements as Record<EditableElement, string>;
 
-  const hasHiddenElements = usedElements.size < ELEMENTS.length;
+  const elements = ELEMENT_KEYS.map((key) => ({ key, label: elementLabels[key] ?? key }));
+
+  const visibleElements = showAll
+    ? elements
+    : elements.filter((e) => usedElements.has(e.key));
+
+  const hasHiddenElements = usedElements.size < elements.length;
 
   const currentStyle = elementStyles[selectedElement] || {};
+
+  const fontWeightOptions = [
+    { value: '', label: t.fontWeights.default },
+    { value: '300', label: t.fontWeights.light },
+    { value: '400', label: t.fontWeights.normal },
+    { value: '500', label: t.fontWeights.medium },
+    { value: '600', label: t.fontWeights.semiBold },
+    { value: '700', label: t.fontWeights.bold },
+    { value: '800', label: t.fontWeights.extraBold },
+  ];
 
   const fontOptions = [
     ...FONT_OPTIONS,
@@ -174,29 +167,32 @@ export function ElementStyleEditor() {
     updateElementStyle(element, style);
   };
 
+  const selectedLabel = elements.find((e) => e.key === selectedElement)?.label ?? '';
+
   const handleReset = useCallback(() => {
     if (confirmReset) {
       resetElementStyle(selectedElement);
       setConfirmReset(false);
-      const label = ELEMENTS.find((e) => e.key === selectedElement)?.label;
-      showToast(`${label} style has been reset.`, 'info');
+      showToast(t.elementResetComplete.replace('{{label}}', selectedLabel), 'info');
     } else {
       setConfirmReset(true);
       setTimeout(() => setConfirmReset(false), 3000);
     }
-  }, [confirmReset, resetElementStyle, selectedElement]);
+  }, [confirmReset, resetElementStyle, selectedElement, selectedLabel, t]);
 
   const isNonTypographyElement = (['hr', 'image', 'table'] as EditableElement[]).includes(selectedElement);
   const isTextElement = (['paragraph', 'bulletList', 'orderedList', 'todoList', 'todoChecked', 'blockquote'] as EditableElement[]).includes(selectedElement);
   const isHeadingElement = (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as EditableElement[]).includes(selectedElement);
   const isTableElement = selectedElement === 'table';
 
+  const spacingLabels = { top: t.top, bottom: t.bottom, left: t.left, right: t.right };
+
   return (
     <div className="flex flex-col gap-3">
       {/* Element selector */}
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between border-b border-[var(--ui-border)] pb-2">
-          <label className="text-sm font-medium">Element</label>
+          <label className="text-sm font-medium">{t.element}</label>
           {hasHiddenElements && (
             <label className="flex items-center gap-1.5 cursor-pointer">
               <input
@@ -205,7 +201,7 @@ export function ElementStyleEditor() {
                 onChange={(e) => setShowAll(e.target.checked)}
                 className="accent-[var(--printmd-link-color)]"
               />
-              <span className="text-xs text-[var(--ui-text-muted)]">Show all</span>
+              <span className="text-xs text-[var(--ui-text-muted)]">{t.showAll}</span>
             </label>
           )}
         </div>
@@ -229,39 +225,40 @@ export function ElementStyleEditor() {
       {/* Style controls */}
       <div className="flex flex-col gap-3 border-t border-[var(--ui-border)] pt-3">
         <h3 className="text-sm font-medium">
-          {ELEMENTS.find((e) => e.key === selectedElement)?.label}
+          {selectedLabel}
         </h3>
 
         {selectedElement === 'page' ? (
           <>
-            <Section title="Background">
+            <Section title={t.background}>
               <ColorPicker
-                label="Background"
+                label={t.background}
                 value={currentStyle.backgroundColor || '#ffffff'}
                 onChange={(backgroundColor) => handleStyleChange({ backgroundColor })}
               />
             </Section>
 
-            <Section title="Padding">
+            <Section title={t.padding}>
               <SpacingGrid
                 values={globalStyles.padding}
                 onChange={(field, value) =>
                   updateGlobalStyles({ padding: { ...globalStyles.padding, [field]: value ?? 0 } })
                 }
+                labels={spacingLabels}
                 onFieldFocus={(field) => setSpacingHighlight({ element: 'page', type: 'padding', side: field as 'top' | 'bottom' | 'left' | 'right' })}
                 onFieldBlur={() => setSpacingHighlight(null)}
               />
             </Section>
 
-            <Section title="Typography">
+            <Section title={t.typography}>
               <ColorPicker
-                label="Text Color"
+                label={t.textColor}
                 value={globalStyles.textColor}
                 onChange={(textColor) => updateGlobalStyles({ textColor })}
               />
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm text-[var(--ui-text-muted)]">Font</label>
+                <label className="text-sm text-[var(--ui-text-muted)]">{t.font}</label>
                 <select
                   value={globalStyles.fontFamily}
                   onChange={(e) => updateGlobalStyles({ fontFamily: e.target.value })}
@@ -276,7 +273,7 @@ export function ElementStyleEditor() {
               </div>
 
               <Slider
-                label="Font Size"
+                label={t.fontSize}
                 value={globalStyles.fontSize}
                 onChange={(fontSize) => updateGlobalStyles({ fontSize })}
                 min={12}
@@ -285,7 +282,7 @@ export function ElementStyleEditor() {
               />
 
               <Slider
-                label="Line Height"
+                label={t.lineHeight}
                 value={globalStyles.lineHeight}
                 onChange={(lineHeight) => updateGlobalStyles({ lineHeight })}
                 min={1.2}
@@ -294,9 +291,9 @@ export function ElementStyleEditor() {
               />
             </Section>
 
-            <Section title="Layout">
+            <Section title={t.layout}>
               <Slider
-                label="Max Width"
+                label={t.maxWidth}
                 value={globalStyles.maxWidth}
                 onChange={(maxWidth) => updateGlobalStyles({ maxWidth })}
                 min={500}
@@ -306,14 +303,14 @@ export function ElementStyleEditor() {
               />
             </Section>
 
-            <Section title="Colors">
+            <Section title={t.colors}>
               <ColorPicker
-                label="Link"
+                label={t.link}
                 value={globalStyles.linkColor}
                 onChange={(linkColor) => updateGlobalStyles({ linkColor })}
               />
               <ColorPicker
-                label="Code BG"
+                label={t.codeBg}
                 value={globalStyles.codeBackground}
                 onChange={(codeBackground) => updateGlobalStyles({ codeBackground })}
               />
@@ -323,15 +320,15 @@ export function ElementStyleEditor() {
           <>
             {/* Typography */}
             {!isNonTypographyElement && (
-              <Section title="Typography">
+              <Section title={t.typography}>
                 <ColorPicker
-                  label="Color"
+                  label={t.color}
                   value={currentStyle.color || '#000000'}
                   onChange={(color) => handleStyleChange({ color })}
                 />
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm text-[var(--ui-text-muted)]">Font</label>
+                  <label className="text-sm text-[var(--ui-text-muted)]">{t.font}</label>
                   <select
                     value={currentStyle.fontFamily || ''}
                     onChange={(e) => handleStyleChange({ fontFamily: e.target.value || undefined })}
@@ -346,7 +343,7 @@ export function ElementStyleEditor() {
                 </div>
 
                 <Slider
-                  label="Font Size"
+                  label={t.fontSize}
                   value={currentStyle.fontSize || 16}
                   onChange={(fontSize) => handleStyleChange({ fontSize })}
                   min={8}
@@ -355,13 +352,13 @@ export function ElementStyleEditor() {
                 />
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm text-[var(--ui-text-muted)]">Font Weight</label>
+                  <label className="text-sm text-[var(--ui-text-muted)]">{t.fontWeight}</label>
                   <select
                     value={currentStyle.fontWeight || ''}
                     onChange={(e) => handleStyleChange({ fontWeight: e.target.value || undefined })}
                     className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
                   >
-                    {FONT_WEIGHT_OPTIONS.map((fw) => (
+                    {fontWeightOptions.map((fw) => (
                       <option key={fw.value} value={fw.value}>
                         {fw.label}
                       </option>
@@ -373,9 +370,9 @@ export function ElementStyleEditor() {
 
             {/* Background */}
             {selectedElement !== 'image' && (
-              <Section title="Background">
+              <Section title={t.background}>
                 <ColorPicker
-                  label={selectedElement === 'hr' ? 'Line Color' : 'Background'}
+                  label={selectedElement === 'hr' ? t.lineColor : t.background}
                   value={currentStyle.backgroundColor || '#ffffff'}
                   onChange={(backgroundColor) => handleStyleChange({ backgroundColor })}
                 />
@@ -385,39 +382,39 @@ export function ElementStyleEditor() {
             {/* Image-specific controls */}
             {selectedElement === 'image' && (
               <>
-                <Section title="Size">
+                <Section title={t.size}>
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs text-[var(--ui-text-muted)]">Width</label>
+                    <label className="text-xs text-[var(--ui-text-muted)]">{t.width}</label>
                     <select
                       value={currentStyle.imageWidth || ''}
                       onChange={(e) => handleStyleChange({ imageWidth: (e.target.value || undefined) as 'auto' | '100%' | undefined })}
                       className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
                     >
-                      <option value="">Default (max 100%)</option>
-                      <option value="auto">Original Size</option>
-                      <option value="100%">Full Width (100%)</option>
+                      <option value="">{t.imageWidth.default}</option>
+                      <option value="auto">{t.imageWidth.auto}</option>
+                      <option value="100%">{t.imageWidth.full}</option>
                     </select>
                   </div>
                 </Section>
 
-                <Section title="Border" defaultOpen={false}>
+                <Section title={t.border} defaultOpen={false}>
                   <div className="flex flex-col gap-2">
                     <div className="flex flex-col gap-1">
-                      <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
+                      <label className="text-xs text-[var(--ui-text-muted)]">{t.borderStyle}</label>
                       <select
                         value={currentStyle.borderStyle || ''}
                         onChange={(e) => handleStyleChange({ borderStyle: e.target.value || undefined })}
                         className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
                       >
-                        <option value="">None</option>
-                        <option value="solid">Solid</option>
-                        <option value="dashed">Dashed</option>
-                        <option value="dotted">Dotted</option>
+                        <option value="">{t.borderStyles.none}</option>
+                        <option value="solid">{t.borderStyles.solid}</option>
+                        <option value="dashed">{t.borderStyles.dashed}</option>
+                        <option value="dotted">{t.borderStyles.dotted}</option>
                       </select>
                     </div>
 
                     <Slider
-                      label="Width"
+                      label={t.borderWidth}
                       value={currentStyle.borderWidth ?? 1}
                       onChange={(borderWidth) => handleStyleChange({ borderWidth })}
                       min={0}
@@ -426,13 +423,13 @@ export function ElementStyleEditor() {
                     />
 
                     <ColorPicker
-                      label="Color"
+                      label={t.borderColor}
                       value={currentStyle.borderColor || '#d0d0d0'}
                       onChange={(borderColor) => handleStyleChange({ borderColor })}
                     />
 
                     <Slider
-                      label="Radius"
+                      label={t.borderRadius}
                       value={currentStyle.borderRadius ?? 4}
                       onChange={(borderRadius) => handleStyleChange({ borderRadius })}
                       min={0}
@@ -445,10 +442,10 @@ export function ElementStyleEditor() {
             )}
 
             {/* Margin */}
-            <Section title="Margin">
+            <Section title={t.margin}>
               <SpacingGrid
                 values={{ top: currentStyle.marginTop, bottom: currentStyle.marginBottom }}
-                fields={[{ key: 'top', label: 'Top' }, { key: 'bottom', label: 'Bottom' }]}
+                fields={[{ key: 'top', label: t.top }, { key: 'bottom', label: t.bottom }]}
                 onChange={(field, value) => {
                   if (field === 'top') handleStyleChange({ marginTop: value });
                   if (field === 'bottom') handleStyleChange({ marginBottom: value });
@@ -466,45 +463,45 @@ export function ElementStyleEditor() {
               const tdStyle = elementStyles['tableCell'] || {};
               return (
                 <>
-                  <Section title="Header (th)">
+                  <Section title={t.table.header}>
                     <ColorPicker
-                      label="Background"
+                      label={t.background}
                       value={thStyle.backgroundColor || 'rgba(0,0,0,0.06)'}
                       onChange={(backgroundColor) => handleSubElementStyleChange('tableHeader', { backgroundColor })}
                     />
                     <ColorPicker
-                      label="Text Color"
+                      label={t.textColor}
                       value={thStyle.color || ''}
                       onChange={(color) => handleSubElementStyleChange('tableHeader', { color: color || undefined })}
                     />
                     <div className="flex flex-col gap-1">
-                      <label className="text-sm text-[var(--ui-text-muted)]">Font Weight</label>
+                      <label className="text-sm text-[var(--ui-text-muted)]">{t.fontWeight}</label>
                       <select
                         value={thStyle.fontWeight || ''}
                         onChange={(e) => handleSubElementStyleChange('tableHeader', { fontWeight: e.target.value || undefined })}
                         className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
                       >
-                        {FONT_WEIGHT_OPTIONS.map((fw) => (
+                        {fontWeightOptions.map((fw) => (
                           <option key={fw.value} value={fw.value}>{fw.label}</option>
                         ))}
                       </select>
                     </div>
                   </Section>
 
-                  <Section title="Cell (td)">
+                  <Section title={t.table.cell}>
                     <ColorPicker
-                      label="Background"
+                      label={t.background}
                       value={tdStyle.backgroundColor || ''}
                       onChange={(backgroundColor) => handleSubElementStyleChange('tableCell', { backgroundColor: backgroundColor || undefined })}
                     />
                     <ColorPicker
-                      label="Text Color"
+                      label={t.textColor}
                       value={tdStyle.color || ''}
                       onChange={(color) => handleSubElementStyleChange('tableCell', { color: color || undefined })}
                     />
                   </Section>
 
-                  <Section title="Striped Rows">
+                  <Section title={t.table.stripedRows}>
                     {(() => {
                       const evenRowStyle = elementStyles['tableEvenRow'] || {};
                       const hasStripe = evenRowStyle.backgroundColor !== 'transparent';
@@ -521,11 +518,11 @@ export function ElementStyleEditor() {
                               }}
                               className="accent-[var(--printmd-link-color)]"
                             />
-                            <span className="text-sm">Enable alternating row color</span>
+                            <span className="text-sm">{t.table.enableStriped}</span>
                           </label>
                           {hasStripe && (
                             <ColorPicker
-                              label="Even Row Color"
+                              label={t.table.evenRowColor}
                               value={evenRowStyle.backgroundColor || 'rgba(0,0,0,0.03)'}
                               onChange={(backgroundColor) => handleSubElementStyleChange('tableEvenRow', { backgroundColor })}
                             />
@@ -535,16 +532,16 @@ export function ElementStyleEditor() {
                     })()}
                   </Section>
 
-                  <Section title="Border">
+                  <Section title={t.border}>
                     <div className="flex flex-col gap-2">
                       <div className="flex flex-col gap-1">
-                        <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
+                        <label className="text-xs text-[var(--ui-text-muted)]">{t.borderStyle}</label>
                         <div className="flex gap-1" role="radiogroup">
                           {[
-                            { value: 'solid', label: 'Solid' },
-                            { value: 'dashed', label: 'Dashed' },
-                            { value: 'dotted', label: 'Dotted' },
-                            { value: 'none', label: 'None' },
+                            { value: 'solid', label: t.borderStyles.solid },
+                            { value: 'dashed', label: t.borderStyles.dashed },
+                            { value: 'dotted', label: t.borderStyles.dotted },
+                            { value: 'none', label: t.borderStyles.none },
                           ].map((opt) => {
                             const active = (thStyle.borderStyle || 'solid') === opt.value;
                             return (
@@ -573,7 +570,7 @@ export function ElementStyleEditor() {
 
                       {thStyle.borderStyle !== 'none' && (
                         <Slider
-                          label="Width"
+                          label={t.borderWidth}
                           value={thStyle.borderWidth ?? 1}
                           onChange={(borderWidth) => {
                             handleSubElementStyleChange('tableHeader', { borderWidth });
@@ -586,7 +583,7 @@ export function ElementStyleEditor() {
                       )}
 
                       <ColorPicker
-                        label="Color"
+                        label={t.borderColor}
                         value={thStyle.borderColor || 'rgba(0,0,0,0.20)'}
                         onChange={(borderColor) => {
                           handleSubElementStyleChange('tableHeader', { borderColor });
@@ -601,7 +598,7 @@ export function ElementStyleEditor() {
 
             {/* Padding */}
             {!isNonTypographyElement && (
-              <Section title="Padding">
+              <Section title={t.padding}>
                 <SpacingGrid
                   values={{
                     top: currentStyle.paddingTop,
@@ -613,6 +610,7 @@ export function ElementStyleEditor() {
                     const map: Record<string, string> = { top: 'paddingTop', bottom: 'paddingBottom', left: 'paddingLeft', right: 'paddingRight' };
                     handleStyleChange({ [map[field]]: value });
                   }}
+                  labels={spacingLabels}
                   defaults={{
                     top: SPACING_DEFAULTS[selectedElement].paddingTop,
                     bottom: SPACING_DEFAULTS[selectedElement].paddingBottom,
@@ -627,7 +625,7 @@ export function ElementStyleEditor() {
 
             {/* Text indent */}
             {isTextElement && (
-              <Section title="Indent" defaultOpen={false}>
+              <Section title={t.indent} defaultOpen={false}>
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
@@ -646,9 +644,9 @@ export function ElementStyleEditor() {
             {/* Code Block */}
             {selectedElement === 'code' && (
               <>
-                <Section title="Code Style">
+                <Section title={t.codeStyle}>
                   <Slider
-                    label="Line Height"
+                    label={t.lineHeight}
                     value={currentStyle.lineHeight ?? 1.5}
                     onChange={(lineHeight) => handleStyleChange({ lineHeight })}
                     min={1.0}
@@ -657,24 +655,24 @@ export function ElementStyleEditor() {
                   />
                 </Section>
 
-                <Section title="Border" defaultOpen={false}>
+                <Section title={t.border} defaultOpen={false}>
                   <div className="flex flex-col gap-2">
                     <div className="flex flex-col gap-1">
-                      <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
+                      <label className="text-xs text-[var(--ui-text-muted)]">{t.borderStyle}</label>
                       <select
                         value={currentStyle.borderStyle || ''}
                         onChange={(e) => handleStyleChange({ borderStyle: e.target.value || undefined })}
                         className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
                       >
-                        <option value="">None</option>
-                        <option value="solid">Solid</option>
-                        <option value="dashed">Dashed</option>
-                        <option value="dotted">Dotted</option>
+                        <option value="">{t.borderStyles.none}</option>
+                        <option value="solid">{t.borderStyles.solid}</option>
+                        <option value="dashed">{t.borderStyles.dashed}</option>
+                        <option value="dotted">{t.borderStyles.dotted}</option>
                       </select>
                     </div>
 
                     <Slider
-                      label="Width"
+                      label={t.borderWidth}
                       value={currentStyle.borderWidth ?? 1}
                       onChange={(borderWidth) => handleStyleChange({ borderWidth })}
                       min={0}
@@ -683,13 +681,13 @@ export function ElementStyleEditor() {
                     />
 
                     <ColorPicker
-                      label="Color"
+                      label={t.borderColor}
                       value={currentStyle.borderColor || '#d0d0d0'}
                       onChange={(borderColor) => handleStyleChange({ borderColor })}
                     />
 
                     <Slider
-                      label="Radius"
+                      label={t.borderRadius}
                       value={currentStyle.borderRadius ?? 6}
                       onChange={(borderRadius) => handleStyleChange({ borderRadius })}
                       min={0}
@@ -703,26 +701,26 @@ export function ElementStyleEditor() {
 
             {/* Border Bottom */}
             {isHeadingElement && (
-              <Section title="Border Bottom" defaultOpen={false}>
+              <Section title={t.borderBottom} defaultOpen={false}>
                 <div className="flex flex-col gap-2">
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
+                    <label className="text-xs text-[var(--ui-text-muted)]">{t.borderStyle}</label>
                     <select
                       value={currentStyle.borderBottomStyle || ''}
                       onChange={(e) => handleStyleChange({ borderBottomStyle: e.target.value || undefined })}
                       className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
                     >
-                      <option value="">Default</option>
-                      <option value="none">None</option>
-                      <option value="solid">Solid</option>
-                      <option value="dashed">Dashed</option>
-                      <option value="dotted">Dotted</option>
-                      <option value="double">Double</option>
+                      <option value="">{t.borderStyles.default}</option>
+                      <option value="none">{t.borderStyles.none}</option>
+                      <option value="solid">{t.borderStyles.solid}</option>
+                      <option value="dashed">{t.borderStyles.dashed}</option>
+                      <option value="dotted">{t.borderStyles.dotted}</option>
+                      <option value="double">{t.borderStyles.double}</option>
                     </select>
                   </div>
 
                   <Slider
-                    label="Width"
+                    label={t.borderWidth}
                     value={currentStyle.borderBottomWidth ?? 1}
                     onChange={(borderBottomWidth) => handleStyleChange({ borderBottomWidth })}
                     min={0}
@@ -731,7 +729,7 @@ export function ElementStyleEditor() {
                   />
 
                   <ColorPicker
-                    label="Color"
+                    label={t.borderColor}
                     value={currentStyle.borderBottomColor || 'rgba(0,0,0,0.15)'}
                     onChange={(borderBottomColor) => handleStyleChange({ borderBottomColor })}
                   />
@@ -751,8 +749,8 @@ export function ElementStyleEditor() {
           }`}
         >
           {confirmReset
-            ? `Reset ${ELEMENTS.find((e) => e.key === selectedElement)?.label}? Click again`
-            : `Reset ${ELEMENTS.find((e) => e.key === selectedElement)?.label}`
+            ? t.resetElementConfirm.replace('{{label}}', selectedLabel)
+            : t.resetElement.replace('{{label}}', selectedLabel)
           }
         </button>
       </div>

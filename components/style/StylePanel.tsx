@@ -8,6 +8,7 @@ import { FontManager } from './FontManager';
 import { ColorPresetEditor } from './ColorPresetEditor';
 import { useStyleStore } from '@/stores';
 import { ToastContainer, showToast } from '@/components/ui/Toast';
+import { useClientDictionary } from '@/hooks/useClientLocale';
 
 interface StylePanelProps {
   onClose: () => void;
@@ -33,6 +34,7 @@ function useTemporalCanUndoRedo() {
 export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps) {
   const [activeTab, setActiveTab] = useState<Tab>('edit');
   const [confirmReset, setConfirmReset] = useState(false);
+  const t = useClientDictionary().stylePanel;
 
   const currentTheme = useStyleStore((state) => state.currentTheme);
   const setTheme = useStyleStore((state) => state.setTheme);
@@ -53,18 +55,18 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
     if (confirmReset) {
       resetToDefault();
       setConfirmReset(false);
-      showToast('모든 스타일이 초기화되었습니다.', 'info');
+      showToast(t.resetComplete, 'info');
     } else {
       setConfirmReset(true);
       setTimeout(() => setConfirmReset(false), 3000);
     }
-  }, [confirmReset, resetToDefault]);
+  }, [confirmReset, resetToDefault, t]);
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: 'edit', label: 'Edit' },
-    { key: 'preset', label: 'Preset' },
-    { key: 'color', label: 'Color' },
-    { key: 'font', label: 'Font' },
+    { key: 'edit', label: t.tabs.edit },
+    { key: 'preset', label: t.tabs.preset },
+    { key: 'color', label: t.tabs.color },
+    { key: 'font', label: t.tabs.font },
   ];
 
   return (
@@ -74,11 +76,11 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
     >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-[var(--ui-border)] px-4 py-3">
-        <h2 id="style-panel-title" className="font-medium">Style Settings</h2>
+        <h2 id="style-panel-title" className="font-medium">{t.title}</h2>
         <button
           onClick={onClose}
           className="rounded p-1.5 hover:bg-[var(--ui-bg-hover)]"
-          aria-label="Close style panel"
+          aria-label={t.closeLabel}
         >
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -87,7 +89,7 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-[var(--ui-border)]" role="tablist" aria-label="Style settings tabs">
+      <div className="flex border-b border-[var(--ui-border)]" role="tablist" aria-label={t.title}>
         {tabs.map(({ key, label }) => (
           <button
             key={key}
@@ -142,25 +144,25 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
           onClick={() => undo()}
           disabled={!canUndo}
           className="flex items-center gap-1.5 rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)] disabled:opacity-30"
-          aria-label="Undo"
-          title="Undo"
+          aria-label={t.undo}
+          title={t.undo}
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a5 5 0 015 5v2M3 10l4-4M3 10l4 4" />
           </svg>
-          Undo
+          {t.undo}
         </button>
         <button
           onClick={() => redo()}
           disabled={!canRedo}
           className="flex items-center gap-1.5 rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)] disabled:opacity-30"
-          aria-label="Redo"
-          title="Redo"
+          aria-label={t.redo}
+          title={t.redo}
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10H11a5 5 0 00-5 5v2m15-7l-4-4m4 4l-4 4" />
           </svg>
-          Redo
+          {t.redo}
         </button>
         <button
           onClick={handleResetClick}
@@ -170,7 +172,7 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
               : 'border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)]'
           }`}
         >
-          {confirmReset ? 'Reset? Click again' : 'Reset All'}
+          {confirmReset ? t.resetConfirm : t.resetAll}
         </button>
       </div>
 

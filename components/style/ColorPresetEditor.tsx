@@ -6,8 +6,10 @@ import { showToast } from '@/components/ui/Toast';
 import type { GlobalStyles, EditableElement, ElementStyle } from '@/types/style';
 import { COLOR_ROLES, getRoleColor, deriveColorRolesFromStyles } from '@/lib/themes/colorRoles';
 import type { ColorRole } from '@/lib/themes/colorRoles';
+import { useClientDictionary } from '@/hooks/useClientLocale';
 
 export function ColorPresetEditor() {
+  const t = useClientDictionary().stylePanel;
   const colorPresets = useStyleStore((state) => state.colorPresets);
   const addColorPreset = useStyleStore((state) => state.addColorPreset);
   const removeColorPreset = useStyleStore((state) => state.removeColorPreset);
@@ -76,15 +78,15 @@ export function ColorPresetEditor() {
     const trimmed = newName.trim();
     if (!trimmed) return;
     if (colorPresets.some((p) => p.name === trimmed)) {
-      showToast('Same name already exists.', 'error');
+      showToast(t.colorToast.duplicateName, 'error');
       return;
     }
     addColorPreset({ name: trimmed, color: newColor });
     setNewName('');
     setNewColor('#3b82f6');
     setIsAdding(false);
-    showToast('Color added.', 'success');
-  }, [newName, newColor, colorPresets, addColorPreset]);
+    showToast(t.colorToast.added, 'success');
+  }, [newName, newColor, colorPresets, addColorPreset, t]);
 
   const handleAddKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') handleAdd();
@@ -95,7 +97,7 @@ export function ColorPresetEditor() {
     if (confirmDeleteName === name) {
       removeColorPreset(name);
       setConfirmDeleteName(null);
-      showToast('Color removed.', 'success');
+      showToast(t.colorToast.removed, 'success');
     } else {
       setConfirmDeleteName(name);
       setTimeout(() => setConfirmDeleteName(null), 3000);
@@ -106,7 +108,7 @@ export function ColorPresetEditor() {
     <div className="flex flex-col gap-4">
       {/* Color Roles */}
       <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-medium border-b border-[var(--ui-border)] pb-2">Color Roles</h3>
+        <h3 className="text-sm font-medium border-b border-[var(--ui-border)] pb-2">{t.colorRoles}</h3>
         <div className="flex flex-col gap-1.5">
           {rolePresets.map((rp) => (
             <div
@@ -135,7 +137,7 @@ export function ColorPresetEditor() {
 
       {/* Custom Colors */}
       <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-medium border-b border-[var(--ui-border)] pb-2">Custom Colors</h3>
+        <h3 className="text-sm font-medium border-b border-[var(--ui-border)] pb-2">{t.customColors}</h3>
 
         {customPresets.length > 0 && (
           <div className="flex flex-col gap-1.5">
@@ -162,7 +164,7 @@ export function ColorPresetEditor() {
                       : 'text-[var(--ui-text-muted)] hover:text-red-500'
                   }`}
                 >
-                  {confirmDeleteName === preset.name ? 'Confirm?' : 'Delete'}
+                  {confirmDeleteName === preset.name ? t.confirmDelete : t.delete}
                 </button>
               </div>
             ))}
@@ -182,7 +184,7 @@ export function ColorPresetEditor() {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={handleAddKeyDown}
-              placeholder="Color name"
+              placeholder={t.colorName}
               className="flex-1 rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm outline-none focus:border-[var(--printmd-link-color)]"
               autoFocus
             />
@@ -191,13 +193,13 @@ export function ColorPresetEditor() {
               disabled={!newName.trim()}
               className="rounded bg-[var(--foreground)] px-3 py-1.5 text-sm text-[var(--background)] disabled:opacity-40"
             >
-              Add
+              {t.add}
             </button>
             <button
               onClick={() => { setIsAdding(false); setNewName(''); }}
               className="rounded border border-[var(--ui-border)] px-3 py-1.5 text-sm hover:bg-[var(--ui-bg-hover)]"
             >
-              Cancel
+              {t.cancel}
             </button>
           </div>
         ) : (
@@ -208,7 +210,7 @@ export function ColorPresetEditor() {
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add Custom Color
+            {t.addCustomColor}
           </button>
         )}
       </div>
