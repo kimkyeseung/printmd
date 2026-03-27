@@ -539,13 +539,12 @@ export function ElementStyleEditor() {
                         <label className="text-xs text-[var(--ui-text-muted)]">Style</label>
                         <div className="flex gap-1" role="radiogroup">
                           {[
-                            { value: '', label: 'Default' },
                             { value: 'solid', label: 'Solid' },
                             { value: 'dashed', label: 'Dashed' },
                             { value: 'dotted', label: 'Dotted' },
                             { value: 'none', label: 'None' },
                           ].map((opt) => {
-                            const active = (thStyle.borderStyle || '') === opt.value;
+                            const active = (thStyle.borderStyle || 'solid') === opt.value;
                             return (
                               <button
                                 key={opt.value}
