@@ -2,8 +2,6 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
-import { SiteFooter } from '@/components/layout';
-
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
@@ -59,12 +57,5 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  const dict = await getDictionary(locale);
-
-  return (
-    <>
-      {children}
-      <SiteFooter locale={locale} dict={dict.footer} />
-    </>
-  );
+  return <>{children}</>;
 }

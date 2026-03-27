@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
+import { SiteFooter } from '@/components/layout';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -183,7 +184,7 @@ export default async function AboutPage({
           </section>
         </div>
       </main>
-
+      <SiteFooter locale={locale} dict={dict.footer} />
     </div>
   );
 }

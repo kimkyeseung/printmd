@@ -2,11 +2,20 @@ import Link from 'next/link';
 import { AdSidebar } from '@/components/adsense/AdSidebar';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { TableOfContents } from './TableOfContents';
+import { SiteFooter } from '@/components/layout';
 
 interface Heading {
   id: string;
   text: string;
   level: number;
+}
+
+interface FooterDict {
+  privacy: string;
+  terms: string;
+  about: string;
+  contact: string;
+  allRights: string;
 }
 
 interface BlogLayoutProps {
@@ -19,6 +28,7 @@ interface BlogLayoutProps {
   headings: Heading[];
   tocTitle?: string;
   backLabel?: string;
+  footerDict: FooterDict;
   children?: React.ReactNode;
 }
 
@@ -32,6 +42,7 @@ export function BlogLayout({
   headings,
   tocTitle,
   backLabel = '← Blog',
+  footerDict,
 }: BlogLayoutProps) {
   return (
     <div className="h-screen overflow-y-auto bg-white">
@@ -138,6 +149,7 @@ export function BlogLayout({
         </div>
       </div>
 
+      <SiteFooter locale={locale as 'en' | 'ko'} dict={footerDict} />
     </div>
   );
 }

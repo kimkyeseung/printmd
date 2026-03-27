@@ -5,6 +5,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries';
 import { themePresets, themeElementStyles, presetKeys } from '@/lib/themes/presets';
 import { THEME_NAMES, THEME_DESCRIPTIONS } from '@/types/theme';
 import type { ThemePreset } from '@/types/style';
+import { SiteFooter } from '@/components/layout';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -493,6 +494,7 @@ export default async function ThemePage({
           </Link>
         </div>
       </main>
+      <SiteFooter locale={locale} dict={dict.footer} />
     </div>
   );
 }

@@ -4,6 +4,8 @@ import { locales, type Locale } from '@/lib/i18n/config';
 import { themePresets } from '@/lib/themes/presets';
 import { themeElementStyles } from '@/lib/themes/presets';
 import { COLOR_ROLES } from '@/lib/themes/colorRoles';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+import { SiteFooter } from '@/components/layout';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -252,6 +254,7 @@ export default async function ColorsGuidePage({
 }) {
   const { locale: localeParam } = await params;
   const locale = isValidLocale(localeParam) ? localeParam : 'en';
+  const dict = await getDictionary(locale);
   const s = t[locale];
 
   /* ---- Structured Data ------------------------------------------- */
@@ -493,6 +496,7 @@ export default async function ColorsGuidePage({
           </Link>
         </section>
       </main>
+      <SiteFooter locale={locale} dict={dict.footer} />
     </div>
   );
 }

@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { themePresets, themeElementStyles, presetKeys } from '@/lib/themes/presets';
 import { THEME_NAMES } from '@/types/theme';
+import { getDictionary } from '@/lib/i18n/dictionaries';
+import { SiteFooter } from '@/components/layout';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -189,6 +191,7 @@ export default async function TableStylingPage({
 }) {
   const { locale: localeParam } = await params;
   const locale = isValidLocale(localeParam) ? localeParam : 'en';
+  const dict = await getDictionary(locale);
   const strings = t[locale];
 
   const howToJsonLd = {
@@ -264,6 +267,7 @@ export default async function TableStylingPage({
           </Link>
         </section>
       </main>
+      <SiteFooter locale={locale} dict={dict.footer} />
     </div>
   );
 }

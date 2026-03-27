@@ -5,6 +5,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries';
 import { CheatsheetClient } from '@/components/cheatsheet/CheatsheetClient';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { AdSidebar } from '@/components/adsense/AdSidebar';
+import { SiteFooter } from '@/components/layout';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -216,6 +217,7 @@ export default async function CheatsheetPage({
             </aside>
           </div>
         </div>
+        <SiteFooter locale={locale} dict={dict.footer} />
       </div>
     </>
   );

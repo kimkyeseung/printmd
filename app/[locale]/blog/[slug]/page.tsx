@@ -159,6 +159,7 @@ export default async function BlogPostPage({
         headings={headings}
         tocTitle={locale === 'ko' ? '목차' : 'Table of Contents'}
         backLabel={locale === 'ko' ? '← 블로그' : '← Blog'}
+        footerDict={dict.footer}
       />
     </>
   );

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
+import { SiteFooter } from '@/components/layout';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -43,6 +44,7 @@ export default async function GitHubPage({
 }) {
   const { locale: localeParam } = await params;
   const locale = isValidLocale(localeParam) ? localeParam : 'en';
+  const dict = await getDictionary(locale);
 
   const howToJsonLd = {
     '@context': 'https://schema.org',
@@ -216,6 +218,7 @@ export default async function GitHubPage({
           printmd 열기
         </Link>
       </section>
+      <SiteFooter locale={locale} dict={dict.footer} />
       </div>
     </>
   );

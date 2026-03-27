@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
+import { SiteFooter } from '@/components/layout';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -42,6 +43,7 @@ export default async function PrivacyPage({
 }) {
   const { locale: localeParam } = await params;
   const locale = isValidLocale(localeParam) ? localeParam : 'en';
+  const dict = await getDictionary(locale);
   return (
     <div className="h-screen overflow-y-auto bg-white">
       <script
@@ -263,7 +265,7 @@ export default async function PrivacyPage({
 
         </div>
       </main>
-
+      <SiteFooter locale={locale} dict={dict.footer} />
     </div>
   );
 }

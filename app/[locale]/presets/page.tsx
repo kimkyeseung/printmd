@@ -4,6 +4,7 @@ import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { themePresets, presetKeys } from '@/lib/themes/presets';
 import { THEME_NAMES, THEME_DESCRIPTIONS } from '@/types/theme';
+import { SiteFooter } from '@/components/layout';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -201,6 +202,7 @@ export default async function PresetsPage({
           </Link>
         </section>
       </main>
+      <SiteFooter locale={locale} dict={dict.footer} />
     </div>
   );
 }

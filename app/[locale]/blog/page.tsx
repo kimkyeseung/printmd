@@ -5,6 +5,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries';
 import { getAllPosts } from '@/lib/blog';
 import { BlogPostCard } from '@/components/blog/BlogPostCard';
 import { AdBanner } from '@/components/adsense/AdBanner';
+import { SiteFooter } from '@/components/layout';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -114,6 +115,7 @@ export default async function BlogPage({
           slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER}
         />
       </main>
+      <SiteFooter locale={locale} dict={dict.footer} />
     </div>
   );
 }
