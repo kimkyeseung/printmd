@@ -42,7 +42,7 @@ const initialState: UIState = {
   isSidebarOpen: false,
   isFullscreen: false,
   editorWidth: 50,
-  stylePanelWidth: 320,
+  stylePanelWidth: 360,
   spacingHighlight: null,
 };
 
@@ -81,8 +81,10 @@ export const useUIStore = create<UIStore>()(
       setEditorWidth: (editorWidth: number) =>
         set({ editorWidth: Math.min(Math.max(editorWidth, 20), 80) }),
 
-      setStylePanelWidth: (stylePanelWidth: number) =>
-        set({ stylePanelWidth: Math.min(Math.max(stylePanelWidth, 240), 480) }),
+      setStylePanelWidth: (stylePanelWidth: number) => {
+        const maxWidth = typeof window !== 'undefined' ? Math.floor(window.innerWidth * 0.45) : 480;
+        set({ stylePanelWidth: Math.min(Math.max(stylePanelWidth, 280), Math.min(maxWidth, 480)) });
+      },
 
       setSpacingHighlight: (spacingHighlight) => set({ spacingHighlight }),
     }),

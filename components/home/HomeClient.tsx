@@ -30,11 +30,15 @@ function StylePanelResizer({
   children: React.ReactNode;
 }) {
   const isDragging = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging.current) return;
-      const newWidth = window.innerWidth - e.clientX;
+      if (!isDragging.current || !containerRef.current) return;
+      // Use the flex parent's right edge (excludes ad sidebar etc.)
+      const flexParent = containerRef.current.closest('.flex.h-full.w-full');
+      const rightEdge = flexParent?.getBoundingClientRect().right ?? window.innerWidth;
+      const newWidth = rightEdge - e.clientX;
       onWidthChange(newWidth);
     };
     const handleMouseUp = () => {
@@ -58,7 +62,7 @@ function StylePanelResizer({
   }, []);
 
   return (
-    <div className="flex h-full shrink-0" style={{ width }}>
+    <div ref={containerRef} className="flex h-full shrink-0" style={{ width }}>
       {/* Drag handle */}
       <div
         className="relative h-full w-1 cursor-col-resize bg-[var(--ui-border)] hover:bg-[var(--printmd-link-color)] active:bg-[var(--printmd-link-color)]"
@@ -211,8 +215,7 @@ export default function HomeClient() {
   // Render content based on view mode and style panel state
   const renderedContent = useMemo(() => {
     if (isStylePanelOpen) {
-      // Style panel open
-      // Mobile: full-screen overlay | Desktop: Preview(left) + StylePanel(right)
+      // Style panel open — flex layout: Preview(left) + StylePanel(right)
       return (
         <div className="flex h-full w-full">
           <div className="hidden md:flex flex-1 min-w-0 overflow-hidden">
