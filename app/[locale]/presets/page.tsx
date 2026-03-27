@@ -23,9 +23,14 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
   const t = dict.presets;
 
+  const keywords = locale === 'ko'
+    ? ['마크다운 테마', '마크다운 프리셋', 'PDF 스타일', '마크다운 PDF 테마', 'printmd 프리셋', '커스텀 PDF 스타일', '마크다운 커스터마이즈', 'markdown theme preset']
+    : ['markdown theme', 'markdown preset', 'PDF style', 'markdown PDF theme', 'printmd presets', 'custom PDF style', 'markdown customize', 'markdown to pdf themes', 'pdf styling presets'];
+
   return {
     title: `${t.title} - printmd`,
     description: t.description,
+    keywords,
     openGraph: {
       title: `${t.title} | printmd`,
       description: t.description,

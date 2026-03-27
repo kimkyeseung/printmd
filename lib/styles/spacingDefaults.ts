@@ -1,6 +1,7 @@
 import type { EditableElement } from '@/types/style';
 
 export interface SpacingValues {
+  [key: string]: number;
   marginTop: number;
   marginBottom: number;
   paddingTop: number;

@@ -67,7 +67,7 @@ export default async function Home({
     featureList: [
       'Markdown to PDF conversion',
       'Real-time preview',
-      '5 theme presets',
+      '15 customizable presets',
       'Custom styling',
       'GitHub integration',
       'Chrome extension',
@@ -134,7 +134,7 @@ export default async function Home({
         {/* FAQ */}
         <h2 className="mt-16 text-2xl font-semibold">{seo.faqTitle}</h2>
         <dl className="mt-6 space-y-6">
-          {([1, 2, 3, 4, 5] as const).map((n) => (
+          {([1, 2, 3, 4, 5, 6] as const).map((n) => (
             <div key={n}>
               <dt className="font-medium">
                 {seo[`faq${n}Q` as keyof typeof seo]}

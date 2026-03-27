@@ -1,6 +1,6 @@
 {
   "editor": {
-    "defaultContent": "# printmd\n\n**The easiest way to turn Markdown into beautifully styled PDFs.**\n\nFree. No signup. Right in your browser.\n\n---\n\n## Key Features\n\n- **Live Preview** — See changes as you type\n- **5 Theme Presets** — Switch styles with a single click\n- **Custom Styling** — Fine-tune fonts, colors, spacing, and more\n- **Inline Editing** — Double-click any block in the preview to edit\n- **PDF Export** — Save your polished document as a PDF\n\n## Getting Started\n\n1. Write Markdown directly or drag and drop a file\n2. Check the live preview on the right\n3. Pick a theme to style your document\n4. **Save as PDF** or **print** directly\n\n## Text Formatting\n\nMarkdown supports a variety of **text formatting** options:\n\n- **Bold** — Emphasize important text\n- *Italic* — Subtle emphasis\n- ~~Strikethrough~~ — Mark deleted content\n- `Inline code` — Display code or commands within text\n- **Bold + *italic*** — Combine them freely\n\nLinks are simple too: [printmd homepage](https://printmd.app)\n\n## Checklist\n\n- [x] Open the Markdown editor\n- [x] Choose a theme\n- [ ] Apply custom styles\n- [ ] Export to PDF\n\n## Code Blocks\n\n```javascript\n// Try a code block in printmd\nfunction greet(name) {\n  return `Hello, ${name}! Welcome to printmd.`;\n}\n\nconsole.log(greet('World'));\n```\n\n```python\n# Python is supported too\ndef fibonacci(n):\n    a, b = 0, 1\n    for _ in range(n):\n        yield a\n        a, b = b, a + b\n\nprint(list(fibonacci(10)))\n```\n\n## Table\n\n| Feature | Description | Shortcut |\n|---------|-------------|----------|\n| Editor | CodeMirror 6 markdown editor | — |\n| Preview | Live rendering + inline editing | Double-click |\n| Themes | 5 presets + custom styling | — |\n| Save | Save document | `Ctrl/⌘ + S` |\n| Export | PDF save and print | `Ctrl/⌘ + P` |\n\n## Nested Lists\n\n- Markdown syntax\n  - Block elements\n    - Headings (h1–h6)\n    - Paragraphs\n    - Blockquotes\n    - Code blocks\n  - Inline elements\n    - Bold, italic\n    - Links, images\n    - Inline code\n\n### Ordered Nested List\n\n1. Write your document\n   1. Author content in Markdown\n   2. Check the live preview\n2. Apply styles\n   1. Choose a theme preset\n   2. Adjust custom styles if needed\n3. Export\n   1. Save as PDF\n   2. Or print directly\n\n### Heading Levels\n\nBelow are examples of h3 through h6 headings:\n\n#### h4 Fourth-Level Heading\n\n##### h5 Fifth-Level Heading\n\n###### h6 Sixth-Level Heading\n\n## Blockquotes\n\n> Write Markdown. Let printmd handle the styling.\n\n> **Tip:** Double-click any block in the preview\n> to edit its Markdown source inline.\n> Press `Ctrl/⌘ + Enter` to confirm, `Escape` to cancel.\n\n## Image\n\n![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n---\n\n*Paste your Markdown or drag a file to get started.*"
+    "defaultContent": "# printmd\n\n**The easiest way to turn Markdown into beautifully styled PDFs.**\n\nFree. No signup. Right in your browser.\n\n---\n\n## Key Features\n\n- **Live Preview** — See changes as you type\n- **15 Customizable Presets** — Switch styles with a single click\n- **Custom Styling** — Fine-tune fonts, colors, spacing, and more\n- **Inline Editing** — Double-click any block in the preview to edit\n- **PDF Export** — Save your polished document as a PDF\n\n## Getting Started\n\n1. Write Markdown directly or drag and drop a file\n2. Check the live preview on the right\n3. Pick a theme to style your document\n4. **Save as PDF** or **print** directly\n\n## Text Formatting\n\nMarkdown supports a variety of **text formatting** options:\n\n- **Bold** — Emphasize important text\n- *Italic* — Subtle emphasis\n- ~~Strikethrough~~ — Mark deleted content\n- `Inline code` — Display code or commands within text\n- **Bold + *italic*** — Combine them freely\n\nLinks are simple too: [printmd homepage](https://printmd.app)\n\n## Checklist\n\n- [x] Open the Markdown editor\n- [x] Choose a theme\n- [ ] Apply custom styles\n- [ ] Export to PDF\n\n## Code Blocks\n\n```javascript\n// Try a code block in printmd\nfunction greet(name) {\n  return `Hello, ${name}! Welcome to printmd.`;\n}\n\nconsole.log(greet('World'));\n```\n\n```python\n# Python is supported too\ndef fibonacci(n):\n    a, b = 0, 1\n    for _ in range(n):\n        yield a\n        a, b = b, a + b\n\nprint(list(fibonacci(10)))\n```\n\n## Table\n\n| Feature | Description | Shortcut |\n|---------|-------------|----------|\n| Editor | CodeMirror 6 markdown editor | — |\n| Preview | Live rendering + inline editing | Double-click |\n| Themes | 15 presets + custom styling | — |\n| Save | Save document | `Ctrl/⌘ + S` |\n| Export | PDF save and print | `Ctrl/⌘ + P` |\n\n## Nested Lists\n\n- Markdown syntax\n  - Block elements\n    - Headings (h1–h6)\n    - Paragraphs\n    - Blockquotes\n    - Code blocks\n  - Inline elements\n    - Bold, italic\n    - Links, images\n    - Inline code\n\n### Ordered Nested List\n\n1. Write your document\n   1. Author content in Markdown\n   2. Check the live preview\n2. Apply styles\n   1. Choose a theme preset\n   2. Adjust custom styles if needed\n3. Export\n   1. Save as PDF\n   2. Or print directly\n\n### Heading Levels\n\nBelow are examples of h3 through h6 headings:\n\n#### h4 Fourth-Level Heading\n\n##### h5 Fifth-Level Heading\n\n###### h6 Sixth-Level Heading\n\n## Blockquotes\n\n> Write Markdown. Let printmd handle the styling.\n\n> **Tip:** Double-click any block in the preview\n> to edit its Markdown source inline.\n> Press `Ctrl/⌘ + Enter` to confirm, `Escape` to cancel.\n\n## Image\n\n![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n---\n\n*Paste your Markdown or drag a file to get started.*"
   },
   "meta": {
     "title": "printmd - Markdown to PDF",
@@ -30,7 +30,7 @@
       "featuresTitle": "Key Features",
       "feature1": "Live Preview",
       "feature1Desc": "See your formatted document update in real time as you type Markdown.",
-      "feature2": "5 Theme Presets",
+      "feature2": "15 Customizable Presets",
       "feature2Desc": "Choose from GitHub, Notion, Academic, Minimal, or Dark styles with one click.",
       "feature3": "Custom Styling",
       "feature3Desc": "Fine-tune fonts, colors, spacing, and more to match your brand or preference.",
@@ -44,7 +44,7 @@
       "howToStep1Title": "1. Open or Paste Markdown",
       "howToStep1Desc": "Drag and drop a .md file into the editor, or paste your Markdown text directly.",
       "howToStep2Title": "2. Choose a Theme",
-      "howToStep2Desc": "Pick from 5 built-in presets or customize fonts, colors, and spacing to your liking.",
+      "howToStep2Desc": "Pick from 15 customizable presets or fine-tune fonts, colors, and spacing to your liking.",
       "howToStep3Title": "3. Export as PDF",
       "howToStep3Desc": "Press Ctrl+P (Cmd+P on Mac) to save as PDF or print directly from your browser.",
       "faqTitle": "Frequently Asked Questions",
@@ -55,9 +55,11 @@
       "faq3Q": "What Markdown features are supported?",
       "faq3A": "Headings, bold, italic, strikethrough, ordered and unordered lists, code blocks with syntax highlighting, tables, blockquotes, images, links, and horizontal rules.",
       "faq4Q": "Can I customize the PDF style?",
-      "faq4A": "Yes. Choose from 5 built-in themes or apply custom CSS for full control over fonts, colors, spacing, and layout.",
+      "faq4A": "Yes. Choose from 15 customizable presets or apply custom CSS for full control over fonts, colors, spacing, and layout.",
       "faq5Q": "Does it work on mobile?",
       "faq5A": "Yes. printmd is fully responsive and works on phones, tablets, and desktops.",
+      "faq6Q": "Can I customize the colors in a preset?",
+      "faq6A": "Yes. Every preset's background color, text color, link color, and code block background can be freely adjusted in the style panel. Use any preset as a starting point and make it your own.",
       "ctaText": "Looking for a dedicated converter page?",
       "ctaLink": "Try our Markdown to PDF converter"
     }
@@ -78,7 +80,7 @@
       "privacy": "Privacy First",
       "privacyDesc": "Files never leave your browser",
       "themes": "Multiple Themes",
-      "themesDesc": "5 presets + custom styling",
+      "themesDesc": "15 presets + custom styling",
       "responsive": "Responsive Design",
       "responsiveDesc": "Works on mobile too"
     },
@@ -99,7 +101,7 @@
       "step1": "Open Markdown File",
       "step1Desc": "Drag & drop your .md file or type directly",
       "step2": "Choose a Theme",
-      "step2Desc": "Pick from 5 presets like GitHub, Notion, and more",
+      "step2Desc": "Pick from 15 presets like GitHub, Notion, and more",
       "step3": "Save as PDF",
       "step3Desc": "Press Ctrl+P to save as PDF or print"
     },
@@ -129,7 +131,7 @@
       "q4": "What Markdown features are supported for PDF conversion?",
       "a4": "printmd supports headings, bold/italic/strikethrough, ordered and unordered lists, code blocks with syntax highlighting, tables, blockquotes, images, links, and horizontal rules.",
       "q5": "Can I customize the PDF output style?",
-      "a5": "Yes. Choose from 5 built-in themes (GitHub, Notion, Academic, Minimal, Dark) or apply custom CSS for full control over the PDF output."
+      "a5": "Yes. Choose from 15 customizable presets or apply custom CSS for full control over the PDF output."
     }
   },
   "markdownPrint": {
@@ -146,7 +148,7 @@
       "step1": "Open File",
       "step1Desc": "Drag & drop or select file",
       "step2": "Choose Theme",
-      "step2Desc": "Pick from 5 presets",
+      "step2Desc": "Pick from 15 presets",
       "step3": "Print",
       "step3Desc": "Press Ctrl+P to print"
     },
@@ -207,8 +209,8 @@
       "title": "Editor Features",
       "preview": "Live Preview",
       "previewDesc": "See rendered output as you type",
-      "themes": "5 Themes",
-      "themesDesc": "GitHub, Notion, Academic, Minimal, Dark",
+      "themes": "15 Themes",
+      "themesDesc": "GitHub, Notion, Academic, Minimal, Dark, and more",
       "syntax": "Syntax Highlighting",
       "syntaxDesc": "50+ programming languages supported",
       "responsive": "Responsive Layout",
@@ -287,14 +289,14 @@
   },
   "presets": {
     "title": "Theme Presets",
-    "subtitle": "5 built-in themes for styling your Markdown PDF",
-    "description": "Browse printmd's 5 built-in theme presets for Markdown to PDF. Preview Default, Dark, Document, Blog, and Minimal styles with live examples.",
+    "subtitle": "15 customizable presets for styling your Markdown PDF",
+    "description": "Browse printmd's 15 customizable presets for Markdown to PDF. Preview Default, Dark, Document, Blog, Minimal, and many more styles with live examples. Customize colors, fonts, and spacing in every preset.",
     "cta": "Try these presets on your own Markdown",
     "ctaButton": "Open printmd"
   },
   "github": {
     "title": "GitHub README to PDF",
-    "description": "Convert your GitHub README.md to a beautiful PDF. One-click conversion with Chrome extension, 5 theme presets, and custom styling.",
+    "description": "Convert your GitHub README.md to a beautiful PDF. One-click conversion with Chrome extension, 15 customizable presets, and custom styling.",
     "keywords": "GitHub README,GitHub markdown,README PDF,GitHub PDF converter,README print,GitHub docs PDF,markdown to pdf github"
   },
   "privacy": {
@@ -316,8 +318,8 @@
     "whatDesc": "printmd is a free, browser-based tool that lets you edit Markdown and instantly convert it to styled PDFs. Whether you are a developer writing documentation, a student preparing assignments, or a professional formatting reports, printmd makes it simple.",
     "featureEditor": "Live Editor",
     "featureEditorDesc": "CodeMirror 6-based editor with syntax highlighting and real-time preview.",
-    "featureThemes": "5 Themes",
-    "featureThemesDesc": "GitHub, Notion, Academic, Minimal, and Dark styles to choose from.",
+    "featureThemes": "15 Themes",
+    "featureThemesDesc": "GitHub, Notion, Academic, Minimal, Dark, and many more styles to choose from.",
     "featurePdf": "PDF Export",
     "featurePdfDesc": "Convert your Markdown to PDF with one click. Print-optimized output.",
     "featurePrivacy": "Privacy First",
