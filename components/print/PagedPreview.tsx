@@ -34,13 +34,18 @@ export function PagedPreview({
     [elementStyles]
   );
 
+  const useBg = settings.includeBackground;
+
+  const bgColor = useBg ? styles.backgroundColor : '#ffffff';
+  const textColor = useBg ? styles.textColor : '#1a1a1a';
+
   const baseStylesCss = useMemo(
     () => getPdfStyles({
-      linkColor: styles.linkColor,
-      codeBackground: styles.codeBackground,
-      textColor: styles.textColor,
+      linkColor: useBg ? styles.linkColor : '#0366d6',
+      codeBackground: useBg ? styles.codeBackground : '#f5f5f5',
+      textColor,
     }),
-    [styles.linkColor, styles.codeBackground, styles.textColor]
+    [useBg, styles.linkColor, styles.codeBackground, textColor]
   );
 
   const html = useMemo(() => {
@@ -48,16 +53,20 @@ export function PagedPreview({
   }, [markdown]);
 
   // Calculate content area dimensions (in pixels)
+  const marginTopPx = settings.margins.top * (96 / 25.4);
+  const marginBottomPx = settings.margins.bottom * (96 / 25.4);
+  const marginLeftPx = settings.margins.left * (96 / 25.4);
+  const marginRightPx = settings.margins.right * (96 / 25.4);
+  const hdrH = settings.header.enabled ? 20 : 0; // px
+  const ftrH = settings.footer.enabled ? 20 : 0; // px
+
   const contentArea = useMemo(() => {
-    const marginTopPx = settings.margins.top * (96 / 25.4);
-    const marginBottomPx = settings.margins.bottom * (96 / 25.4);
-    const marginLeftPx = settings.margins.left * (96 / 25.4);
-    const marginRightPx = settings.margins.right * (96 / 25.4);
     return {
       width: paperWidth - marginLeftPx - marginRightPx,
-      height: paperHeight - marginTopPx - marginBottomPx,
+      height: paperHeight - marginTopPx - marginBottomPx - hdrH - ftrH,
     };
-  }, [paperWidth, paperHeight, settings.margins]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paperWidth, paperHeight, marginTopPx, marginBottomPx, marginLeftPx, marginRightPx, hdrH, ftrH]);
 
   useEffect(() => {
     if (!measureRef.current) return;
@@ -92,8 +101,21 @@ export function PagedPreview({
     fontFamily: styles.fontFamily,
     fontSize: styles.fontSize,
     lineHeight: styles.lineHeight,
-    color: styles.textColor,
+    color: textColor,
   };
+
+  // Resolve header/footer template variables
+  const resolveTemplate = (tpl: string, pageNum: number, totalPages: number): string => {
+    const title = markdown.split('\n').find(l => l.startsWith('# '))?.replace(/^#\s+/, '') || 'Untitled';
+    return tpl
+      .replace(/\{title\}/g, title)
+      .replace(/\{date\}/g, new Date().toLocaleDateString())
+      .replace(/\{page\}/g, String(pageNum))
+      .replace(/\{pages\}/g, String(totalPages));
+  };
+
+  const headerHeight = hdrH;
+  const footerHeight = ftrH;
 
   return (
     <div className="paged-preview flex flex-col items-center gap-5">
@@ -115,45 +137,81 @@ export function PagedPreview({
         </div>
       ) : (
         <>
-          {pages.map((pageId, index) => (
-            <div
-              key={pageId}
-              className="shadow-lg relative"
-              style={{
-                width: paperWidth,
-                height: paperHeight,
-                overflow: 'hidden',
-                backgroundColor: styles.backgroundColor,
-              }}
-            >
-              {/* Page content with offset */}
+          {pages.map((pageId, index) => {
+            const pageNum = index + 1;
+            return (
               <div
-                className="absolute preview-content"
+                key={pageId}
+                className="shadow-lg relative"
                 style={{
-                  ...contentStyles,
-                  top: settings.margins.top * (96 / 25.4),
-                  left: settings.margins.left * (96 / 25.4),
-                  right: settings.margins.right * (96 / 25.4),
-                  bottom: settings.margins.bottom * (96 / 25.4),
+                  width: paperWidth,
+                  height: paperHeight,
                   overflow: 'hidden',
+                  backgroundColor: bgColor,
                 }}
               >
-                <div
-                  style={{
-                    transform: `translateY(-${index * contentArea.height}px)`,
-                  }}
-                  dangerouslySetInnerHTML={{ __html: html }}
-                />
-              </div>
+                {/* Header */}
+                {settings.header.enabled && (
+                  <div
+                    className="absolute flex items-end"
+                    style={{
+                      top: marginTopPx,
+                      left: marginLeftPx,
+                      right: marginRightPx,
+                      height: headerHeight,
+                      fontSize: 9,
+                      color: useBg ? textColor : '#666666',
+                      opacity: 0.8,
+                    }}
+                  >
+                    <span className="flex-1 text-left truncate">{resolveTemplate(settings.header.left, pageNum, pages.length)}</span>
+                    <span className="flex-1 text-center truncate">{resolveTemplate(settings.header.center, pageNum, pages.length)}</span>
+                    <span className="flex-1 text-right truncate">{resolveTemplate(settings.header.right, pageNum, pages.length)}</span>
+                  </div>
+                )}
 
-              {/* Page number */}
-              <div
-                className="absolute bottom-2 left-0 right-0 text-center text-xs text-gray-400"
-              >
-                {index + 1} / {pages.length}
+                {/* Page content with offset */}
+                <div
+                  className="absolute preview-content"
+                  style={{
+                    ...contentStyles,
+                    top: marginTopPx + headerHeight,
+                    left: marginLeftPx,
+                    right: marginRightPx,
+                    bottom: marginBottomPx + footerHeight,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      transform: `translateY(-${index * contentArea.height}px)`,
+                    }}
+                    dangerouslySetInnerHTML={{ __html: html }}
+                  />
+                </div>
+
+                {/* Footer */}
+                {settings.footer.enabled && (
+                  <div
+                    className="absolute flex items-start"
+                    style={{
+                      bottom: marginBottomPx,
+                      left: marginLeftPx,
+                      right: marginRightPx,
+                      height: footerHeight,
+                      fontSize: 9,
+                      color: useBg ? textColor : '#666666',
+                      opacity: 0.8,
+                    }}
+                  >
+                    <span className="flex-1 text-left truncate">{resolveTemplate(settings.footer.left, pageNum, pages.length)}</span>
+                    <span className="flex-1 text-center truncate">{resolveTemplate(settings.footer.center, pageNum, pages.length)}</span>
+                    <span className="flex-1 text-right truncate">{resolveTemplate(settings.footer.right, pageNum, pages.length)}</span>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           <div className="text-sm text-[var(--ui-text-muted)]">
             {pages.length} page{pages.length > 1 ? 's' : ''}
@@ -163,7 +221,7 @@ export function PagedPreview({
 
       {/* Base styles from theme, then element-level overrides */}
       <style dangerouslySetInnerHTML={{ __html: baseStylesCss }} />
-      {elementStylesCss && (
+      {useBg && elementStylesCss && (
         <style dangerouslySetInnerHTML={{ __html: elementStylesCss }} />
       )}
     </div>

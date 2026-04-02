@@ -60,15 +60,23 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
       const marginLeft = settings.margins.left;
       const contentWidthMm = width - marginLeft - marginRight;
 
+      // Resolve colours based on includeBackground setting
+      const bgColor = settings.includeBackground ? globalStyles.backgroundColor : '#ffffff';
+      const textColor = settings.includeBackground ? globalStyles.textColor : '#1a1a1a';
+      const linkColor = settings.includeBackground ? globalStyles.linkColor : '#0366d6';
+      const codeBg = settings.includeBackground ? globalStyles.codeBackground : '#f5f5f5';
+
       const htmlContent = sanitizeHtml(parseMarkdown(content));
 
       // Generate theme-aware styles
       const pdfBaseStyles = getPdfStyles({
-        linkColor: globalStyles.linkColor,
-        codeBackground: globalStyles.codeBackground,
-        textColor: globalStyles.textColor,
+        linkColor,
+        codeBackground: codeBg,
+        textColor,
       });
-      const elementCss = generateElementStylesCss(elementStyles);
+      const elementCss = settings.includeBackground
+        ? generateElementStylesCss(elementStyles)
+        : '';
 
       // Build a self-contained HTML container with inline <style>
       const container = document.createElement('div');
@@ -78,8 +86,8 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
       container.style.zIndex = '-1';
       container.style.pointerEvents = 'none';
       container.style.width = `${mmToPx(contentWidthMm)}px`;
-      container.style.backgroundColor = globalStyles.backgroundColor;
-      container.style.color = globalStyles.textColor;
+      container.style.backgroundColor = bgColor;
+      container.style.color = textColor;
       container.style.fontFamily = globalStyles.fontFamily;
       container.style.fontSize = `${globalStyles.fontSize}px`;
       container.style.lineHeight = String(globalStyles.lineHeight);
@@ -98,7 +106,7 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
       const canvas = await html2canvas(container, {
         scale: 2,
         useCORS: true,
-        backgroundColor: globalStyles.backgroundColor,
+        backgroundColor: bgColor,
         width: container.scrollWidth,
         height: container.scrollHeight,
       });
@@ -112,9 +120,28 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
         format: [width, height],
       });
 
-      const pageContentHeight = height - marginTop - marginBottom;
+      // Resolve header/footer template variables
+      const resolveTemplate = (tpl: string, pageNum: number, totalPages: number): string => {
+        const title = content.split('\n').find(l => l.startsWith('# '))?.replace(/^#\s+/, '') || 'Untitled';
+        return tpl
+          .replace(/\{title\}/g, title)
+          .replace(/\{date\}/g, new Date().toLocaleDateString())
+          .replace(/\{page\}/g, String(pageNum))
+          .replace(/\{pages\}/g, String(totalPages));
+      };
+
+      const headerFooterFontSize = 9;
+      // Reserve space for header/footer text within margins
+      const headerHeight = settings.header.enabled ? 5 : 0;
+      const footerHeight = settings.footer.enabled ? 5 : 0;
+
+      const pageContentHeight = height - marginTop - marginBottom - headerHeight - footerHeight;
+      const contentTopMm = marginTop + headerHeight;
       const imgWidthMm = contentWidthMm;
       const imgHeightMm = (canvas.height / canvas.width) * imgWidthMm;
+
+      // Calculate total pages
+      const totalPages = Math.max(1, Math.ceil(imgHeightMm / pageContentHeight));
 
       // Add image, handling multiple pages
       let yOffset = 0;
@@ -125,6 +152,14 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
           pdf.addPage();
         }
 
+        const pageNum = page + 1;
+
+        // Fill page background
+        if (settings.includeBackground && bgColor !== '#ffffff') {
+          pdf.setFillColor(bgColor);
+          pdf.rect(0, 0, width, height, 'F');
+        }
+
         // Calculate source crop for this page
         const sourceY = (yOffset / imgHeightMm) * canvas.height;
         const sourceH = Math.min(
@@ -133,13 +168,13 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
         );
         const drawHeight = Math.min(pageContentHeight, imgHeightMm - yOffset);
 
-        // Create a cropped canvas for this page
+        // Create a cropped canvas for this page (PNG for crisp text)
         const pageCanvas = document.createElement('canvas');
         pageCanvas.width = canvas.width;
         pageCanvas.height = sourceH;
         const ctx = pageCanvas.getContext('2d');
         if (ctx) {
-          ctx.fillStyle = globalStyles.backgroundColor;
+          ctx.fillStyle = bgColor;
           ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
           ctx.drawImage(
             canvas,
@@ -148,8 +183,42 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
           );
         }
 
-        const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.98);
-        pdf.addImage(pageImgData, 'JPEG', marginLeft, marginTop, imgWidthMm, drawHeight);
+        const pageImgData = pageCanvas.toDataURL('image/png');
+        pdf.addImage(pageImgData, 'PNG', marginLeft, contentTopMm, imgWidthMm, drawHeight);
+
+        // Render header
+        if (settings.header.enabled) {
+          const headerY = marginTop + 3; // baseline within top margin
+          pdf.setFontSize(headerFooterFontSize);
+          pdf.setTextColor(settings.includeBackground ? textColor : '#666666');
+
+          if (settings.header.left) {
+            pdf.text(resolveTemplate(settings.header.left, pageNum, totalPages), marginLeft, headerY);
+          }
+          if (settings.header.center) {
+            pdf.text(resolveTemplate(settings.header.center, pageNum, totalPages), width / 2, headerY, { align: 'center' });
+          }
+          if (settings.header.right) {
+            pdf.text(resolveTemplate(settings.header.right, pageNum, totalPages), width - marginRight, headerY, { align: 'right' });
+          }
+        }
+
+        // Render footer
+        if (settings.footer.enabled) {
+          const footerY = height - marginBottom - 1; // baseline within bottom margin
+          pdf.setFontSize(headerFooterFontSize);
+          pdf.setTextColor(settings.includeBackground ? textColor : '#666666');
+
+          if (settings.footer.left) {
+            pdf.text(resolveTemplate(settings.footer.left, pageNum, totalPages), marginLeft, footerY);
+          }
+          if (settings.footer.center) {
+            pdf.text(resolveTemplate(settings.footer.center, pageNum, totalPages), width / 2, footerY, { align: 'center' });
+          }
+          if (settings.footer.right) {
+            pdf.text(resolveTemplate(settings.footer.right, pageNum, totalPages), width - marginRight, footerY, { align: 'right' });
+          }
+        }
 
         yOffset += pageContentHeight;
         page++;

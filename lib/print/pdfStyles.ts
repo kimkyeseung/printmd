@@ -1,5 +1,3 @@
-import type { GlobalStyles } from '@/types/style';
-
 interface PdfStyleOptions {
   linkColor?: string;
   codeBackground?: string;
