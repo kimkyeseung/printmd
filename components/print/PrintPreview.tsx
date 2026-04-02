@@ -9,6 +9,7 @@ import { getPaperDimensions, mmToPx } from '@/lib/print/paperSizes';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { getPdfStyles } from '@/lib/print/pdfStyles';
+import { generateElementStylesCss } from '@/lib/themes';
 
 interface PrintPreviewProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
   const updateFooter = usePrintStore((state) => state.updateFooter);
 
   const globalStyles = useStyleStore((state) => state.globalStyles);
+  const elementStyles = useStyleStore((state) => state.elementStyles);
 
   const paperDimensions = useMemo(() => {
     const { width, height } = getPaperDimensions(settings.paperSize, settings.orientation);
@@ -60,6 +62,14 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
 
       const htmlContent = sanitizeHtml(parseMarkdown(content));
 
+      // Generate theme-aware styles
+      const pdfBaseStyles = getPdfStyles({
+        linkColor: globalStyles.linkColor,
+        codeBackground: globalStyles.codeBackground,
+        textColor: globalStyles.textColor,
+      });
+      const elementCss = generateElementStylesCss(elementStyles);
+
       // Build a self-contained HTML container with inline <style>
       const container = document.createElement('div');
       container.style.position = 'absolute';
@@ -68,15 +78,16 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
       container.style.zIndex = '-1';
       container.style.pointerEvents = 'none';
       container.style.width = `${mmToPx(contentWidthMm)}px`;
-      container.style.backgroundColor = '#ffffff';
-      container.style.color = '#1a1a1a';
+      container.style.backgroundColor = globalStyles.backgroundColor;
+      container.style.color = globalStyles.textColor;
       container.style.fontFamily = globalStyles.fontFamily;
       container.style.fontSize = `${globalStyles.fontSize}px`;
       container.style.lineHeight = String(globalStyles.lineHeight);
       container.style.padding = '0';
 
-      // Embed styles directly so html2canvas can apply them
-      container.innerHTML = `<style>${getPdfStyles()}</style><div class="preview-content">${htmlContent}</div>`;
+      // Embed base + element styles so html2canvas can apply them
+      // Element styles come after base so preset overrides take priority
+      container.innerHTML = `<style>${pdfBaseStyles}\n${elementCss}</style><div class="preview-content">${htmlContent}</div>`;
 
       document.body.appendChild(container);
 
@@ -87,7 +98,7 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
       const canvas = await html2canvas(container, {
         scale: 2,
         useCORS: true,
-        backgroundColor: '#ffffff',
+        backgroundColor: globalStyles.backgroundColor,
         width: container.scrollWidth,
         height: container.scrollHeight,
       });
@@ -128,7 +139,7 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
         pageCanvas.height = sourceH;
         const ctx = pageCanvas.getContext('2d');
         if (ctx) {
-          ctx.fillStyle = '#ffffff';
+          ctx.fillStyle = globalStyles.backgroundColor;
           ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
           ctx.drawImage(
             canvas,

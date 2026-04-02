@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { generateElementStylesCss } from '@/lib/themes';
+import { getPdfStyles } from '@/lib/print/pdfStyles';
 import { useStyleStore } from '@/stores';
 import type { GlobalStyles } from '@/types/style';
 import type { PrintSettings } from '@/types/print';
@@ -31,6 +32,15 @@ export function PagedPreview({
   const elementStylesCss = useMemo(
     () => generateElementStylesCss(elementStyles),
     [elementStyles]
+  );
+
+  const baseStylesCss = useMemo(
+    () => getPdfStyles({
+      linkColor: styles.linkColor,
+      codeBackground: styles.codeBackground,
+      textColor: styles.textColor,
+    }),
+    [styles.linkColor, styles.codeBackground, styles.textColor]
   );
 
   const html = useMemo(() => {
@@ -108,11 +118,12 @@ export function PagedPreview({
           {pages.map((pageId, index) => (
             <div
               key={pageId}
-              className="bg-white shadow-lg relative"
+              className="shadow-lg relative"
               style={{
                 width: paperWidth,
                 height: paperHeight,
                 overflow: 'hidden',
+                backgroundColor: styles.backgroundColor,
               }}
             >
               {/* Page content with offset */}
@@ -150,47 +161,11 @@ export function PagedPreview({
         </>
       )}
 
+      {/* Base styles from theme, then element-level overrides */}
+      <style dangerouslySetInnerHTML={{ __html: baseStylesCss }} />
       {elementStylesCss && (
         <style dangerouslySetInnerHTML={{ __html: elementStylesCss }} />
       )}
-
-      <style jsx global>{`
-        .preview-content h1 { font-size: 2em; font-weight: bold; margin: 0.67em 0; }
-        .preview-content h2 { font-size: 1.5em; font-weight: bold; margin: 0.83em 0; }
-        .preview-content h3 { font-size: 1.17em; font-weight: bold; margin: 1em 0; }
-        .preview-content p { margin: 1em 0; }
-        .preview-content ul, .preview-content ol { margin: 1em 0; padding-left: 2em; }
-        .preview-content li { margin: 0.5em 0; }
-        .preview-content code {
-          background: #f3f4f6;
-          padding: 0.2em 0.4em;
-          border-radius: 3px;
-          font-size: 0.9em;
-        }
-        .preview-content pre {
-          background: #f3f4f6;
-          padding: 1em;
-          border-radius: 6px;
-          overflow-x: auto;
-        }
-        .preview-content pre code { background: none; padding: 0; }
-        .preview-content blockquote {
-          border-left: 4px solid #e5e7eb;
-          margin: 1em 0;
-          padding-left: 1em;
-          color: #6b7280;
-        }
-        .preview-content table { border-collapse: collapse; width: 100%; margin: 1em 0; }
-        .preview-content th, .preview-content td {
-          border: 1px solid #e5e7eb;
-          padding: 0.5em 1em;
-          text-align: left;
-        }
-        .preview-content th { background: #f9fafb; font-weight: 600; }
-        .preview-content a { color: #2563eb; }
-        .preview-content hr { border: none; border-top: 1px solid #e5e7eb; margin: 2em 0; }
-        .preview-content img { max-width: 100%; height: auto; }
-      `}</style>
     </div>
   );
 }

@@ -9,8 +9,6 @@
   html, body {
     margin: 0;
     padding: 0;
-    background: white !important;
-    color: black !important;
   }
 
   /* Hide all UI elements */
@@ -51,8 +49,6 @@
     max-width: none !important;
     margin: 0 !important;
     padding: 20mm !important;
-    background: white !important;
-    color: black !important;
   }
 
   /* Typography adjustments for print */
