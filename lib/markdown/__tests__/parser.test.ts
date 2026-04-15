@@ -134,3 +134,55 @@ describe('lineAnnotationPlugin', () => {
     expect(result).toMatch(/data-line="0"/);
   });
 });
+
+describe('inlineCheckboxPlugin', () => {
+  it('converts [ ] in paragraph to unchecked checkbox', () => {
+    const result = parseMarkdown('[ ] standalone task');
+    expect(result).toContain('type="checkbox"');
+    expect(result).not.toContain('checked');
+    expect(result).toContain('standalone task');
+  });
+
+  it('converts [x] in paragraph to checked checkbox', () => {
+    const result = parseMarkdown('[x] completed task');
+    expect(result).toContain('type="checkbox"');
+    expect(result).toContain('checked');
+    expect(result).toContain('completed task');
+  });
+
+  it('converts [X] (uppercase) to checked checkbox', () => {
+    const result = parseMarkdown('[X] also completed');
+    expect(result).toContain('type="checkbox"');
+    expect(result).toContain('checked');
+  });
+
+  it('handles multiple inline checkboxes on separate lines', () => {
+    const result = parseMarkdown('[ ] first task\n[ ] second task\n[x] done task');
+    const checkboxCount = (result.match(/type="checkbox"/g) || []).length;
+    expect(checkboxCount).toBe(3);
+  });
+
+  it('does not convert [ ] without trailing space', () => {
+    const result = parseMarkdown('array[0] access');
+    expect(result).not.toContain('type="checkbox"');
+  });
+
+  it('does not interfere with list task items', () => {
+    const result = parseMarkdown('- [ ] list task\n- [x] list done');
+    const checkboxCount = (result.match(/type="checkbox"/g) || []).length;
+    expect(checkboxCount).toBe(2);
+    expect(result).toContain('task-list');
+  });
+
+  it('handles mixed list and paragraph checkboxes', () => {
+    const result = parseMarkdown('- [ ] list item\n\n[ ] paragraph item');
+    const checkboxCount = (result.match(/type="checkbox"/g) || []).length;
+    expect(checkboxCount).toBe(2);
+  });
+
+  it('converts checkbox with Korean text', () => {
+    const result = parseMarkdown('[ ] 전체 관계도 페이지');
+    expect(result).toContain('type="checkbox"');
+    expect(result).toContain('전체 관계도 페이지');
+  });
+});

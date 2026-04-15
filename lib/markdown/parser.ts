@@ -153,6 +153,77 @@ function taskListPlugin(mdi: MarkdownIt) {
 
 md.use(taskListPlugin);
 
+// Inline checkbox plugin: converts `[ ]` / `[x]` in paragraphs (outside lists)
+// into checkbox elements. The taskListPlugin only handles list items (`- [ ]`);
+// this plugin handles standalone occurrences like `[ ] some task` in paragraphs.
+function inlineCheckboxPlugin(mdi: MarkdownIt) {
+  mdi.core.ruler.after('task-list', 'inline-checkbox', (state) => {
+    const tokens = state.tokens;
+    let insideListItem = false;
+
+    for (let i = 0; i < tokens.length; i++) {
+      if (tokens[i].type === 'list_item_open') insideListItem = true;
+      if (tokens[i].type === 'list_item_close') insideListItem = false;
+
+      // Skip tokens inside list items (already handled by taskListPlugin)
+      if (tokens[i].type !== 'inline' || !tokens[i].children || insideListItem) continue;
+
+      const children = tokens[i].children!;
+      const newChildren: typeof children = [];
+      let modified = false;
+
+      for (const child of children) {
+        if (child.type !== 'text') {
+          newChildren.push(child);
+          continue;
+        }
+
+        // Match [ ], [x], [X] followed by a space
+        const regex = /\[([ xX])\] /g;
+        let lastIndex = 0;
+        let match;
+        let hasMatch = false;
+
+        while ((match = regex.exec(child.content)) !== null) {
+          hasMatch = true;
+          modified = true;
+
+          // Text before the match
+          if (match.index > lastIndex) {
+            const textToken = new state.Token('text', '', 0);
+            textToken.content = child.content.slice(lastIndex, match.index);
+            newChildren.push(textToken);
+          }
+
+          // Checkbox
+          const checked = match[1] !== ' ';
+          const cbToken = new state.Token('html_inline', '', 0);
+          cbToken.content = `<input type="checkbox"${checked ? ' checked' : ''} disabled> `;
+          newChildren.push(cbToken);
+
+          lastIndex = regex.lastIndex;
+        }
+
+        if (hasMatch) {
+          if (lastIndex < child.content.length) {
+            const textToken = new state.Token('text', '', 0);
+            textToken.content = child.content.slice(lastIndex);
+            newChildren.push(textToken);
+          }
+        } else {
+          newChildren.push(child);
+        }
+      }
+
+      if (modified) {
+        tokens[i].children = newChildren;
+      }
+    }
+  });
+}
+
+md.use(inlineCheckboxPlugin);
+
 // Line annotation plugin: adds data-line / data-line-end to every block element
 // so the preview can map rendered blocks back to source lines.
 function lineAnnotationPlugin(mdi: MarkdownIt) {
