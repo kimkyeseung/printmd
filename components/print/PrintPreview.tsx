@@ -16,6 +16,7 @@ import {
   renderTextToImage,
   calcAlignedX,
 } from '@/lib/print/pdfTextRenderer';
+import { findKeepTogetherZones, computePageBreaks } from '@/lib/print/pageBreaks';
 
 interface PrintPreviewProps {
   isOpen: boolean;
@@ -108,6 +109,14 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
       // Wait for fonts/images to load
       await new Promise((r) => setTimeout(r, 300));
 
+      // Scan DOM for keep-together zones before rendering to canvas
+      const pageContentHeightPx = mmToPx(
+        height - marginTop - marginBottom - (settings.header.enabled ? 5 : 0) - (settings.footer.enabled ? 5 : 0)
+      );
+      const maxZoneHeight = pageContentHeightPx * 0.4;
+      const keepZones = findKeepTogetherZones(container, maxZoneHeight);
+      const containerHeightPx = container.scrollHeight;
+
       // Render to canvas
       const canvas = await html2canvas(container, {
         scale: 2,
@@ -140,14 +149,13 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
       const imgWidthMm = contentWidthMm;
       const imgHeightMm = (canvas.height / canvas.width) * imgWidthMm;
 
-      // Calculate total pages
-      const totalPages = Math.max(1, Math.ceil(imgHeightMm / pageContentHeight));
+      // Compute smart page breaks that avoid splitting tables / headings
+      const pageBreaksPx = computePageBreaks(containerHeightPx, pageContentHeightPx, keepZones);
+      const pxToMm = imgHeightMm / (canvas.height / 2); // canvas scale = 2
+      const totalPages = pageBreaksPx.length;
 
       // Add image, handling multiple pages
-      let yOffset = 0;
-      let page = 0;
-
-      while (yOffset < imgHeightMm) {
+      for (let page = 0; page < totalPages; page++) {
         if (page > 0) {
           pdf.addPage();
         }
@@ -160,13 +168,15 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
           pdf.rect(0, 0, width, height, 'F');
         }
 
-        // Calculate source crop for this page
-        const sourceY = (yOffset / imgHeightMm) * canvas.height;
-        const sourceH = Math.min(
-          (pageContentHeight / imgHeightMm) * canvas.height,
-          canvas.height - sourceY
-        );
-        const drawHeight = Math.min(pageContentHeight, imgHeightMm - yOffset);
+        // Calculate source crop for this page using smart break points
+        const breakStartPx = pageBreaksPx[page];
+        const breakEndPx = page + 1 < totalPages ? pageBreaksPx[page + 1] : containerHeightPx;
+        const segmentPx = breakEndPx - breakStartPx;
+
+        const canvasScale = 2;
+        const sourceY = breakStartPx * canvasScale;
+        const sourceH = Math.min(segmentPx * canvasScale, canvas.height - sourceY);
+        const drawHeight = segmentPx * pxToMm;
 
         // Create a cropped canvas for this page
         const pageCanvas = document.createElement('canvas');
@@ -218,8 +228,6 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
           if (settings.footer.right) addHFText(settings.footer.right, 'right', footerY);
         }
 
-        yOffset += pageContentHeight;
-        page++;
       }
 
       pdf.save('document.pdf');
