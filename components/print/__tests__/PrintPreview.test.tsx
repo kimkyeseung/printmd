@@ -104,4 +104,18 @@ describe('PrintPreview', () => {
     );
     expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
+
+  it('has print-preview-modal class on modal for print CSS hiding', () => {
+    const { container } = render(
+      <PrintPreview isOpen={true} onClose={onClose} content="# Test" />
+    );
+    expect(container.querySelector('.print-preview-modal')).toBeInTheDocument();
+  });
+
+  it('has print-preview-backdrop class on backdrop for print CSS hiding', () => {
+    const { container } = render(
+      <PrintPreview isOpen={true} onClose={onClose} content="# Test" />
+    );
+    expect(container.querySelector('.print-preview-backdrop')).toBeInTheDocument();
+  });
 });

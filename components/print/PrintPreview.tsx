@@ -252,12 +252,12 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-black/50"
+        className="print-preview-backdrop fixed inset-0 z-40 bg-black/50"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex flex-col bg-[var(--background)] shadow-2xl md:inset-4 md:rounded-lg lg:inset-8 xl:inset-16">
+      <div className="print-preview-modal fixed inset-0 z-50 flex flex-col bg-[var(--background)] shadow-2xl md:inset-4 md:rounded-lg lg:inset-8 xl:inset-16">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--ui-border)] px-4 py-3 md:px-6 md:py-4">
           <h2 className="text-base font-semibold md:text-lg">Print Preview</h2>
