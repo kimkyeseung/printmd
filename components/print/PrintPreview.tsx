@@ -10,6 +10,12 @@ import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { getPdfStyles } from '@/lib/print/pdfStyles';
 import { generateElementStylesCss } from '@/lib/themes';
+import {
+  resolveTemplate,
+  extractTitle,
+  renderTextToImage,
+  calcAlignedX,
+} from '@/lib/print/pdfTextRenderer';
 
 interface PrintPreviewProps {
   isOpen: boolean;
@@ -120,17 +126,11 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
         format: [width, height],
       });
 
-      // Resolve header/footer template variables
-      const resolveTemplate = (tpl: string, pageNum: number, totalPages: number): string => {
-        const title = content.split('\n').find(l => l.startsWith('# '))?.replace(/^#\s+/, '') || 'Untitled';
-        return tpl
-          .replace(/\{title\}/g, title)
-          .replace(/\{date\}/g, new Date().toLocaleDateString())
-          .replace(/\{page\}/g, String(pageNum))
-          .replace(/\{pages\}/g, String(totalPages));
-      };
-
+      const docTitle = extractTitle(content);
+      const docDate = new Date().toLocaleDateString();
       const headerFooterFontSize = 9;
+      const hfColor = settings.includeBackground ? textColor : '#666666';
+      const hfFontFamily = globalStyles.fontFamily;
       // Reserve space for header/footer text within margins
       const headerHeight = settings.header.enabled ? 5 : 0;
       const footerHeight = settings.footer.enabled ? 5 : 0;
@@ -186,38 +186,34 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
         const pageImgData = pageCanvas.toDataURL('image/png');
         pdf.addImage(pageImgData, 'PNG', marginLeft, contentTopMm, imgWidthMm, drawHeight);
 
-        // Render header
-        if (settings.header.enabled) {
-          const headerY = marginTop + 3; // baseline within top margin
-          pdf.setFontSize(headerFooterFontSize);
-          pdf.setTextColor(settings.includeBackground ? textColor : '#666666');
+        // Render header / footer as canvas images (supports CJK characters)
+        const templateVars = { title: docTitle, date: docDate, page: pageNum, pages: totalPages };
 
-          if (settings.header.left) {
-            pdf.text(resolveTemplate(settings.header.left, pageNum, totalPages), marginLeft, headerY);
-          }
-          if (settings.header.center) {
-            pdf.text(resolveTemplate(settings.header.center, pageNum, totalPages), width / 2, headerY, { align: 'center' });
-          }
-          if (settings.header.right) {
-            pdf.text(resolveTemplate(settings.header.right, pageNum, totalPages), width - marginRight, headerY, { align: 'right' });
-          }
+        const addHFText = (
+          tpl: string,
+          align: 'left' | 'center' | 'right',
+          yMm: number
+        ) => {
+          const resolved = resolveTemplate(tpl, templateVars);
+          const img = renderTextToImage(resolved, headerFooterFontSize, hfColor, hfFontFamily);
+          if (!img) return;
+          const x = calcAlignedX(align, img.widthMm, width, marginLeft, marginRight);
+          const y = yMm - img.heightMm / 2;
+          pdf.addImage(img.dataUrl, 'PNG', x, y, img.widthMm, img.heightMm);
+        };
+
+        if (settings.header.enabled) {
+          const headerY = marginTop + 3;
+          if (settings.header.left) addHFText(settings.header.left, 'left', headerY);
+          if (settings.header.center) addHFText(settings.header.center, 'center', headerY);
+          if (settings.header.right) addHFText(settings.header.right, 'right', headerY);
         }
 
-        // Render footer
         if (settings.footer.enabled) {
-          const footerY = height - marginBottom - 1; // baseline within bottom margin
-          pdf.setFontSize(headerFooterFontSize);
-          pdf.setTextColor(settings.includeBackground ? textColor : '#666666');
-
-          if (settings.footer.left) {
-            pdf.text(resolveTemplate(settings.footer.left, pageNum, totalPages), marginLeft, footerY);
-          }
-          if (settings.footer.center) {
-            pdf.text(resolveTemplate(settings.footer.center, pageNum, totalPages), width / 2, footerY, { align: 'center' });
-          }
-          if (settings.footer.right) {
-            pdf.text(resolveTemplate(settings.footer.right, pageNum, totalPages), width - marginRight, footerY, { align: 'right' });
-          }
+          const footerY = height - marginBottom - 1;
+          if (settings.footer.left) addHFText(settings.footer.left, 'left', footerY);
+          if (settings.footer.center) addHFText(settings.footer.center, 'center', footerY);
+          if (settings.footer.right) addHFText(settings.footer.right, 'right', footerY);
         }
 
         yOffset += pageContentHeight;
