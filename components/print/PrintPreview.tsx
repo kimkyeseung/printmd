@@ -168,7 +168,7 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
         );
         const drawHeight = Math.min(pageContentHeight, imgHeightMm - yOffset);
 
-        // Create a cropped canvas for this page (PNG for crisp text)
+        // Create a cropped canvas for this page
         const pageCanvas = document.createElement('canvas');
         pageCanvas.width = canvas.width;
         pageCanvas.height = sourceH;
@@ -183,8 +183,10 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
           );
         }
 
-        const pageImgData = pageCanvas.toDataURL('image/png');
-        pdf.addImage(pageImgData, 'PNG', marginLeft, contentTopMm, imgWidthMm, drawHeight);
+        // Use JPEG (quality 0.92) instead of PNG to reduce file size drastically
+        // (e.g. 54 MB → ~3 MB for an 8-page text document)
+        const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.92);
+        pdf.addImage(pageImgData, 'JPEG', marginLeft, contentTopMm, imgWidthMm, drawHeight);
 
         // Render header / footer as canvas images (supports CJK characters)
         const templateVars = { title: docTitle, date: docDate, page: pageNum, pages: totalPages };
