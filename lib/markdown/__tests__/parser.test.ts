@@ -185,4 +185,24 @@ describe('inlineCheckboxPlugin', () => {
     expect(result).toContain('type="checkbox"');
     expect(result).toContain('전체 관계도 페이지');
   });
+
+  it('converts [ ] that follows a soft break inside a list item', () => {
+    // When a `[ ]` line immediately follows a nested list (no blank line),
+    // markdown-it treats it as a continuation of the preceding list item
+    // joined by a <br>. The checkbox must still be converted.
+    const md = `- [ ] first task
+  - nested child
+[ ] continuation task`;
+    const result = parseMarkdown(md);
+    const checkboxCount = (result.match(/type="checkbox"/g) || []).length;
+    expect(checkboxCount).toBe(2);
+    expect(result).toContain('continuation task');
+  });
+
+  it('converts [ ] anywhere within list item inline content', () => {
+    // Middle-of-text [x] should also become a checkbox
+    const result = parseMarkdown('- [ ] prefix [x] middle task');
+    const checkboxCount = (result.match(/type="checkbox"/g) || []).length;
+    expect(checkboxCount).toBe(2);
+  });
 });

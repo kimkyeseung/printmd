@@ -153,26 +153,25 @@ function taskListPlugin(mdi: MarkdownIt) {
 
 md.use(taskListPlugin);
 
-// Inline checkbox plugin: converts `[ ]` / `[x]` in paragraphs (outside lists)
-// into checkbox elements. The taskListPlugin only handles list items (`- [ ]`);
-// this plugin handles standalone occurrences like `[ ] some task` in paragraphs.
+// Inline checkbox plugin: converts `[ ]` / `[x]` anywhere in inline content
+// (paragraphs, list items after <br>, etc.) into checkbox elements.
+// taskListPlugin only handles the "[ ] " at the very start of a list item,
+// so this plugin covers all remaining cases — including `[ ]` on lines that
+// were joined to a list item via soft breaks.
 function inlineCheckboxPlugin(mdi: MarkdownIt) {
   mdi.core.ruler.after('task-list', 'inline-checkbox', (state) => {
     const tokens = state.tokens;
-    let insideListItem = false;
 
     for (let i = 0; i < tokens.length; i++) {
-      if (tokens[i].type === 'list_item_open') insideListItem = true;
-      if (tokens[i].type === 'list_item_close') insideListItem = false;
-
-      // Skip tokens inside list items (already handled by taskListPlugin)
-      if (tokens[i].type !== 'inline' || !tokens[i].children || insideListItem) continue;
+      if (tokens[i].type !== 'inline' || !tokens[i].children) continue;
 
       const children = tokens[i].children!;
       const newChildren: typeof children = [];
       let modified = false;
 
       for (const child of children) {
+        // Preserve non-text children as-is (includes html_inline checkboxes
+        // already inserted by taskListPlugin, softbreak, code_inline, etc.)
         if (child.type !== 'text') {
           newChildren.push(child);
           continue;
@@ -188,14 +187,12 @@ function inlineCheckboxPlugin(mdi: MarkdownIt) {
           hasMatch = true;
           modified = true;
 
-          // Text before the match
           if (match.index > lastIndex) {
             const textToken = new state.Token('text', '', 0);
             textToken.content = child.content.slice(lastIndex, match.index);
             newChildren.push(textToken);
           }
 
-          // Checkbox
           const checked = match[1] !== ' ';
           const cbToken = new state.Token('html_inline', '', 0);
           cbToken.content = `<input type="checkbox"${checked ? ' checked' : ''} disabled> `;
