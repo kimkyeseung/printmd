@@ -5,12 +5,46 @@ export interface DragDropOptions {
   onDragLeave?: () => void;
   onDrop?: (file: FileInfo) => void;
   onError?: (error: Error) => void;
+  /** Override the no-activity timeout (ms). Defaults to 300ms. */
+  idleTimeoutMs?: number;
 }
+
+/**
+ * Duration (ms) with no `dragover` event before the drag is considered
+ * "left the window". Browsers fire `dragover` continuously while the pointer
+ * is over the document; if this stream stops, the drag has escaped (e.g.
+ * to another app or the browser chrome) and we can safely hide the overlay.
+ */
+const DEFAULT_IDLE_TIMEOUT_MS = 300;
 
 export function createDragDropHandler(options: DragDropOptions) {
   const { onDragEnter, onDragLeave, onDrop, onError } = options;
+  const idleTimeoutMs = options.idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS;
 
   let dragCounter = 0;
+  let idleTimer: ReturnType<typeof setTimeout> | null = null;
+  let active = false;
+
+  const clearIdleTimer = () => {
+    if (idleTimer !== null) {
+      clearTimeout(idleTimer);
+      idleTimer = null;
+    }
+  };
+
+  const resetState = () => {
+    dragCounter = 0;
+    clearIdleTimer();
+    if (active) {
+      active = false;
+      onDragLeave?.();
+    }
+  };
+
+  const scheduleIdleCleanup = () => {
+    clearIdleTimer();
+    idleTimer = setTimeout(resetState, idleTimeoutMs);
+  };
 
   // Ignore internal sidebar drag operations (folder/document reordering)
   const isInternalDrag = (e: DragEvent): boolean => {
@@ -25,19 +59,21 @@ export function createDragDropHandler(options: DragDropOptions) {
     e.stopPropagation();
     dragCounter++;
 
-    if (dragCounter === 1) {
+    if (!active) {
+      active = true;
       onDragEnter?.();
     }
+    scheduleIdleCleanup();
   };
 
   const handleDragLeave = (e: DragEvent) => {
     if (isInternalDrag(e)) return;
     e.preventDefault();
     e.stopPropagation();
-    dragCounter--;
+    dragCounter = Math.max(0, dragCounter - 1);
 
     if (dragCounter === 0) {
-      onDragLeave?.();
+      resetState();
     }
   };
 
@@ -49,14 +85,16 @@ export function createDragDropHandler(options: DragDropOptions) {
     if (e.dataTransfer) {
       e.dataTransfer.dropEffect = 'copy';
     }
+    // Continuous dragover events mean drag is still inside the window.
+    // Reset the idle timer on each one.
+    scheduleIdleCleanup();
   };
 
   const handleDrop = async (e: DragEvent) => {
     if (isInternalDrag(e)) return;
     e.preventDefault();
     e.stopPropagation();
-    dragCounter = 0;
-    onDragLeave?.();
+    resetState();
 
     const files = e.dataTransfer?.files;
     if (!files || files.length === 0) {
