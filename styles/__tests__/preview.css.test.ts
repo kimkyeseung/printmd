@@ -20,4 +20,21 @@ describe('preview.css', () => {
   it('includes .preview-content selectors', () => {
     expect(css).toContain('.preview-content');
   });
+
+  it('does not use flex on task-list-item (breaks nested lists)', () => {
+    // flex on li makes nested <ul>/<ol> children lay out as flex items (row)
+    // which pushes them out horizontally. Must use normal flow instead.
+    const taskItemBlock = css.match(
+      /\.preview-content \.task-list-item\s*\{[^}]*\}/
+    )?.[0];
+    expect(taskItemBlock).toBeDefined();
+    expect(taskItemBlock).not.toMatch(/display:\s*flex/);
+  });
+
+  it('styles all preview checkboxes, not just task-list-item ones', () => {
+    // Both list checkboxes AND standalone [ ] in paragraphs need custom styling
+    expect(css).toMatch(
+      /\.preview-content input\[type="checkbox"\]\s*\{/
+    );
+  });
 });

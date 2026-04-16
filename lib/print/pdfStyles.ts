@@ -140,7 +140,44 @@ export function getPdfStyles(options?: PdfStyleOptions): string {
     .preview-content strong { font-weight: 600; }
     .preview-content em { font-style: italic; }
     .preview-content del { text-decoration: line-through; }
-    .preview-content input[type="checkbox"] { margin-right: 0.5em; }
+
+    /* Task list layout: no flex, so nested <ul>/<ol> wrap onto their own lines */
+    .preview-content .task-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    .preview-content .task-list-item { margin-bottom: 0.25em; }
+    .preview-content .task-list-item-checked { opacity: 0.6; text-decoration: line-through; }
+
+    /* Custom checkbox (inline) — works for both list items and standalone [ ] */
+    .preview-content input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 1.1em;
+      height: 1.1em;
+      min-width: 1.1em;
+      border: 2px solid rgba(${overlayBase}, 0.45);
+      border-radius: 3px;
+      margin: 0 0.4em 0 0;
+      vertical-align: -0.2em;
+      position: relative;
+      background-color: transparent;
+    }
+    .preview-content input[type="checkbox"]:checked {
+      background-color: ${linkColor};
+      border-color: ${linkColor};
+    }
+    .preview-content input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 0;
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
   `;
 }
 

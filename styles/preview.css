@@ -220,14 +220,16 @@
   margin-bottom: 1em;
 }
 
+/* Use inline-flow instead of flex so nested <ul>/<ol> stay on their own line.
+   The checkbox sits inline with the first line; block children (nested lists)
+   flow normally below. */
 .preview-content .task-list-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5em;
   margin-bottom: 0.25em;
 }
 
-.preview-content .task-list-item input[type="checkbox"] {
+/* Custom checkbox styling for ANY checkbox in preview content
+   (task-list items AND standalone `[ ]` in paragraphs) */
+.preview-content input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
   width: 1.15em;
@@ -235,18 +237,19 @@
   min-width: 1.15em;
   border: 2px solid rgba(0, 0, 0, 0.35);
   border-radius: 3px;
-  margin: 0.15em 0 0 0;
+  margin: 0 0.4em 0 0;
+  vertical-align: -0.2em;
   cursor: pointer;
   position: relative;
   background-color: transparent;
 }
 
-.preview-content .task-list-item input[type="checkbox"]:checked {
+.preview-content input[type="checkbox"]:checked {
   background-color: #2563eb;
   border-color: #2563eb;
 }
 
-.preview-content .task-list-item input[type="checkbox"]:checked::after {
+.preview-content input[type="checkbox"]:checked::after {
   content: '';
   position: absolute;
   left: 3px;

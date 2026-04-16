@@ -42,4 +42,18 @@ describe('getPdfStyles', () => {
     expect(css).toContain('.preview-content code');
     expect(css).toContain('.preview-content pre');
   });
+
+  it('includes task-list styles without flex (nested lists must wrap)', () => {
+    expect(css).toContain('.preview-content .task-list');
+    expect(css).toContain('.preview-content .task-list-item');
+    const taskItemBlock = css.match(
+      /\.preview-content \.task-list-item\s*\{[^}]*\}/
+    )?.[0];
+    expect(taskItemBlock).toBeDefined();
+    expect(taskItemBlock).not.toMatch(/display:\s*flex/);
+  });
+
+  it('styles all preview checkboxes (list and paragraph)', () => {
+    expect(css).toMatch(/\.preview-content input\[type="checkbox"\]\s*\{/);
+  });
 });
