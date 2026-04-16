@@ -15,6 +15,7 @@ import {
   extractTitle,
   renderTextToImage,
   calcAlignedX,
+  buildPdfFilename,
 } from '@/lib/print/pdfTextRenderer';
 import { findKeepTogetherZones, computePageBreaks } from '@/lib/print/pageBreaks';
 
@@ -230,7 +231,7 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
 
       }
 
-      pdf.save('document.pdf');
+      pdf.save(buildPdfFilename(docTitle));
     } catch (error) {
       console.error('Failed to generate PDF:', error);
     } finally {

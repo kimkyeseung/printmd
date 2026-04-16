@@ -30,6 +30,48 @@ export function extractTitle(markdown: string): string {
   );
 }
 
+/** Format a Date as YYYY-MM-DD. */
+export function formatDateYMD(date: Date = new Date()): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/**
+ * Build a safe PDF filename from a title and date.
+ *
+ * - Strips markdown formatting (**, __, *, _, `, etc.) from the title
+ * - Removes / replaces characters that most filesystems reject
+ *   (`/ \ : * ? " < > |` and control chars)
+ * - Collapses whitespace, trims the result
+ * - Preserves CJK and other Unicode characters
+ * - Falls back to `document` if the cleaned title is empty
+ * - Caps title length at 80 characters to keep the final name reasonable
+ *
+ * Format: `{title}-{date}.pdf`  (e.g. `My Document-2026-04-16.pdf`)
+ */
+export function buildPdfFilename(title: string, date: Date = new Date()): string {
+  const cleanedTitle = sanitizeFilenameTitle(title);
+  const datePart = formatDateYMD(date);
+  const base = cleanedTitle || 'document';
+  return `${base}-${datePart}.pdf`;
+}
+
+function sanitizeFilenameTitle(title: string): string {
+  return title
+    // Strip common markdown inline syntax
+    .replace(/[*_`~]+/g, '')
+    // Remove filesystem-forbidden chars and control chars
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\\/:*?"<>|\x00-\x1f]/g, '')
+    // Collapse runs of whitespace to a single space
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 80)
+    .trim();
+}
+
 export interface RenderedText {
   dataUrl: string;
   widthMm: number;

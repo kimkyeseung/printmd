@@ -4,6 +4,8 @@ import {
   extractTitle,
   renderTextToImage,
   calcAlignedX,
+  buildPdfFilename,
+  formatDateYMD,
 } from '../pdfTextRenderer';
 
 describe('resolveTemplate', () => {
@@ -104,6 +106,69 @@ describe('renderTextToImage', () => {
 
     renderTextToImage('Test', 9, '#000', 'Noto Sans KR');
     expect(mockCtx.font).toContain('Noto Sans KR');
+  });
+});
+
+describe('formatDateYMD', () => {
+  it('formats date as YYYY-MM-DD', () => {
+    expect(formatDateYMD(new Date(2026, 3, 16))).toBe('2026-04-16');
+  });
+
+  it('zero-pads single-digit month and day', () => {
+    expect(formatDateYMD(new Date(2026, 0, 5))).toBe('2026-01-05');
+  });
+});
+
+describe('buildPdfFilename', () => {
+  const date = new Date(2026, 3, 16); // 2026-04-16
+
+  it('combines sanitized title and date with .pdf extension', () => {
+    expect(buildPdfFilename('My Document', date)).toBe('My Document-2026-04-16.pdf');
+  });
+
+  it('preserves Korean and CJK characters', () => {
+    expect(buildPdfFilename('실행 계획', date)).toBe('실행 계획-2026-04-16.pdf');
+  });
+
+  it('strips markdown formatting from title', () => {
+    expect(buildPdfFilename('**Bold** and _italic_ `code`', date)).toBe(
+      'Bold and italic code-2026-04-16.pdf'
+    );
+  });
+
+  it('removes filesystem-forbidden characters', () => {
+    expect(buildPdfFilename('a/b\\c:d*e?f"g<h>i|j', date)).toBe('abcdefghij-2026-04-16.pdf');
+  });
+
+  it('collapses whitespace runs', () => {
+    expect(buildPdfFilename('Title   with    spaces', date)).toBe(
+      'Title with spaces-2026-04-16.pdf'
+    );
+  });
+
+  it('falls back to "document" when title is empty', () => {
+    expect(buildPdfFilename('', date)).toBe('document-2026-04-16.pdf');
+  });
+
+  it('falls back to "document" when title is only forbidden chars', () => {
+    expect(buildPdfFilename('///***???', date)).toBe('document-2026-04-16.pdf');
+  });
+
+  it('truncates very long titles to 80 characters', () => {
+    const longTitle = 'a'.repeat(200);
+    const result = buildPdfFilename(longTitle, date);
+    // 80 a's + -2026-04-16.pdf
+    expect(result).toBe('a'.repeat(80) + '-2026-04-16.pdf');
+  });
+
+  it('uses current date when not provided', () => {
+    const result = buildPdfFilename('Test');
+    expect(result).toMatch(/^Test-\d{4}-\d{2}-\d{2}\.pdf$/);
+  });
+
+  it('handles real-world Korean title', () => {
+    const result = buildPdfFilename('Sillok Roadmap — 2026년 실행 계획', date);
+    expect(result).toBe('Sillok Roadmap — 2026년 실행 계획-2026-04-16.pdf');
   });
 });
 
