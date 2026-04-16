@@ -211,10 +211,18 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
     if (lineNum < 0 || lineNum >= lines.length) return;
 
     const line = lines[lineNum];
-    if (/- \[ \]/.test(line)) {
-      lines[lineNum] = line.replace('- [ ]', '- [x]');
-    } else if (/- \[x\]/i.test(line)) {
-      lines[lineNum] = line.replace(/- \[x\]/i, '- [ ]');
+    // Match `[ ]` / `[x]` / `[X]` with flexible leading (list marker or none)
+    // and optional whitespace. This covers:
+    //   - [ ] task         (list)
+    //   * [ ] task         (list)
+    //   [ ] task           (standalone paragraph)
+    //   text [x] middle    (inline within text)
+    const uncheckedMatch = line.match(/\[ \]/);
+    const checkedMatch = line.match(/\[[xX]\]/);
+    if (uncheckedMatch) {
+      lines[lineNum] = line.replace('[ ]', '[x]');
+    } else if (checkedMatch) {
+      lines[lineNum] = line.replace(/\[[xX]\]/, '[ ]');
     } else {
       return;
     }

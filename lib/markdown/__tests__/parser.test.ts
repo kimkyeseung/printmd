@@ -205,4 +205,25 @@ describe('inlineCheckboxPlugin', () => {
     const checkboxCount = (result.match(/type="checkbox"/g) || []).length;
     expect(checkboxCount).toBe(2);
   });
+
+  it('inline checkboxes are clickable (no disabled attribute)', () => {
+    const listCheckbox = parseMarkdown('- [ ] task');
+    const paragraphCheckbox = parseMarkdown('[ ] task');
+    expect(listCheckbox).not.toContain('disabled');
+    expect(paragraphCheckbox).not.toContain('disabled');
+  });
+
+  it('inline checkboxes in paragraphs include data-line attribute', () => {
+    const result = parseMarkdown('[ ] paragraph task');
+    expect(result).toMatch(/data-line="0"/);
+  });
+
+  it('inline checkbox after soft break gets correct data-line', () => {
+    // Paragraph starts at line 0, `[ ]` is on line 1 (after soft break)
+    const md = `first line
+[ ] second line task`;
+    const result = parseMarkdown(md);
+    // Checkbox should have data-line="1"
+    expect(result).toMatch(/<input type="checkbox" data-line="1">/);
+  });
 });

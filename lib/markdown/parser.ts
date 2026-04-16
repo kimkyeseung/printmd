@@ -123,8 +123,9 @@ function taskListPlugin(mdi: MarkdownIt) {
                 }
 
                 // Replace the inline content: strip `[ ] ` prefix and prepend checkbox html
+                // (no `disabled` — the preview's click handler toggles the markdown source)
                 const checkboxHtml =
-                  `<input type="checkbox"${checked ? ' checked' : ''} disabled data-line="${sourceLine}"> `;
+                  `<input type="checkbox"${checked ? ' checked' : ''} data-line="${sourceLine}"> `;
                 tokens[k].content = tokens[k].content.slice(match[0].length);
                 tokens[k].children = tokens[k].children || [];
 
@@ -169,10 +170,19 @@ function inlineCheckboxPlugin(mdi: MarkdownIt) {
       const newChildren: typeof children = [];
       let modified = false;
 
+      // Track current line within the inline block for data-line on checkboxes.
+      // softbreak/hardbreak increment the line counter so each `[ ]` maps to the
+      // correct line in the original markdown source.
+      const baseLine = tokens[i].map ? tokens[i].map![0] : 0;
+      let currentLine = baseLine;
+
       for (const child of children) {
         // Preserve non-text children as-is (includes html_inline checkboxes
         // already inserted by taskListPlugin, softbreak, code_inline, etc.)
         if (child.type !== 'text') {
+          if (child.type === 'softbreak' || child.type === 'hardbreak') {
+            currentLine++;
+          }
           newChildren.push(child);
           continue;
         }
@@ -195,7 +205,8 @@ function inlineCheckboxPlugin(mdi: MarkdownIt) {
 
           const checked = match[1] !== ' ';
           const cbToken = new state.Token('html_inline', '', 0);
-          cbToken.content = `<input type="checkbox"${checked ? ' checked' : ''} disabled> `;
+          cbToken.content =
+            `<input type="checkbox"${checked ? ' checked' : ''} data-line="${currentLine}"> `;
           newChildren.push(cbToken);
 
           lastIndex = regex.lastIndex;

@@ -233,6 +233,58 @@ describe('Preview - inline editing', () => {
     expect(mockUpdateTabContent).toHaveBeenCalledWith('tab-1', '- [x] task item');
   });
 
+  it('toggles [x] back to [ ] on click', () => {
+    const md = '- [x] completed';
+    mockActiveTab.content = md;
+    render(<Preview markdown={md} styles={defaultStyles} />);
+    const article = document.querySelector('.preview-content')!;
+    const checkbox = article.querySelector('input[type="checkbox"]')!;
+
+    act(() => {
+      fireEvent.click(checkbox);
+    });
+
+    expect(mockUpdateTabContent).toHaveBeenCalledWith('tab-1', '- [ ] completed');
+  });
+
+  it('toggles standalone [ ] in paragraph on click', () => {
+    const md = '[ ] standalone task';
+    mockActiveTab.content = md;
+    render(<Preview markdown={md} styles={defaultStyles} />);
+    const article = document.querySelector('.preview-content')!;
+    const checkbox = article.querySelector('input[type="checkbox"]')!;
+    expect(checkbox).not.toBeNull();
+
+    act(() => {
+      fireEvent.click(checkbox);
+    });
+
+    expect(mockUpdateTabContent).toHaveBeenCalledWith('tab-1', '[x] standalone task');
+  });
+
+  it('toggles paragraph [x] back to [ ]', () => {
+    const md = '[x] done task';
+    mockActiveTab.content = md;
+    render(<Preview markdown={md} styles={defaultStyles} />);
+    const article = document.querySelector('.preview-content')!;
+    const checkbox = article.querySelector('input[type="checkbox"]')!;
+
+    act(() => {
+      fireEvent.click(checkbox);
+    });
+
+    expect(mockUpdateTabContent).toHaveBeenCalledWith('tab-1', '[ ] done task');
+  });
+
+  it('checkbox does not have disabled attribute (so clicks fire)', () => {
+    const md = '- [ ] clickable';
+    mockActiveTab.content = md;
+    render(<Preview markdown={md} styles={defaultStyles} />);
+    const article = document.querySelector('.preview-content')!;
+    const checkbox = article.querySelector('input[type="checkbox"]') as HTMLInputElement;
+    expect(checkbox.disabled).toBe(false);
+  });
+
   it('preview-container has position relative for textarea overlay', () => {
     render(<Preview markdown="# Hello" styles={defaultStyles} />);
     const container = document.querySelector('.preview-container') as HTMLElement;
