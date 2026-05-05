@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useRef, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { EditorState, type Transaction } from '@codemirror/state';
+import { indentUnit } from '@codemirror/language';
 import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, highlightActiveLine } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { markdown } from '@codemirror/lang-markdown';
@@ -72,6 +73,7 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
         highlightSpecialChars(),
         history(),
         drawSelection(),
+        indentUnit.of('    '),
         indentOnInput(),
         bracketMatching(),
         highlightActiveLine(),
