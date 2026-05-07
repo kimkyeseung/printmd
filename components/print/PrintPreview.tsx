@@ -76,29 +76,42 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
       ? generateElementStylesCss(elementStyles)
       : '';
 
-    // Build a self-contained HTML container with inline <style>
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '0px';
-    container.style.top = '0px';
-    container.style.zIndex = '-1';
-    container.style.pointerEvents = 'none';
-    container.style.width = `${mmToPx(contentWidthMm)}px`;
-    container.style.backgroundColor = bgColor;
-    container.style.color = textColor;
-    container.style.fontFamily = globalStyles.fontFamily;
-    container.style.fontSize = `${globalStyles.fontSize}px`;
-    container.style.lineHeight = String(globalStyles.lineHeight);
-    container.style.padding = '0';
+    // Render in an isolated iframe to prevent app CSS (preview.css, Tailwind)
+    // from interfering with PDF-specific styles.
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.left = '-9999px';
+    iframe.style.top = '-9999px';
+    iframe.style.width = `${mmToPx(contentWidthMm) + 50}px`;
+    iframe.style.height = '10000px';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
 
-    // Embed base + element styles so html2canvas can apply them
-    // Element styles come after base so preset overrides take priority
-    container.innerHTML = `<style>${pdfBaseStyles}\n${elementCss}</style><div class="preview-content">${htmlContent}</div>`;
+    const iframeDoc = iframe.contentDocument!;
+    iframeDoc.open();
+    iframeDoc.write(`<!DOCTYPE html>
+<html><head><style>
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  width: ${mmToPx(contentWidthMm)}px;
+  background-color: ${bgColor};
+  color: ${textColor};
+  font-family: ${globalStyles.fontFamily};
+  font-size: ${globalStyles.fontSize}px;
+  line-height: ${globalStyles.lineHeight};
+  padding: 0;
+  margin: 0;
+}
+${pdfBaseStyles}
+${elementCss}
+</style></head>
+<body><div class="preview-content">${htmlContent}</div></body></html>`);
+    iframeDoc.close();
 
-    document.body.appendChild(container);
-
-    // Wait for fonts/images to load
+    // Wait for fonts/images to load inside iframe
     await new Promise((r) => setTimeout(r, 300));
+
+    const container = iframeDoc.body;
 
     // Scan DOM for keep-together zones before rendering to canvas
     const pageContentHeightPx = mmToPx(
@@ -114,10 +127,11 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
       useCORS: true,
       backgroundColor: bgColor,
       width: container.scrollWidth,
-      height: container.scrollHeight,
+      height: containerHeightPx,
+      foreignObjectRendering: true,
     });
 
-    document.body.removeChild(container);
+    document.body.removeChild(iframe);
 
     // Create PDF
     const pdf = new jsPDF({

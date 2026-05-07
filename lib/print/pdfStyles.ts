@@ -126,10 +126,8 @@ export function getPdfStyles(options?: PdfStyleOptions): string {
     }
     .preview-content table th,
     .preview-content table td {
-      padding: 8px 16px;
+      padding: 0.5em 1em;
       border: 1px solid rgba(${overlayBase}, 0.20);
-      vertical-align: middle;
-      line-height: 1.4;
     }
     .preview-content table th {
       font-weight: 600;
@@ -151,10 +149,7 @@ export function getPdfStyles(options?: PdfStyleOptions): string {
       list-style: none;
       padding-left: 0;
     }
-    .preview-content .task-list-item {
-      margin-bottom: 0.25em;
-      line-height: 1.4;
-    }
+    .preview-content .task-list-item { margin-bottom: 0.25em; }
     .preview-content .task-list-item-checked { opacity: 0.6; text-decoration: line-through; }
 
     /* Custom checkbox (inline) — works for both list items and standalone [ ] */
@@ -167,7 +162,7 @@ export function getPdfStyles(options?: PdfStyleOptions): string {
       border: 2px solid rgba(${overlayBase}, 0.45);
       border-radius: 3px;
       margin: 0 0.4em 0 0;
-      vertical-align: middle;
+      vertical-align: -0.2em;
       position: relative;
       background-color: transparent;
     }
