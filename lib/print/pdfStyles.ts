@@ -25,6 +25,9 @@ export function getPdfStyles(options?: PdfStyleOptions): string {
       word-wrap: break-word;
       overflow-wrap: break-word;
     }
+    .preview-content > :first-child {
+      margin-top: 0;
+    }
     .preview-content h1,
     .preview-content h2,
     .preview-content h3,
