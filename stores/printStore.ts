@@ -11,7 +11,7 @@ const defaultSettings: PrintSettings = {
     bottom: 20,
     left: 20,
   },
-  includeBackground: false,
+  includeBackground: true,
   header: {
     enabled: true,
     left: '{title}',
