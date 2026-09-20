@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useImperativeHandle, useRef, useState, useMemo } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { useStyleStore } from '@/stores';
 import { mmToPx } from '@/lib/print/paperSizes';
 import { findKeepTogetherZones, computePageBreaks } from '@/lib/print/pageBreaks';
-import { extractTitle, resolveTemplate } from '@/lib/print/pdfTextRenderer';
+import { extractTitle, resolveTemplate } from '@/lib/print/headerFooter';
 import {
   buildPrintDocument,
   getPrintGeometry,
@@ -21,29 +21,42 @@ import {
 import type { GlobalStyles } from '@/types/style';
 import type { PrintSettings, HeaderFooterConfig } from '@/types/print';
 
+export interface PagedPreviewHandle {
+  /**
+   * Send the paged document to the browser's print pipeline. Returns false if
+   * pagination hasn't finished yet, so the caller can decline rather than
+   * printing a half-built document.
+   */
+  print: () => boolean;
+}
+
 interface PagedPreviewProps {
   markdown: string;
   styles: GlobalStyles;
   settings: PrintSettings;
+  ref?: React.Ref<PagedPreviewHandle>;
 }
 
 /** Gap (px) between page sheets in the preview. */
 const PAGE_GAP_PX = 20;
 
 /**
- * Paged print preview.
+ * Paged print preview — and the document that actually gets printed.
  *
- * Renders the same isolated document the PDF exporter renders, then slices it
- * into sheets using the same page-break algorithm. Keeping both paths on
- * `buildPrintDocument` + `computePageBreaks` is what makes the preview match
- * the exported file — app CSS (Tailwind, preview.css) must never reach it.
+ * The sheets rendered here are what the browser prints: `print()` hands this
+ * iframe to the print pipeline, so the output is the preview, laid out by the
+ * same `buildPrintDocument` + `computePageBreaks` the user is looking at.
+ * Printing the live document (rather than rasterising it) keeps the text as
+ * real text — selectable, searchable, and rendered with the fonts the iframe
+ * already has, including uploaded ones.
  */
-export function PagedPreview({ markdown, styles, settings }: PagedPreviewProps) {
+export function PagedPreview({ markdown, styles, settings, ref }: PagedPreviewProps) {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const elementStyles = useStyleStore((state) => state.elementStyles);
   const customFonts = useStyleStore((state) => state.customFonts);
 
   const html = useMemo(() => sanitizeHtml(parseMarkdown(markdown)), [markdown]);
+  const docTitle = useMemo(() => extractTitle(markdown), [markdown]);
   const geometry = useMemo(() => getPrintGeometry(settings), [settings]);
   const colors = useMemo(
     () => resolvePrintColors(styles, settings.includeBackground),
@@ -54,6 +67,7 @@ export function PagedPreview({ markdown, styles, settings }: PagedPreviewProps) 
     () =>
       buildPrintDocument({
         html,
+        title: docTitle,
         geometry,
         colors,
         styles,
@@ -62,7 +76,16 @@ export function PagedPreview({ markdown, styles, settings }: PagedPreviewProps) 
         includeBackground: settings.includeBackground,
         extraCss: buildPagedCss(geometry, colors.background),
       }),
-    [html, geometry, colors, styles, elementStyles, customFonts, settings.includeBackground]
+    [
+      html,
+      docTitle,
+      geometry,
+      colors,
+      styles,
+      elementStyles,
+      customFonts,
+      settings.includeBackground,
+    ]
   );
 
   /**
@@ -75,14 +98,29 @@ export function PagedPreview({ markdown, styles, settings }: PagedPreviewProps) 
       docHtml,
       geometry,
       settings,
-      docTitle: extractTitle(markdown),
+      docTitle,
       headerFooterColor: colors.headerFooter,
     }),
-    [docHtml, geometry, settings, markdown, colors.headerFooter]
+    [docHtml, geometry, settings, docTitle, colors.headerFooter]
   );
 
   const [rendered, setRendered] = useState<{ plan: unknown; pageCount: number } | null>(null);
   const isRendering = rendered === null || rendered.plan !== plan;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      print: () => {
+        const win = frameRef.current?.contentWindow;
+        if (!win || isRendering) return false;
+        // focus() first: Safari prints the top document otherwise.
+        win.focus();
+        win.print();
+        return true;
+      },
+    }),
+    [isRendering]
+  );
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -134,7 +172,8 @@ export function PagedPreview({ markdown, styles, settings }: PagedPreviewProps) 
       <iframe
         ref={frameRef}
         title="Print preview"
-        sandbox="allow-same-origin"
+        // allow-modals is what lets the print dialog open from inside the frame.
+        sandbox="allow-same-origin allow-modals"
         style={{
           width: geometry.paperWidthPx,
           minHeight: geometry.paperHeightPx,
@@ -158,9 +197,21 @@ export function PagedPreview({ markdown, styles, settings }: PagedPreviewProps) 
   );
 }
 
-/** Chrome for the sheets themselves — only ever applied inside the preview iframe. */
+/**
+ * Chrome for the sheets themselves — only ever applied inside the preview
+ * iframe, and the CSS the browser prints from.
+ *
+ * On screen the sheets are stacked with a gap and a drop shadow; in print each
+ * one fills exactly one physical page. `@page { margin: 0 }` puts the sheet in
+ * charge of its own margins, which are already baked into `.print-page-content`,
+ * so the printed page lands on the same geometry as the preview.
+ */
 function buildPagedCss(geometry: ReturnType<typeof getPrintGeometry>, background: string): string {
   return `
+@page {
+  size: ${geometry.paperWidthMm}mm ${geometry.paperHeightMm}mm;
+  margin: 0;
+}
 .print-page {
   position: relative;
   width: ${geometry.paperWidthPx}px;
@@ -189,6 +240,29 @@ function buildPagedCss(geometry: ReturnType<typeof getPrintGeometry>, background
 .print-hf-left { left: ${mmToPx(geometry.marginLeftMm)}px; }
 .print-hf-right { right: ${mmToPx(geometry.marginRightMm)}px; }
 .print-hf-center { left: 50%; transform: translateX(-50%); }
+
+/* Last, so these win over the screen rules above at equal specificity. */
+@media print {
+  html, body { background: #fff; }
+  .print-page {
+    /* Sized in mm so a fractional pixel can't spill a blank page. */
+    width: ${geometry.paperWidthMm}mm;
+    height: ${geometry.paperHeightMm}mm;
+    margin: 0;
+    box-shadow: none;
+    break-after: page;
+    page-break-after: always;
+    /* Without this the theme background is dropped unless the user ticks
+       "Background graphics" in the print dialog. */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print-page:last-child {
+    margin-bottom: 0;
+    break-after: auto;
+    page-break-after: auto;
+  }
+}
 `;
 }
 

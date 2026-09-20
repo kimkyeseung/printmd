@@ -1,30 +1,12 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { usePrintStore, useStyleStore } from '@/stores';
 import { PrintSettings } from './PrintSettings';
 import { HeaderFooter } from './HeaderFooter';
-import { PagedPreview } from './PagedPreview';
-import { parseMarkdown } from '@/lib/markdown/parser';
-import { sanitizeHtml } from '@/lib/markdown/sanitizer';
-import {
-  buildPrintDocument,
-  getPrintGeometry,
-  resolvePrintColors,
-  waitForPrintDocument,
-  HEADER_BASELINE_OFFSET_MM,
-  FOOTER_BASELINE_OFFSET_MM,
-  HEADER_FOOTER_FONT_SIZE_PT,
-  PRINT_ROOT_CLASS,
-} from '@/lib/print/printDocument';
-import {
-  resolveTemplate,
-  extractTitle,
-  renderTextToImage,
-  calcAlignedX,
-  buildPdfFilename,
-} from '@/lib/print/pdfTextRenderer';
-import { findKeepTogetherZones, computePageBreaks } from '@/lib/print/pageBreaks';
+import { PagedPreview, type PagedPreviewHandle } from './PagedPreview';
+import { getPrintGeometry } from '@/lib/print/printDocument';
+import { showToast } from '@/components/ui/Toast';
 
 interface PrintPreviewProps {
   isOpen: boolean;
@@ -33,240 +15,28 @@ interface PrintPreviewProps {
 }
 
 export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
-  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-
   const settings = usePrintStore((state) => state.settings);
   const updateSettings = usePrintStore((state) => state.updateSettings);
   const updateHeader = usePrintStore((state) => state.updateHeader);
   const updateFooter = usePrintStore((state) => state.updateFooter);
 
   const globalStyles = useStyleStore((state) => state.globalStyles);
-  const elementStyles = useStyleStore((state) => state.elementStyles);
-  const customFonts = useStyleStore((state) => state.customFonts);
 
   const geometry = useMemo(() => getPrintGeometry(settings), [settings]);
 
-  const generatePdf = async () => {
-    const html2canvasModule = await import('html2canvas');
-    const html2canvas = html2canvasModule.default;
-    const { jsPDF } = await import('jspdf');
+  const previewRef = useRef<PagedPreviewHandle>(null);
 
-    const { paperWidthMm: width, paperHeightMm: height } = geometry;
-    const {
-      marginTopMm: marginTop,
-      marginRightMm: marginRight,
-      marginBottomMm: marginBottom,
-      marginLeftMm: marginLeft,
-      contentWidthMm,
-      pageContentHeightPx,
-    } = geometry;
-
-    const colors = resolvePrintColors(globalStyles, settings.includeBackground);
-    const bgColor = colors.background;
-
-    const htmlContent = sanitizeHtml(parseMarkdown(content));
-
-    // Render in an isolated iframe to prevent app CSS (preview.css, Tailwind)
-    // from interfering with print-specific styles. PagedPreview writes the same
-    // document, so what the user saw in the preview is what gets exported.
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.left = '-9999px';
-    iframe.style.top = '-9999px';
-    iframe.style.width = `${geometry.contentWidthPx + 50}px`;
-    iframe.style.height = '10000px';
-    iframe.style.border = 'none';
-    document.body.appendChild(iframe);
-
-    const iframeDoc = iframe.contentDocument!;
-    iframeDoc.open();
-    iframeDoc.write(
-      buildPrintDocument({
-        html: htmlContent,
-        geometry,
-        colors,
-        styles: globalStyles,
-        elementStyles,
-        customFonts,
-        includeBackground: settings.includeBackground,
-      })
-    );
-    iframeDoc.close();
-
-    await waitForPrintDocument(iframeDoc);
-
-    const container =
-      iframeDoc.querySelector<HTMLElement>(`.${PRINT_ROOT_CLASS}`) ?? iframeDoc.body;
-
-    // Scan DOM for keep-together zones before rendering to canvas
-    const maxZoneHeight = pageContentHeightPx * 0.4;
-    const keepZones = findKeepTogetherZones(container, maxZoneHeight);
-    const containerHeightPx = container.scrollHeight;
-
-    // Render to canvas
-    const canvas = await html2canvas(container, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: bgColor,
-      width: container.scrollWidth,
-      height: containerHeightPx,
-      foreignObjectRendering: true,
-    });
-
-    document.body.removeChild(iframe);
-
-    // Create PDF
-    const pdf = new jsPDF({
-      orientation: settings.orientation,
-      unit: 'mm',
-      format: [width, height],
-    });
-
-    const docTitle = extractTitle(content);
-    const docDate = new Date().toLocaleDateString();
-    const headerFooterFontSize = HEADER_FOOTER_FONT_SIZE_PT;
-    const hfColor = colors.headerFooter;
-    const hfFontFamily = globalStyles.fontFamily;
-
-    const contentTopMm = geometry.contentTopMm;
-    const imgWidthMm = contentWidthMm;
-    const imgHeightMm = (canvas.height / canvas.width) * imgWidthMm;
-
-    // Compute smart page breaks that avoid splitting tables / headings
-    const pageBreaksPx = computePageBreaks(containerHeightPx, pageContentHeightPx, keepZones);
-    const pxToMm = imgHeightMm / (canvas.height / 2); // canvas scale = 2
-    const totalPages = pageBreaksPx.length;
-
-    // Add image, handling multiple pages
-    for (let page = 0; page < totalPages; page++) {
-      if (page > 0) {
-        pdf.addPage();
-      }
-
-      const pageNum = page + 1;
-
-      // Fill page background
-      if (settings.includeBackground && bgColor !== '#ffffff') {
-        pdf.setFillColor(bgColor);
-        pdf.rect(0, 0, width, height, 'F');
-      }
-
-      // Calculate source crop for this page using smart break points
-      const breakStartPx = pageBreaksPx[page];
-      const breakEndPx = page + 1 < totalPages ? pageBreaksPx[page + 1] : containerHeightPx;
-      const segmentPx = breakEndPx - breakStartPx;
-
-      const canvasScale = 2;
-      const sourceY = breakStartPx * canvasScale;
-      const sourceH = Math.min(segmentPx * canvasScale, canvas.height - sourceY);
-      const drawHeight = segmentPx * pxToMm;
-
-      // Create a cropped canvas for this page
-      const pageCanvas = document.createElement('canvas');
-      pageCanvas.width = canvas.width;
-      pageCanvas.height = sourceH;
-      const ctx = pageCanvas.getContext('2d');
-      if (ctx) {
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-        ctx.drawImage(
-          canvas,
-          0, sourceY, canvas.width, sourceH,
-          0, 0, pageCanvas.width, sourceH
-        );
-      }
-
-      // Use JPEG (quality 0.92) instead of PNG to reduce file size drastically
-      // (e.g. 54 MB → ~3 MB for an 8-page text document)
-      const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.92);
-      pdf.addImage(pageImgData, 'JPEG', marginLeft, contentTopMm, imgWidthMm, drawHeight);
-
-      // Render header / footer as canvas images (supports CJK characters)
-      const templateVars = { title: docTitle, date: docDate, page: pageNum, pages: totalPages };
-
-      const addHFText = (
-        tpl: string,
-        align: 'left' | 'center' | 'right',
-        yMm: number
-      ) => {
-        const resolved = resolveTemplate(tpl, templateVars);
-        const img = renderTextToImage(resolved, headerFooterFontSize, hfColor, hfFontFamily);
-        if (!img) return;
-        const x = calcAlignedX(align, img.widthMm, width, marginLeft, marginRight);
-        const y = yMm - img.heightMm / 2;
-        pdf.addImage(img.dataUrl, 'PNG', x, y, img.widthMm, img.heightMm);
-      };
-
-      if (settings.header.enabled) {
-        const headerY = marginTop + HEADER_BASELINE_OFFSET_MM;
-        if (settings.header.left) addHFText(settings.header.left, 'left', headerY);
-        if (settings.header.center) addHFText(settings.header.center, 'center', headerY);
-        if (settings.header.right) addHFText(settings.header.right, 'right', headerY);
-      }
-
-      if (settings.footer.enabled) {
-        const footerY = height - marginBottom - FOOTER_BASELINE_OFFSET_MM;
-        if (settings.footer.left) addHFText(settings.footer.left, 'left', footerY);
-        if (settings.footer.center) addHFText(settings.footer.center, 'center', footerY);
-        if (settings.footer.right) addHFText(settings.footer.right, 'right', footerY);
-      }
-
-    }
-
-    return pdf;
-  };
-
-  const handlePrint = async () => {
-    if (isGeneratingPdf) return;
-    setIsGeneratingPdf(true);
-
-    try {
-      const pdf = await generatePdf();
-      const blobUrl = String(pdf.output('bloburl'));
-
-      const printFrame = document.createElement('iframe');
-      printFrame.style.position = 'fixed';
-      printFrame.style.left = '-9999px';
-      printFrame.style.top = '-9999px';
-      printFrame.style.width = '0';
-      printFrame.style.height = '0';
-      document.body.appendChild(printFrame);
-
-      printFrame.src = blobUrl;
-      printFrame.onload = () => {
-        printFrame.contentWindow?.print();
-        // Clean up after print dialog closes
-        const cleanup = () => {
-          document.body.removeChild(printFrame);
-          URL.revokeObjectURL(blobUrl);
-        };
-        // Use onafterprint if available, otherwise fallback to timeout
-        if (printFrame.contentWindow) {
-          printFrame.contentWindow.onafterprint = cleanup;
-        }
-        setTimeout(cleanup, 60000);
-      };
-
-      onClose();
-    } catch (error) {
-      console.error('Failed to print PDF:', error);
-    } finally {
-      setIsGeneratingPdf(false);
-    }
-  };
-
-  const handleSavePdf = async () => {
-    if (isGeneratingPdf) return;
-    setIsGeneratingPdf(true);
-
-    try {
-      const pdf = await generatePdf();
-      const docTitle = extractTitle(content);
-      pdf.save(buildPdfFilename(docTitle));
-    } catch (error) {
-      console.error('Failed to generate PDF:', error);
-    } finally {
-      setIsGeneratingPdf(false);
+  /**
+   * Hand the paged preview to the browser's print pipeline.
+   *
+   * Both buttons land here: "Print" and "Save PDF" are the same operation to
+   * the browser, which offers a physical printer or "Save as PDF" as
+   * destinations in one dialog. Printing the live document keeps the text as
+   * real text, which rasterising it to an image could not.
+   */
+  const handlePrint = () => {
+    if (!previewRef.current?.print()) {
+      showToast('Still laying out pages — try again in a moment.', 'info');
     }
   };
 
@@ -315,6 +85,7 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
               }}
             >
               <PagedPreview
+                ref={previewRef}
                 markdown={content}
                 styles={globalStyles}
                 settings={settings}
@@ -348,27 +119,24 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 border-t border-[var(--ui-border)] px-4 py-3 md:gap-3 md:px-6 md:py-4">
-          <button
-            onClick={onClose}
-            className="rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)] md:px-4"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSavePdf}
-            disabled={isGeneratingPdf}
-            className="rounded border border-blue-600 bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50 md:px-4"
-          >
-            {isGeneratingPdf ? 'Generating...' : 'Save PDF'}
-          </button>
-          <button
-            onClick={handlePrint}
-            disabled={isGeneratingPdf}
-            className="rounded bg-[var(--foreground)] px-3 py-2 text-sm text-[var(--background)] hover:opacity-90 disabled:opacity-50 md:px-4"
-          >
-            {isGeneratingPdf ? 'Generating...' : 'Print'}
-          </button>
+        <div className="flex items-center justify-between gap-3 border-t border-[var(--ui-border)] px-4 py-3 md:px-6 md:py-4">
+          <p className="hidden text-xs text-[var(--ui-text-muted)] sm:block">
+            To export a file, pick “Save as PDF” as the destination.
+          </p>
+          <div className="flex items-center gap-2 md:gap-3">
+            <button
+              onClick={onClose}
+              className="rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)] md:px-4"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handlePrint}
+              className="rounded border border-blue-600 bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700 md:px-4"
+            >
+              Print / Save PDF
+            </button>
+          </div>
         </div>
       </div>
 

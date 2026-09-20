@@ -9,12 +9,12 @@ interface ContentStyleOptions {
  * it: the editor preview, the slide view, the paged print preview and the
  * exported PDF.
  *
- * This is deliberately a generated string rather than a .css file. The print
+ * This is deliberately a generated string rather than a .css file: the print
  * pipeline renders into an isolated iframe that inherits no external
- * stylesheets, and html2canvas does not reliably resolve them either — so the
- * rules have to travel with the document. Keeping the on-screen surfaces on the
- * same function is what stops the preview and the PDF drifting apart;
- * styles/preview.css holds only screen-only affordances (hover, cursor).
+ * stylesheets, so the rules have to travel with the document. Keeping the
+ * on-screen surfaces on the same function is what stops the preview and the
+ * printed output drifting apart; styles/preview.css holds only screen-only
+ * affordances (hover, cursor).
  *
  * Colours are derived from the active theme so borders and overlays stay
  * visible on dark backgrounds instead of being hardcoded against white.

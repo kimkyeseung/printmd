@@ -53,6 +53,7 @@ function build(overrides: Partial<PrintSettings> = {}, fonts: CustomFont[] = [])
   const merged = { ...settings, ...overrides };
   return buildPrintDocument({
     html: '<h1>Title</h1>',
+    title: 'My Doc',
     geometry: getPrintGeometry(merged),
     colors: resolvePrintColors(globalStyles, merged.includeBackground),
     styles: globalStyles,
@@ -132,6 +133,21 @@ describe('toMonochrome', () => {
   });
 });
 
+/** Build a document with the given title and read back what landed in <title>. */
+function titleOf(title: string): string {
+  const doc = buildPrintDocument({
+    html: '',
+    title,
+    geometry: getPrintGeometry(settings),
+    colors: resolvePrintColors(globalStyles, true),
+    styles: globalStyles,
+    elementStyles: {},
+    customFonts: [],
+    includeBackground: true,
+  });
+  return /<title>([^<]*)<\/title>/.exec(doc)?.[1] ?? '';
+}
+
 describe('buildPrintDocument', () => {
   it('wraps the content in a single measurable root', () => {
     const doc = build();
@@ -174,6 +190,7 @@ describe('buildPrintDocument', () => {
   it('appends extra CSS after the shared rules', () => {
     const doc = buildPrintDocument({
       html: '',
+      title: 'Extra',
       geometry: getPrintGeometry(settings),
       colors: resolvePrintColors(globalStyles, true),
       styles: globalStyles,
@@ -200,5 +217,19 @@ describe('buildPrintDocument', () => {
 
   it('emits no @font-face when nothing was uploaded', () => {
     expect(build()).not.toContain('@font-face');
+  });
+
+  it('sets a document title, which names the saved PDF', () => {
+    expect(build()).toContain('<title>My Doc</title>');
+  });
+
+  it('cleans markup out of the title', () => {
+    // cleanTitle strips angle brackets as filesystem-forbidden, so they never
+    // reach the markup in the first place.
+    expect(titleOf('**Report** <script>/2026')).toBe('Report script2026');
+  });
+
+  it('escapes what cleanTitle leaves behind', () => {
+    expect(titleOf('Q1 & Q2')).toBe('Q1 &amp; Q2');
   });
 });

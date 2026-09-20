@@ -29,7 +29,7 @@ test.describe('Content Persistence', () => {
     expect(content).toBeDefined();
   });
 
-  test('Save PDF button opens print preview and starts download', async ({ page }) => {
+  test('print preview paginates the document ready for printing', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.cm-editor', { timeout: 10_000 });
 
@@ -40,14 +40,20 @@ test.describe('Content Persistence', () => {
     // PrintPreview modal should appear
     await expect(page.getByText('Print Preview')).toBeVisible({ timeout: 5_000 });
 
-    // Save PDF button should be available
-    const savePdfButton = page.getByRole('button', { name: 'Save PDF' });
-    await expect(savePdfButton).toBeVisible();
+    // One action covers both printing and saving a PDF — the browser's own
+    // dialog offers "Save as PDF" as a destination, so there is no separate
+    // export button and no programmatic download to wait for.
+    await expect(page.getByRole('button', { name: 'Print / Save PDF' })).toBeVisible();
 
-    // Clicking Save PDF should trigger a download
-    const downloadPromise = page.waitForEvent('download', { timeout: 30_000 });
-    await savePdfButton.click();
-    const download = await downloadPromise;
-    expect(download.suggestedFilename()).toBe('document.pdf');
+    // The printable document is the preview iframe: wait for pagination to
+    // finish and assert it produced at least one sheet with real text.
+    const frame = page.frameLocator('iframe[title="Print preview"]');
+    await expect(frame.locator('.print-page').first()).toBeVisible({ timeout: 15_000 });
+
+    const pageCount = await frame.locator('.print-page').count();
+    expect(pageCount).toBeGreaterThan(0);
+
+    // Text must be text, not a rasterised image.
+    await expect(frame.locator('.print-page .preview-content').first()).not.toBeEmpty();
   });
 });

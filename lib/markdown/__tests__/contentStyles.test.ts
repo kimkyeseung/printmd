@@ -8,7 +8,7 @@ describe('getContentStyles', () => {
     expect(css.trim().length).toBeGreaterThan(0);
   });
 
-  it('does NOT contain color-mix() (html2canvas cannot parse it)', () => {
+  it('does NOT contain color-mix() (kept for older-browser support)', () => {
     expect(css).not.toContain('color-mix(');
   });
 

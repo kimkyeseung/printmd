@@ -12,6 +12,7 @@ import { getContentStyles } from '@/lib/markdown/contentStyles';
 import { getPaperDimensions, mmToPx } from './paperSizes';
 import { generateElementStylesCss } from '@/lib/themes';
 import { buildFontFaceCss } from '@/lib/fonts/fontFace';
+import { cleanTitle } from './headerFooter';
 import type {
   CustomFont,
   GlobalStyles,
@@ -24,7 +25,7 @@ import type { PrintSettings } from '@/types/print';
 /** Space (mm) reserved inside the top/bottom margin for header/footer text. */
 export const HEADER_FOOTER_HEIGHT_MM = 5;
 
-/** Header/footer text size, in points (matches jsPDF's text sizing). */
+/** Header/footer text size, in points. */
 export const HEADER_FOOTER_FONT_SIZE_PT = 9;
 
 /** Distance (mm) from the top margin to the header text's vertical centre. */
@@ -35,7 +36,7 @@ export const FOOTER_BASELINE_OFFSET_MM = 1;
 
 /**
  * Line-box height (mm) of a rendered header/footer line.
- * Mirrors `renderTextToImage`, which sizes its canvas at 1.4x the font size.
+ * 1.4x the font size, matching a normal line box.
  */
 export const HEADER_FOOTER_LINE_HEIGHT_MM =
   (HEADER_FOOTER_FONT_SIZE_PT * 1.4 * 25.4) / 72;
@@ -132,6 +133,12 @@ export function getPrintGeometry(settings: PrintSettings): PrintGeometry {
 export interface PrintDocumentOptions {
   /** Sanitized markdown HTML. */
   html: string;
+  /**
+   * Document title. The browser offers this as the filename when the user
+   * saves the print output as a PDF, so an empty title would save the file as
+   * "about:blank".
+   */
+  title: string;
   geometry: PrintGeometry;
   colors: PrintColors;
   styles: GlobalStyles;
@@ -157,6 +164,7 @@ export interface PrintDocumentOptions {
 export function buildPrintDocument(options: PrintDocumentOptions): string {
   const {
     html,
+    title,
     geometry,
     colors,
     styles,
@@ -177,7 +185,7 @@ export function buildPrintDocument(options: PrintDocumentOptions): string {
   );
 
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><style>
+<html><head><meta charset="utf-8"><title>${escapeHtml(cleanTitle(title))}</title><style>
 ${buildFontFaceCss(customFonts)}
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -195,6 +203,14 @@ ${elementCss}
 ${extraCss ?? ''}
 </style></head>
 <body><div class="${PRINT_ROOT_CLASS}"><div class="preview-content">${html}</div></div></body></html>`;
+}
+
+/** Escape text for interpolation into the document's markup. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
 /** Element-style properties that carry colour rather than layout. */
