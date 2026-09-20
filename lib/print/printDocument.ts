@@ -11,7 +11,7 @@
 import { getPdfStyles } from './pdfStyles';
 import { getPaperDimensions, mmToPx } from './paperSizes';
 import { generateElementStylesCss } from '@/lib/themes';
-import type { GlobalStyles, ElementStyles } from '@/types/style';
+import type { GlobalStyles, ElementStyle, ElementStyles, EditableElement } from '@/types/style';
 import type { PrintSettings } from '@/types/print';
 
 /** Space (mm) reserved inside the top/bottom margin for header/footer text. */
@@ -129,6 +129,7 @@ export interface PrintDocumentOptions {
   colors: PrintColors;
   styles: GlobalStyles;
   elementStyles: ElementStyles;
+  /** When false the document is rendered monochrome, but keeps its layout. */
   includeBackground: boolean;
   /** Extra CSS appended after the shared rules (paged-preview chrome). */
   extraCss?: string;
@@ -149,7 +150,9 @@ export function buildPrintDocument(options: PrintDocumentOptions): string {
     textColor: colors.text,
   });
 
-  const elementCss = includeBackground ? generateElementStylesCss(elementStyles) : '';
+  const elementCss = generateElementStylesCss(
+    includeBackground ? elementStyles : toMonochrome(elementStyles)
+  );
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
@@ -169,6 +172,40 @@ ${elementCss}
 ${extraCss ?? ''}
 </style></head>
 <body><div class="${PRINT_ROOT_CLASS}"><div class="preview-content">${html}</div></div></body></html>`;
+}
+
+/** Element-style properties that carry colour rather than layout. */
+const COLOR_PROPERTIES: readonly (keyof ElementStyle)[] = [
+  'color',
+  'backgroundColor',
+  'borderColor',
+  'borderBottomColor',
+];
+
+/**
+ * Drop colour from element styles while keeping layout intact.
+ *
+ * Printing without the background should make the document monochrome, not
+ * discard the preset entirely: sizes, spacing and border widths still decide
+ * where the page breaks fall, and a preset that turned a base border *off*
+ * must keep doing so. Borders left without a colour fall back to
+ * `currentColor`, so they stay visible in black.
+ */
+export function toMonochrome(styles: ElementStyles): ElementStyles {
+  const result: ElementStyles = {};
+
+  for (const [element, style] of Object.entries(styles) as [
+    EditableElement,
+    ElementStyle | undefined,
+  ][]) {
+    if (!style) continue;
+
+    const stripped: ElementStyle = { ...style };
+    for (const property of COLOR_PROPERTIES) delete stripped[property];
+    result[element] = stripped;
+  }
+
+  return result;
 }
 
 /**
