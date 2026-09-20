@@ -74,6 +74,7 @@ vi.mock('@/stores', () => ({
         padding: 20,
       },
       elementStyles: {},
+      customFonts: [],
     };
     return selector(state);
   },

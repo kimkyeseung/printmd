@@ -11,7 +11,14 @@
 import { getPdfStyles } from './pdfStyles';
 import { getPaperDimensions, mmToPx } from './paperSizes';
 import { generateElementStylesCss } from '@/lib/themes';
-import type { GlobalStyles, ElementStyle, ElementStyles, EditableElement } from '@/types/style';
+import { buildFontFaceCss } from '@/lib/fonts/fontFace';
+import type {
+  CustomFont,
+  GlobalStyles,
+  ElementStyle,
+  ElementStyles,
+  EditableElement,
+} from '@/types/style';
 import type { PrintSettings } from '@/types/print';
 
 /** Space (mm) reserved inside the top/bottom margin for header/footer text. */
@@ -129,6 +136,12 @@ export interface PrintDocumentOptions {
   colors: PrintColors;
   styles: GlobalStyles;
   elementStyles: ElementStyles;
+  /**
+   * Uploaded fonts. The iframe is a separate document, so the app's
+   * `@font-face` rules don't reach it — they have to be re-declared here or
+   * the selected font silently falls back.
+   */
+  customFonts: CustomFont[];
   /** When false the document is rendered monochrome, but keeps its layout. */
   includeBackground: boolean;
   /** Extra CSS appended after the shared rules (paged-preview chrome). */
@@ -142,7 +155,16 @@ export interface PrintDocumentOptions {
  * collapsing behave identically in both paths.
  */
 export function buildPrintDocument(options: PrintDocumentOptions): string {
-  const { html, geometry, colors, styles, elementStyles, includeBackground, extraCss } = options;
+  const {
+    html,
+    geometry,
+    colors,
+    styles,
+    elementStyles,
+    customFonts,
+    includeBackground,
+    extraCss,
+  } = options;
 
   const baseCss = getPdfStyles({
     linkColor: colors.link,
@@ -156,6 +178,7 @@ export function buildPrintDocument(options: PrintDocumentOptions): string {
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><style>
+${buildFontFaceCss(customFonts)}
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body { background-color: ${colors.background}; }

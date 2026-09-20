@@ -41,6 +41,7 @@ const PAGE_GAP_PX = 20;
 export function PagedPreview({ markdown, styles, settings }: PagedPreviewProps) {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const elementStyles = useStyleStore((state) => state.elementStyles);
+  const customFonts = useStyleStore((state) => state.customFonts);
 
   const html = useMemo(() => sanitizeHtml(parseMarkdown(markdown)), [markdown]);
   const geometry = useMemo(() => getPrintGeometry(settings), [settings]);
@@ -57,10 +58,11 @@ export function PagedPreview({ markdown, styles, settings }: PagedPreviewProps) 
         colors,
         styles,
         elementStyles,
+        customFonts,
         includeBackground: settings.includeBackground,
         extraCss: buildPagedCss(geometry, colors.background),
       }),
-    [html, geometry, colors, styles, elementStyles, settings.includeBackground]
+    [html, geometry, colors, styles, elementStyles, customFonts, settings.includeBackground]
   );
 
   /**

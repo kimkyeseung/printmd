@@ -42,6 +42,7 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
 
   const globalStyles = useStyleStore((state) => state.globalStyles);
   const elementStyles = useStyleStore((state) => state.elementStyles);
+  const customFonts = useStyleStore((state) => state.customFonts);
 
   const geometry = useMemo(() => getPrintGeometry(settings), [settings]);
 
@@ -86,6 +87,7 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
         colors,
         styles: globalStyles,
         elementStyles,
+        customFonts,
         includeBackground: settings.includeBackground,
       })
     );

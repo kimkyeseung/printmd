@@ -7,8 +7,12 @@ import {
   HEADER_FOOTER_HEIGHT_MM,
   PRINT_ROOT_CLASS,
 } from '../printDocument';
-import type { GlobalStyles, ElementStyles } from '@/types/style';
+import type { CustomFont, GlobalStyles, ElementStyles } from '@/types/style';
 import type { PrintSettings } from '@/types/print';
+
+const customFonts: CustomFont[] = [
+  { name: 'MyBrand', url: 'data:font/woff2;base64,d09GMgABAAAAAA==' },
+];
 
 const globalStyles: GlobalStyles = {
   fontSize: 16,
@@ -45,7 +49,7 @@ const elementStyles: ElementStyles = {
   paragraph: { color: '#333333' },
 };
 
-function build(overrides: Partial<PrintSettings> = {}) {
+function build(overrides: Partial<PrintSettings> = {}, fonts: CustomFont[] = []) {
   const merged = { ...settings, ...overrides };
   return buildPrintDocument({
     html: '<h1>Title</h1>',
@@ -53,6 +57,7 @@ function build(overrides: Partial<PrintSettings> = {}) {
     colors: resolvePrintColors(globalStyles, merged.includeBackground),
     styles: globalStyles,
     elementStyles,
+    customFonts: fonts,
     includeBackground: merged.includeBackground,
   });
 }
@@ -173,11 +178,27 @@ describe('buildPrintDocument', () => {
       colors: resolvePrintColors(globalStyles, true),
       styles: globalStyles,
       elementStyles: {},
+      customFonts: [],
       includeBackground: true,
       extraCss: '.print-page { color: red; }',
     });
     expect(doc.indexOf('.print-page { color: red; }')).toBeGreaterThan(
       doc.indexOf('.preview-content')
     );
+  });
+
+  it('embeds uploaded fonts, which the iframe cannot inherit', () => {
+    const doc = build({}, customFonts);
+    expect(doc).toContain("font-family: 'MyBrand'");
+    expect(doc).toContain('data:font/woff2;base64,d09GMgABAAAAAA==');
+  });
+
+  it('declares @font-face before the rules that use it', () => {
+    const doc = build({}, customFonts);
+    expect(doc.indexOf('@font-face')).toBeLessThan(doc.indexOf(`.${PRINT_ROOT_CLASS} {`));
+  });
+
+  it('emits no @font-face when nothing was uploaded', () => {
+    expect(build()).not.toContain('@font-face');
   });
 });
