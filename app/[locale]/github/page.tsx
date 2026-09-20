@@ -32,6 +32,7 @@ export async function generateMetadata({
       languages: {
         'ko': 'https://printmd.app/ko/github',
         'en': 'https://printmd.app/en/github',
+        'x-default': 'https://printmd.app/en/github',
       },
     },
   };

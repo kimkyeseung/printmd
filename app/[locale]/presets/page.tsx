@@ -42,6 +42,7 @@ export async function generateMetadata({
       languages: {
         ko: 'https://printmd.app/ko/presets',
         en: 'https://printmd.app/en/presets',
+        'x-default': 'https://printmd.app/en/presets',
       },
     },
   };
@@ -51,13 +52,18 @@ function PresetCard({
   name,
   description,
   styles,
+  href,
 }: {
   name: string;
   description: string;
   styles: typeof themePresets.default;
+  href: string;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+    <Link
+      href={href}
+      className="block overflow-hidden rounded-xl border border-gray-200 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+    >
       {/* Preview */}
       <div
         className="p-6"
@@ -118,7 +124,7 @@ function PresetCard({
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -146,6 +152,7 @@ export default async function PresetsPage({
           position: i + 1,
           name: THEME_NAMES[key],
           description: THEME_DESCRIPTIONS[key],
+          url: `https://printmd.app/${locale}/presets/${key}`,
         })),
       },
     },
@@ -187,6 +194,7 @@ export default async function PresetsPage({
               name={THEME_NAMES[key]}
               description={THEME_DESCRIPTIONS[key]}
               styles={themePresets[key]}
+              href={`/${locale}/presets/${key}`}
             />
           ))}
         </div>

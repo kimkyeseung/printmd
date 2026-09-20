@@ -1,26 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
-import Script from "next/script";
-import { Analytics } from "@vercel/analytics/next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Providers } from "@/components/Providers";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export const metadata: Metadata = {
@@ -30,218 +13,16 @@ export const metadata: Metadata = {
     template: "%s | printmd",
   },
   description:
-    "Free online Markdown to PDF converter. Edit, style, and convert Markdown to PDF instantly in your browser. Live preview, 5 themes, and no signup required.",
+    "Free online Markdown to PDF converter. Edit, style, and convert Markdown to PDF instantly in your browser. Live preview, 15 themes, and no signup required.",
+  // Every page under [locale] supplies its own keywords, so this array only
+  // ever applies to the root-level not-found / offline pages.
   keywords: [
-    // Core conversion keywords
     "markdown to pdf",
-    "markdown converter",
     "md to pdf",
-    "convert markdown to pdf",
-    "markdown pdf converter",
-    "markdown to pdf converter",
-    "markdown to pdf online",
-    "markdown to pdf free",
-    "markdown export pdf",
-    "markdown save as pdf",
-    "markdown file to pdf",
-    "markdown document to pdf",
-    "markdown text to pdf",
-    "markdown into pdf",
-    // md file variations
-    "md file to pdf",
-    "md converter",
-    "md to pdf converter",
-    "md to pdf online",
-    "md to pdf free",
-    ".md to pdf",
-    ".md file to pdf",
-    "md document to pdf",
-    // Free/online/best emphasis
-    "free markdown to pdf converter",
-    "online markdown to pdf converter",
-    "best markdown to pdf converter",
-    "best free markdown to pdf",
-    "markdown to pdf no signup",
-    "markdown to pdf no install",
-    "markdown to pdf browser",
-    "markdown to pdf web app",
-    // Print keywords
-    "print markdown",
-    "markdown print",
-    "markdown printer",
-    "markdown print to pdf",
-    "print md file",
-    "print markdown file",
-    // Editor keywords
+    "markdown converter",
     "markdown editor",
-    "online markdown editor",
-    "free markdown editor",
-    "web markdown editor",
-    "markdown editor online free",
-    "markdown editing",
-    "markdown writing tool",
-    "markdown viewer",
-    "markdown preview",
-    "markdown formatter",
-    "markdown styling",
-    // Tool/generator keywords
-    "markdown pdf tool",
-    "markdown pdf generator",
-    "markdown pdf maker",
-    "markdown pdf creator",
-    "generate pdf from markdown",
-    "create pdf from markdown",
-    "make pdf from markdown",
-    "turn markdown into pdf",
-    // README/GitHub
-    "readme to pdf",
-    "github readme to pdf",
-    "github markdown to pdf",
-    "readme md to pdf",
-    "convert readme to pdf",
-    // Use case keywords
-    "markdown report to pdf",
-    "markdown notes to pdf",
-    "markdown resume to pdf",
-    "markdown to printable pdf",
-    "markdown to styled pdf",
-    "markdown to beautiful pdf",
-    // Alternative/comparison
-    "pandoc alternative",
-    "markdown to pdf without pandoc",
-    "markdown to pdf without command line",
-    "easy markdown to pdf",
-    "simple markdown to pdf",
-    // Feature keywords
-    "markdown to pdf with themes",
-    "markdown to pdf with styling",
-    "markdown to pdf with syntax highlighting",
-    // Format related
-    "markdown to html",
-    "text to pdf",
-    "document converter",
-    "free pdf converter",
-    "pdf export",
-    "PDF",
-    "markdown",
-    // Custom style/theme/preset keywords
-    "markdown custom style",
-    "markdown custom theme",
-    "markdown pdf custom style",
-    "markdown pdf theme preset",
-    "markdown style preset",
-    "markdown pdf styling preset",
-    "custom markdown pdf template",
-    "save markdown style",
-    "markdown style template",
-    "markdown pdf template",
-    "markdown pdf design",
-    "markdown to pdf with custom styles",
-    "markdown to pdf custom theme",
-    "markdown to pdf template",
-    "markdown pdf layout",
-    "markdown pdf custom font",
-    "custom font markdown",
-    "markdown font style",
-    "markdown element styling",
-    "markdown heading style",
-    "markdown paragraph style",
-    "markdown css style",
-    "styled markdown",
-    "styled markdown to pdf",
-    "markdown to styled pdf converter",
-    "markdown pdf preset save",
-    "markdown pdf preset load",
-    "markdown dark theme pdf",
-    "markdown blog style pdf",
-    "markdown document style pdf",
-    "markdown minimal style",
-    "personalized markdown pdf",
-    "markdown pdf customization",
-    "markdown pdf appearance",
-    "customize markdown pdf",
-    "markdown pdf font size",
-    "markdown pdf color",
-    "markdown pdf background color",
-    "markdown pdf line height",
-    "markdown pdf margin",
-    "markdown pdf padding",
-    // Inline editing / WYSIWYG keywords
-    "markdown inline editing",
-    "markdown WYSIWYG editor",
-    "markdown WYSIWYG",
-    "markdown live editing",
-    "markdown preview editing",
-    "edit markdown in preview",
-    "markdown double click edit",
-    "markdown inline editor",
-    "markdown real time editing",
-    "markdown click to edit",
-    "markdown in-place editing",
-    "what you see is what you get markdown",
-    "markdown visual editor",
-    "markdown visual editing",
-    "markdown block editor",
-    "markdown block editing",
-    "markdown direct edit",
-    "markdown preview edit mode",
-    "markdown edit preview",
-    "edit markdown preview",
-    "markdown rich text editor",
-    "markdown rich editor",
-    "markdown editable preview",
-    "markdown interactive preview",
-    "markdown interactive editor",
-    // Korean SEO (mixed)
+    "print markdown",
     "마크다운 PDF 변환",
-    "마크다운 to PDF",
-    "마크다운 변환기",
-    "md 파일 PDF 변환",
-    // Korean style/theme keywords
-    "마크다운 스타일",
-    "마크다운 테마",
-    "마크다운 커스텀 스타일",
-    "마크다운 프리셋",
-    "마크다운 PDF 스타일",
-    "마크다운 PDF 테마",
-    "마크다운 PDF 커스텀",
-    "마크다운 PDF 템플릿",
-    "마크다운 PDF 디자인",
-    "마크다운 폰트 설정",
-    "마크다운 글꼴 변경",
-    "마크다운 PDF 글꼴",
-    "마크다운 스타일 저장",
-    "마크다운 테마 저장",
-    "마크다운 스타일 프리셋",
-    "커스텀 마크다운 PDF",
-    "마크다운 PDF 꾸미기",
-    "마크다운 PDF 커스터마이징",
-    "마크다운 PDF 글자 크기",
-    "마크다운 PDF 색상",
-    "마크다운 PDF 배경색",
-    "마크다운 PDF 줄간격",
-    "마크다운 PDF 여백",
-    "마크다운 다크모드 PDF",
-    "마크다운 블로그 스타일",
-    "마크다운 문서 스타일",
-    "예쁜 마크다운 PDF",
-    "깔끔한 마크다운 PDF",
-    // Korean inline editing / WYSIWYG keywords
-    "마크다운 인라인 편집",
-    "마크다운 위지윅",
-    "마크다운 WYSIWYG",
-    "마크다운 실시간 편집",
-    "마크다운 미리보기 편집",
-    "마크다운 클릭 편집",
-    "마크다운 더블클릭 편집",
-    "마크다운 비주얼 편집기",
-    "마크다운 비주얼 에디터",
-    "마크다운 블록 편집",
-    "마크다운 직접 편집",
-    "마크다운 리치 에디터",
-    "마크다운 리치텍스트 편집기",
-    "마크다운 인터랙티브 편집",
-    "마크다운 인터랙티브 미리보기",
   ],
   authors: [{ name: "printmd" }],
   creator: "printmd",
@@ -261,7 +42,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "printmd - Free Markdown to PDF Converter Online",
     description:
-      "Free online Markdown to PDF converter. Edit, style, and convert Markdown to PDF instantly in your browser. Live preview, 5 themes, and no signup required.",
+      "Free online Markdown to PDF converter. Edit, style, and convert Markdown to PDF instantly in your browser. Live preview, 15 themes, and no signup required.",
     type: "website",
     locale: "en_US",
     alternateLocale: "ko_KR",
@@ -272,7 +53,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "printmd - Free Markdown to PDF Converter Online",
     description:
-      "Free online Markdown to PDF converter. Edit, style, and convert Markdown to PDF instantly in your browser. Live preview, 5 themes, and no signup required.",
+      "Free online Markdown to PDF converter. Edit, style, and convert Markdown to PDF instantly in your browser. Live preview, 15 themes, and no signup required.",
   },
   robots: {
     index: true,
@@ -296,73 +77,26 @@ export const metadata: Metadata = {
     languages: {
       "en-US": "https://printmd.app/en",
       "ko-KR": "https://printmd.app/ko",
+      "x-default": "https://printmd.app/en",
     },
   },
 };
 
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "printmd",
-  url: "https://printmd.app",
-  logo: "https://printmd.app/icon-192.png",
-  description:
-    "Free online Markdown to PDF converter. Edit, style, and convert Markdown to PDF instantly in your browser.",
-  sameAs: [
-    "https://github.com/kimkyeseung/printmd",
-    "https://chromewebstore.google.com/detail/printmd-markdown-to-pdf/aogiijhfmcpobikknoclgabgaeiamfjg",
-  ],
-};
-
-const webSiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "printmd",
-  url: "https://printmd.app",
-  potentialAction: {
-    "@type": "SearchAction",
-    target: "https://printmd.app/en?q={search_term_string}",
-    "query-input": "required name=search_term_string",
-  },
-};
-
-export default async function RootLayout({
+/**
+ * Pass-through root layout.
+ *
+ * The real document shell (<html>/<body>) lives in `app/[locale]/layout.tsx`
+ * so that `lang` can come from the route param instead of a request header.
+ * Reading a request header here would opt every route out of static
+ * generation, since that is a dynamic API.
+ *
+ * Root-level pages that sit outside `[locale]` (not-found, ~offline) render
+ * their own <html>/<body>.
+ */
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headerList = await headers();
-  const locale = headerList.get("x-locale") || "en";
-
-  return (
-    <html lang={locale} suppressHydrationWarning>
-      <head suppressHydrationWarning>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationJsonLd),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(webSiteJsonLd),
-          }}
-        />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
-          <Script
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
-            strategy="lazyOnload"
-            crossOrigin="anonymous"
-          />
-        )}
-        <Providers>{children}</Providers>
-        <Analytics />
-      </body>
-    </html>
-  );
+  return children;
 }

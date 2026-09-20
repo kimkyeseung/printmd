@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
-import { locales } from '@/lib/i18n/config';
+import { locales, defaultLocale } from '@/lib/i18n/config';
 import { getAllPosts } from '@/lib/blog';
+import { presetKeys } from '@/lib/themes/presets';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://printmd.app';
@@ -17,6 +18,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/github', priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/presets', priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/cheatsheet', priority: 0.8, changeFrequency: 'monthly' as const },
+    { path: '/themes/colors', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/themes/table-styling', priority: 0.7, changeFrequency: 'monthly' as const },
+    // Per-theme preset detail pages
+    ...presetKeys.map((theme) => ({
+      path: `/presets/${theme}`,
+      priority: 0.6,
+      changeFrequency: 'monthly' as const,
+    })),
     { path: '/terms', priority: 0.3, changeFrequency: 'yearly' as const },
     { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' as const },
   ];
@@ -34,6 +43,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
           languages: {
             ko: `${baseUrl}/ko${page.path}`,
             en: `${baseUrl}/en${page.path}`,
+            'x-default': `${baseUrl}/en${page.path}`,
           },
         },
       });
@@ -55,6 +65,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
         if (postsByLocale[altLocale].has(slug)) {
           languages[altLocale] = `${baseUrl}/${altLocale}/blog/${slug}`;
         }
+      }
+      // Fall back to the default locale for users whose language we don't serve.
+      if (languages[defaultLocale]) {
+        languages['x-default'] = languages[defaultLocale];
       }
 
       sitemapEntries.push({

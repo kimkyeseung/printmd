@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import HomeClient from '@/components/home/HomeClient';
+import { SiteFooter } from '@/components/layout';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -35,6 +36,7 @@ export async function generateMetadata({
       languages: {
         'ko': 'https://printmd.app/ko',
         'en': 'https://printmd.app/en',
+        'x-default': 'https://printmd.app/en',
       },
     },
   };
@@ -86,7 +88,10 @@ export default async function Home({
   const seo = dict.home.seo;
 
   return (
-    <div className="flex flex-col">
+    // `html, body` are `overflow: hidden` globally, so this container owns the
+    // page scroll — without it the SEO section and footer below the editor are
+    // in the DOM but unreachable.
+    <div className="flex h-screen flex-col overflow-y-auto">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -161,8 +166,12 @@ export default async function Home({
       </section>
 
       {/* Client-side editor UI — visually first */}
-      <div className="order-1">
+      <div className="order-1 shrink-0">
         <HomeClient />
+      </div>
+
+      <div className="order-3">
+        <SiteFooter locale={locale} dict={dict.footer} />
       </div>
     </div>
   );

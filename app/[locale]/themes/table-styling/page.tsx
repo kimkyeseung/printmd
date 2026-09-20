@@ -101,6 +101,7 @@ export async function generateMetadata({
       languages: {
         ko: 'https://printmd.app/ko/themes/table-styling',
         en: 'https://printmd.app/en/themes/table-styling',
+        'x-default': 'https://printmd.app/en/themes/table-styling',
       },
     },
   };

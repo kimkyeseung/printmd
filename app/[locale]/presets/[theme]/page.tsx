@@ -130,6 +130,7 @@ export async function generateMetadata({
       languages: {
         ko: `https://printmd.app/ko/presets/${theme}`,
         en: `https://printmd.app/en/presets/${theme}`,
+        'x-default': `https://printmd.app/en/presets/${theme}`,
       },
     },
   };

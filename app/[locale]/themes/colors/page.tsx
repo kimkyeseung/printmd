@@ -238,6 +238,7 @@ export async function generateMetadata({
       languages: {
         ko: 'https://printmd.app/ko/themes/colors',
         en: 'https://printmd.app/en/themes/colors',
+        'x-default': 'https://printmd.app/en/themes/colors',
       },
     },
   };

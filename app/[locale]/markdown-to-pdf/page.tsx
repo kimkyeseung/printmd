@@ -116,6 +116,7 @@ export async function generateMetadata({
       languages: {
         'ko': 'https://printmd.app/ko/markdown-to-pdf',
         'en': 'https://printmd.app/en/markdown-to-pdf',
+        'x-default': 'https://printmd.app/en/markdown-to-pdf',
       },
     },
   };

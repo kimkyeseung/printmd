@@ -1,20 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { locales, defaultLocale, type Locale } from './lib/i18n/config';
 
-// Known page paths (without locale prefix)
-const knownPaths = [
-  '/',
-  '/markdown-to-pdf',
-  '/markdown-print',
-  '/markdown-editor',
-  '/guide',
-  '/github',
-  '/privacy',
-  '/blog',
-  '/about',
-  '/terms',
-  '/presets',
-];
+// Paths that must never be locale-prefixed.
+const reservedPaths = new Set([
+  '/sitemap.xml',
+  '/robots.txt',
+  '/~offline',
+  '/opengraph-image',
+  '/twitter-image',
+]);
 
 function getLocale(request: NextRequest): Locale {
   // Check Accept-Language header
@@ -41,8 +35,7 @@ export function proxy(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
     pathname.includes('.') ||
-    pathname === '/sitemap.xml' ||
-    pathname === '/robots.txt'
+    reservedPaths.has(pathname)
   ) {
     return NextResponse.next();
   }
@@ -58,17 +51,15 @@ export function proxy(request: NextRequest) {
     );
     const response = NextResponse.next();
     const lang = currentLocale || defaultLocale;
-    response.headers.set('x-locale', lang);
+    // `lang` on <html> comes from the [locale] route param, not this header —
+    // reading a request header in the layout would disable static generation.
     response.headers.set('Content-Language', lang);
     return response;
   }
 
-  // Only redirect known paths to avoid redirect → 404 chains
-  if (!knownPaths.includes(pathname)) {
-    return NextResponse.next();
-  }
-
-  // Redirect to locale-prefixed path
+  // Everything else gets a locale prefix. Paths that turn out not to exist
+  // still 404 — from `/{locale}{pathname}` rather than here — which keeps
+  // shared links like /cheatsheet or /blog/<slug> working.
   const locale = getLocale(request);
   const newUrl = new URL(`/${locale}${pathname}`, request.url);
 

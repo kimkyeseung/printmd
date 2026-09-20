@@ -38,6 +38,7 @@ export async function generateMetadata({
       languages: {
         ko: 'https://printmd.app/ko/blog',
         en: 'https://printmd.app/en/blog',
+        'x-default': 'https://printmd.app/en/blog',
       },
     },
   };

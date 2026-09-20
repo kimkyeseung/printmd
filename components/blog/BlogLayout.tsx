@@ -2,20 +2,12 @@ import Link from 'next/link';
 import { AdSidebar } from '@/components/adsense/AdSidebar';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { TableOfContents } from './TableOfContents';
-import { SiteFooter } from '@/components/layout';
+import { SiteFooter, type FooterDict } from '@/components/layout';
 
 interface Heading {
   id: string;
   text: string;
   level: number;
-}
-
-interface FooterDict {
-  privacy: string;
-  terms: string;
-  about: string;
-  contact: string;
-  allRights: string;
 }
 
 interface BlogLayoutProps {

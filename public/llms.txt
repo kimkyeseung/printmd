@@ -9,7 +9,7 @@ printmd is a free, browser-based tool that converts Markdown files to beautifull
 ## Key Features
 
 - Real-time Markdown editor with live preview
-- 5 theme presets (GitHub, Notion, Academic, Minimal, Dark)
+- 15 theme presets (Default, Dark, Document, Blog, Minimal, Sepia, Ocean, Forest, Sunset, Newspaper, Academic, Notebook, Terminal, Elegant, Pastel)
 - Instant PDF export and print
 - Custom CSS styling
 - Drag & drop file import
@@ -24,6 +24,12 @@ printmd is a free, browser-based tool that converts Markdown files to beautifull
 - Print Markdown: https://printmd.app/en/markdown-print
 - Markdown Editor: https://printmd.app/en/markdown-editor
 - Markdown Guide: https://printmd.app/en/guide
+- Markdown Cheatsheet: https://printmd.app/en/cheatsheet
+- Theme Presets: https://printmd.app/en/presets
+- Color Customization: https://printmd.app/en/themes/colors
+- Table Styling: https://printmd.app/en/themes/table-styling
+- GitHub README to PDF: https://printmd.app/en/github
+- Blog: https://printmd.app/en/blog
 - Full documentation for LLMs: https://printmd.app/llms-full.txt
 
 ## Technical Details

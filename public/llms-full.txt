@@ -27,12 +27,22 @@ GitHub: https://github.com/kimkyeseung/printmd
 - All processing is client-side — files never leave the browser
 
 ### Themes
-- 5 built-in theme presets:
-  1. GitHub — clean developer documentation style
-  2. Notion — modern note-taking style
-  3. Academic — formal paper/thesis style
-  4. Minimal — simple, distraction-free style
-  5. Dark — dark background for screen reading
+- 15 built-in theme presets:
+  1. Default — clean, versatile white background
+  2. Dark — light text on a dark background
+  3. Document — formal serif document style
+  4. Blog — large type and wide spacing for readability
+  5. Minimal — stripped-down, print-first styling
+  6. Sepia — warm, vintage paper tones
+  7. Ocean — deep blue with cyan accents
+  8. Forest — natural greens, easy on the eyes
+  9. Sunset — warm purple with orange accents
+  10. Newspaper — classic serif newspaper typography
+  11. Academic — scholarly paper and thesis layout
+  12. Notebook — casual handwritten-notes feel
+  13. Terminal — monospace green-on-black developer style
+  14. Elegant — gold accents and serif typography
+  15. Pastel — soft lavender and pink tones
 - Custom CSS styling support for full control
 
 ### Markdown Syntax Support
@@ -89,14 +99,14 @@ All modern browsers: Chrome, Firefox, Safari, Edge.
 Headings, bold/italic/strikethrough, lists, links, images, code blocks with syntax highlighting (50+ languages), tables, blockquotes, horizontal rules, and task lists.
 
 ### Can I customize the PDF style?
-Yes. Choose from 5 built-in themes or write your own custom CSS for full control over the output.
+Yes. Choose from 15 built-in themes or write your own custom CSS for full control over the output.
 
 ### Where is my data stored?
 All data is stored in your browser's localStorage. Nothing is sent to any server.
 
 ## Technology Stack
 
-- Framework: Next.js 15 (App Router)
+- Framework: Next.js 16 (App Router)
 - UI: React 19, TypeScript
 - Editor: CodeMirror 6
 - Markdown Renderer: markdown-it

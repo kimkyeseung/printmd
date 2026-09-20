@@ -69,3 +69,7 @@ docs/
 # PDCA status (optional - uncomment if you want to track)
 # .pdca-status.json
 # .bkit-memory.json
+
+# Playwright
+/test-results/
+/playwright-report/

@@ -15,7 +15,7 @@ const DEFAULT_CONTENT: Record<string, string> = {
 ## 주요 기능
 
 - **실시간 미리보기** — 편집하면서 결과를 바로 확인
-- **5가지 테마 프리셋** — 클릭 한 번으로 분위기 전환
+- **15가지 테마 프리셋** — 클릭 한 번으로 분위기 전환
 - **커스텀 스타일링** — 폰트, 색상, 여백까지 세밀하게 조절
 - **인라인 편집** — 미리보기에서 더블클릭으로 바로 수정
 - **PDF 출력** — 완성된 문서를 그대로 PDF로 저장
@@ -144,7 +144,7 @@ Free. No signup. Right in your browser.
 ## Key Features
 
 - **Live Preview** — See changes as you type
-- **5 Theme Presets** — Switch styles with a single click
+- **15 Theme Presets** — Switch styles with a single click
 - **Custom Styling** — Fine-tune fonts, colors, spacing, and more
 - **Inline Editing** — Double-click any block in the preview to edit
 - **PDF Export** — Save your polished document as a PDF
@@ -203,7 +203,7 @@ print(list(fibonacci(10)))
 |---------|-------------|----------|
 | Editor | CodeMirror 6 markdown editor | — |
 | Preview | Live rendering + inline editing | Double-click |
-| Themes | 5 presets + custom styling | — |
+| Themes | 15 presets + custom styling | — |
 | Save | Save document | \`Ctrl/⌘ + S\` |
 | Export | PDF save and print | \`Ctrl/⌘ + P\` |
 

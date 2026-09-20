@@ -1,6 +1,10 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
+
+// Sits outside `[locale]`, so it renders its own document shell.
 export default function OfflinePage() {
   return (
+    <html lang="en" suppressHydrationWarning>
+    <body style={{ margin: 0 }}>
     <div
       style={{
         display: "flex",
@@ -51,5 +55,7 @@ export default function OfflinePage() {
         Open Editor
       </a>
     </div>
+    </body>
+    </html>
   );
 }
