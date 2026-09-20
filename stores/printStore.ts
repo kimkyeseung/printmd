@@ -33,7 +33,7 @@ const initialState = {
 
 export const usePrintStore = create<PrintStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       ...initialState,
 
       updateSettings: (settings: Partial<PrintSettings>) =>
@@ -68,12 +68,6 @@ export const usePrintStore = create<PrintStore>()(
       openPreview: () => set({ isPreviewOpen: true }),
 
       closePreview: () => set({ isPreviewOpen: false }),
-
-      print: () => {
-        const { closePreview } = get();
-        window.print();
-        closePreview();
-      },
     }),
     {
       name: 'printmd-print',

@@ -36,7 +36,6 @@ export interface PrintActions {
   updateFooter: (footer: Partial<HeaderFooterConfig>) => void;
   openPreview: () => void;
   closePreview: () => void;
-  print: () => void;
 }
 
 export type PrintStore = PrintState & PrintActions;
@@ -46,12 +45,6 @@ export interface PaperSizeConfig {
   width: number;
   height: number;
   unit: 'mm';
-}
-
-export interface PrintPreviewProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onPrint: () => void;
 }
 
 export interface PrintSettingsProps {

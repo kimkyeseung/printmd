@@ -10,6 +10,12 @@ describe('print.css', () => {
     expect(css).toContain('.print-preview-backdrop');
   });
 
+  it('owns the page reset for native browser print (not globals.css)', () => {
+    // Consolidated here so print styling lives in one file.
+    expect(css).toContain('background: white !important');
+    expect(css).toContain('color: black !important');
+  });
+
   it('hides UI elements but not checkboxes', () => {
     // Checkboxes should NOT be hidden — they are used for task lists
     expect(css).toContain('input:not([type="checkbox"])');

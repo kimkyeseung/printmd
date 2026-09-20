@@ -1,4 +1,11 @@
-/* Print-specific styles */
+/* Print-specific styles.
+ *
+ * NOT used by the app's own Print button or Ctrl+P — those build a PDF and
+ * print that (see components/print/PrintPreview.tsx). This is the fallback for
+ * the browser's native print command (File > Print), which renders the live
+ * DOM: without these rules the whole editor UI would end up on the page.
+ * Output here is deliberately plainer than the PDF — no header/footer, no
+ * paper-size handling. */
 
 @media print {
   /* Reset */
@@ -9,6 +16,11 @@
   html, body {
     margin: 0;
     padding: 0;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
   }
 
   /* Hide all UI elements */

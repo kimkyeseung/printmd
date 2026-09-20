@@ -104,17 +104,7 @@ body {
   outline-offset: 2px;
 }
 
-/* Print styles - hide UI elements */
-@media print {
-  body {
-    background: white !important;
-    color: black !important;
-  }
-
-  header {
-    display: none !important;
-  }
-}
+/* Print styles live in styles/print.css */
 
 /* Dropdown menu styles */
 .dropdown-menu {
