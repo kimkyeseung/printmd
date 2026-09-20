@@ -266,7 +266,7 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
         minHeight: elRect.height,
       },
     });
-  }, []);
+  }, [getActiveTab]);
 
   // Confirm edit: splice new lines into source
   const handleConfirm = useCallback(

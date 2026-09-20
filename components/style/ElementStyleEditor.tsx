@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { ColorPicker } from './ColorPicker';
 import { Slider } from './Slider';
 import { useStyleStore, useTabsStore, useUIStore } from '@/stores';
@@ -169,7 +169,9 @@ export function ElementStyleEditor() {
 
   const selectedLabel = elements.find((e) => e.key === selectedElement)?.label ?? '';
 
-  const handleReset = useCallback(() => {
+  // Plain function: it is only used as a button's onClick, so a stable identity
+  // buys nothing and the manual memo blocked the component from compiling.
+  const handleReset = () => {
     if (confirmReset) {
       resetElementStyle(selectedElement);
       setConfirmReset(false);
@@ -178,7 +180,7 @@ export function ElementStyleEditor() {
       setConfirmReset(true);
       setTimeout(() => setConfirmReset(false), 3000);
     }
-  }, [confirmReset, resetElementStyle, selectedElement, selectedLabel, t]);
+  };
 
   const isNonTypographyElement = (['hr', 'image', 'table'] as EditableElement[]).includes(selectedElement);
   const isTextElement = (['paragraph', 'bulletList', 'orderedList', 'todoList', 'todoChecked', 'blockquote'] as EditableElement[]).includes(selectedElement);

@@ -1,9 +1,25 @@
 'use client';
 
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import type { ViewMode } from '@/stores/uiStore';
+
+/**
+ * False while rendering on the server and during hydration, true afterwards.
+ *
+ * Used to hold back the theme icon until the client knows the resolved theme,
+ * which would otherwise be a hydration mismatch. Done without an effect so the
+ * component doesn't cascade a render just to record that it mounted.
+ */
+const subscribeToNothing = () => () => {};
+function useIsHydrated(): boolean {
+  return useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false
+  );
+}
 
 interface HeaderProps {
   viewMode: ViewMode;
@@ -66,11 +82,7 @@ export const Header = memo(function Header({
   const [showSave, setShowSave] = useState(false);
   const [showTheme, setShowTheme] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const isHydrated = useIsHydrated();
 
   return (
     <header
@@ -350,7 +362,7 @@ export const Header = memo(function Header({
             aria-expanded={showTheme}
             aria-haspopup="true"
           >
-            {mounted && <ThemeIcon theme={resolvedTheme} />}
+            {isHydrated ? <ThemeIcon theme={resolvedTheme} /> : null}
             <svg className="h-3 w-3 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>

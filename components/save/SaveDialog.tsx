@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { FolderTree } from './FolderTree';
 import { useDocumentsStore } from '@/stores/documentsStore';
 
@@ -39,19 +39,28 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
   const createFolder = useDocumentsStore((state) => state.createFolder);
 
   const [selectedFolderId, setSelectedFolderId] = useState('root');
-  const [documentName, setDocumentName] = useState('');
+  // The parent mounts this dialog only while it is open, so the default name
+  // has to come from the initial state — there is no closed render to
+  // transition from. The reset below covers the case where a caller keeps the
+  // dialog mounted across open/close instead.
+  const [documentName, setDocumentName] = useState(() =>
+    isOpen ? extractDefaultName(content) : ''
+  );
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
 
-  // Reset state when dialog opens
-  useEffect(() => {
+  // Reset when the dialog reopens. Derived during render rather than in an
+  // effect so the fields are already correct on the first painted frame.
+  const [wasOpen, setWasOpen] = useState(isOpen);
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setSelectedFolderId('root');
       setDocumentName(extractDefaultName(content));
       setIsCreatingFolder(false);
       setNewFolderName('');
     }
-  }, [isOpen, content]);
+  }
 
   const handleSave = useCallback(() => {
     if (!documentName.trim()) return;
