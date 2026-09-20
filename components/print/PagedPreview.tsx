@@ -3,227 +3,281 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
-import { generateElementStylesCss } from '@/lib/themes';
-import { getPdfStyles } from '@/lib/print/pdfStyles';
 import { useStyleStore } from '@/stores';
+import { mmToPx } from '@/lib/print/paperSizes';
+import { findKeepTogetherZones, computePageBreaks } from '@/lib/print/pageBreaks';
+import { extractTitle, resolveTemplate } from '@/lib/print/pdfTextRenderer';
+import {
+  buildPrintDocument,
+  getPrintGeometry,
+  resolvePrintColors,
+  waitForPrintDocument,
+  HEADER_BASELINE_OFFSET_MM,
+  FOOTER_BASELINE_OFFSET_MM,
+  HEADER_FOOTER_FONT_SIZE_PT,
+  HEADER_FOOTER_LINE_HEIGHT_MM,
+  PRINT_ROOT_CLASS,
+} from '@/lib/print/printDocument';
 import type { GlobalStyles } from '@/types/style';
-import type { PrintSettings } from '@/types/print';
+import type { PrintSettings, HeaderFooterConfig } from '@/types/print';
 
 interface PagedPreviewProps {
   markdown: string;
   styles: GlobalStyles;
   settings: PrintSettings;
-  paperWidth: number;
-  paperHeight: number;
 }
 
-export function PagedPreview({
-  markdown,
-  styles,
-  settings,
-  paperWidth,
-  paperHeight,
-}: PagedPreviewProps) {
-  const measureRef = useRef<HTMLDivElement>(null);
-  const [pages, setPages] = useState<string[]>([]);
-  const [isRendering, setIsRendering] = useState(true);
+/** Gap (px) between page sheets in the preview. */
+const PAGE_GAP_PX = 20;
+
+/**
+ * Paged print preview.
+ *
+ * Renders the same isolated document the PDF exporter renders, then slices it
+ * into sheets using the same page-break algorithm. Keeping both paths on
+ * `buildPrintDocument` + `computePageBreaks` is what makes the preview match
+ * the exported file — app CSS (Tailwind, preview.css) must never reach it.
+ */
+export function PagedPreview({ markdown, styles, settings }: PagedPreviewProps) {
+  const frameRef = useRef<HTMLIFrameElement>(null);
   const elementStyles = useStyleStore((state) => state.elementStyles);
 
-  const elementStylesCss = useMemo(
-    () => generateElementStylesCss(elementStyles),
-    [elementStyles]
+  const html = useMemo(() => sanitizeHtml(parseMarkdown(markdown)), [markdown]);
+  const geometry = useMemo(() => getPrintGeometry(settings), [settings]);
+  const colors = useMemo(
+    () => resolvePrintColors(styles, settings.includeBackground),
+    [styles, settings.includeBackground]
   );
 
-  const useBg = settings.includeBackground;
+  const docHtml = useMemo(
+    () =>
+      buildPrintDocument({
+        html,
+        geometry,
+        colors,
+        styles,
+        elementStyles,
+        includeBackground: settings.includeBackground,
+        extraCss: buildPagedCss(geometry, colors.background),
+      }),
+    [html, geometry, colors, styles, elementStyles, settings.includeBackground]
+  );
 
-  const bgColor = useBg ? styles.backgroundColor : '#ffffff';
-  const textColor = useBg ? styles.textColor : '#1a1a1a';
-
-  const baseStylesCss = useMemo(
-    () => getPdfStyles({
-      linkColor: useBg ? styles.linkColor : '#0366d6',
-      codeBackground: useBg ? styles.codeBackground : '#f5f5f5',
-      textColor,
+  /**
+   * Everything one pagination pass needs. Its identity doubles as the cache key
+   * for the rendered result, so `isRendering` is derived during render instead
+   * of being toggled from inside the effect.
+   */
+  const plan = useMemo(
+    () => ({
+      docHtml,
+      geometry,
+      settings,
+      docTitle: extractTitle(markdown),
+      headerFooterColor: colors.headerFooter,
     }),
-    [useBg, styles.linkColor, styles.codeBackground, textColor]
+    [docHtml, geometry, settings, markdown, colors.headerFooter]
   );
 
-  const html = useMemo(() => {
-    return sanitizeHtml(parseMarkdown(markdown));
-  }, [markdown]);
-
-  // Calculate content area dimensions (in pixels)
-  const marginTopPx = settings.margins.top * (96 / 25.4);
-  const marginBottomPx = settings.margins.bottom * (96 / 25.4);
-  const marginLeftPx = settings.margins.left * (96 / 25.4);
-  const marginRightPx = settings.margins.right * (96 / 25.4);
-  const hdrH = settings.header.enabled ? 20 : 0; // px
-  const ftrH = settings.footer.enabled ? 20 : 0; // px
-
-  const contentArea = useMemo(() => {
-    return {
-      width: paperWidth - marginLeftPx - marginRightPx,
-      height: paperHeight - marginTopPx - marginBottomPx - hdrH - ftrH,
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paperWidth, paperHeight, marginTopPx, marginBottomPx, marginLeftPx, marginRightPx, hdrH, ftrH]);
+  const [rendered, setRendered] = useState<{ plan: unknown; pageCount: number } | null>(null);
+  const isRendering = rendered === null || rendered.plan !== plan;
 
   useEffect(() => {
-    if (!measureRef.current) return;
+    const frame = frameRef.current;
+    const doc = frame?.contentDocument;
+    if (!frame || !doc) return;
 
-    const paginateContent = () => {
-      setIsRendering(true);
+    let cancelled = false;
 
-      // Measure total content height
-      const totalHeight = measureRef.current!.scrollHeight;
-      const pageHeight = contentArea.height;
+    doc.open();
+    doc.write(plan.docHtml);
+    doc.close();
 
-      // Calculate number of pages needed
-      const numPages = Math.max(1, Math.ceil(totalHeight / pageHeight));
+    const paginate = async () => {
+      await waitForPrintDocument(doc);
+      if (cancelled) return;
 
-      // For now, we'll show pages by clipping with CSS
-      // Each page shows a different portion of the content
-      const pageArray: string[] = [];
-      for (let i = 0; i < numPages; i++) {
-        pageArray.push(`page-${i}`);
-      }
+      const root = doc.querySelector<HTMLElement>(`.${PRINT_ROOT_CLASS}`);
+      if (!root) return;
 
-      setPages(pageArray);
-      setIsRendering(false);
+      const { geometry: geo } = plan;
+
+      // The same measurements the PDF exporter takes, on the same element.
+      const contentHeightPx = root.scrollHeight;
+      const zones = findKeepTogetherZones(root, geo.pageContentHeightPx * 0.4);
+      const breaks = computePageBreaks(contentHeightPx, geo.pageContentHeightPx, zones);
+
+      renderPages(doc, root, breaks, plan);
+      if (cancelled) return;
+
+      frame.style.height = `${
+        breaks.length * geo.paperHeightPx + (breaks.length - 1) * PAGE_GAP_PX
+      }px`;
+      setRendered({ plan, pageCount: breaks.length });
     };
 
-    // Debounce
-    const timer = setTimeout(paginateContent, 100);
-    return () => clearTimeout(timer);
-  }, [html, contentArea.height]);
+    void paginate();
 
-  const contentStyles: React.CSSProperties = {
-    fontFamily: styles.fontFamily,
-    fontSize: styles.fontSize,
-    lineHeight: styles.lineHeight,
-    color: textColor,
-  };
-
-  // Resolve header/footer template variables
-  const resolveTemplate = (tpl: string, pageNum: number, totalPages: number): string => {
-    const title = markdown.split('\n').find(l => l.startsWith('# '))?.replace(/^#\s+/, '') || 'Untitled';
-    return tpl
-      .replace(/\{title\}/g, title)
-      .replace(/\{date\}/g, new Date().toLocaleDateString())
-      .replace(/\{page\}/g, String(pageNum))
-      .replace(/\{pages\}/g, String(totalPages));
-  };
-
-  const headerHeight = hdrH;
-  const footerHeight = ftrH;
+    return () => {
+      cancelled = true;
+    };
+  }, [plan]);
 
   return (
-    <div className="paged-preview flex flex-col items-center gap-5">
-      {/* Hidden measure div */}
-      <div
-        ref={measureRef}
-        className="absolute -left-[9999px] preview-content"
+    <div className="paged-preview relative flex flex-col items-center gap-3">
+      {/*
+        The iframe must keep a layout box while measuring — `display: none`
+        would leave its document without one and `scrollHeight` would read 0.
+      */}
+      <iframe
+        ref={frameRef}
+        title="Print preview"
+        sandbox="allow-same-origin"
         style={{
-          ...contentStyles,
-          width: contentArea.width,
+          width: geometry.paperWidthPx,
+          minHeight: geometry.paperHeightPx,
+          border: 'none',
+          colorScheme: 'light',
+          opacity: isRendering ? 0 : 1,
         }}
-        dangerouslySetInnerHTML={{ __html: html }}
       />
 
       {isRendering ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        <div className="absolute inset-x-0 top-16 flex items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
           <span className="ml-3 text-sm text-gray-500">Rendering pages...</span>
         </div>
       ) : (
-        <>
-          {pages.map((pageId, index) => {
-            const pageNum = index + 1;
-            return (
-              <div
-                key={pageId}
-                className="shadow-lg relative"
-                style={{
-                  width: paperWidth,
-                  height: paperHeight,
-                  overflow: 'hidden',
-                  backgroundColor: bgColor,
-                }}
-              >
-                {/* Header */}
-                {settings.header.enabled && (
-                  <div
-                    className="absolute flex items-end"
-                    style={{
-                      top: marginTopPx,
-                      left: marginLeftPx,
-                      right: marginRightPx,
-                      height: headerHeight,
-                      fontSize: 9,
-                      color: useBg ? textColor : '#666666',
-                      opacity: 0.8,
-                    }}
-                  >
-                    <span className="flex-1 text-left truncate">{resolveTemplate(settings.header.left, pageNum, pages.length)}</span>
-                    <span className="flex-1 text-center truncate">{resolveTemplate(settings.header.center, pageNum, pages.length)}</span>
-                    <span className="flex-1 text-right truncate">{resolveTemplate(settings.header.right, pageNum, pages.length)}</span>
-                  </div>
-                )}
-
-                {/* Page content with offset */}
-                <div
-                  className="absolute preview-content"
-                  style={{
-                    ...contentStyles,
-                    top: marginTopPx + headerHeight,
-                    left: marginLeftPx,
-                    right: marginRightPx,
-                    bottom: marginBottomPx + footerHeight,
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div
-                    style={{
-                      transform: `translateY(-${index * contentArea.height}px)`,
-                    }}
-                    dangerouslySetInnerHTML={{ __html: html }}
-                  />
-                </div>
-
-                {/* Footer */}
-                {settings.footer.enabled && (
-                  <div
-                    className="absolute flex items-start"
-                    style={{
-                      bottom: marginBottomPx,
-                      left: marginLeftPx,
-                      right: marginRightPx,
-                      height: footerHeight,
-                      fontSize: 9,
-                      color: useBg ? textColor : '#666666',
-                      opacity: 0.8,
-                    }}
-                  >
-                    <span className="flex-1 text-left truncate">{resolveTemplate(settings.footer.left, pageNum, pages.length)}</span>
-                    <span className="flex-1 text-center truncate">{resolveTemplate(settings.footer.center, pageNum, pages.length)}</span>
-                    <span className="flex-1 text-right truncate">{resolveTemplate(settings.footer.right, pageNum, pages.length)}</span>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          <div className="text-sm text-[var(--ui-text-muted)]">
-            {pages.length} page{pages.length > 1 ? 's' : ''}
-          </div>
-        </>
-      )}
-
-      {/* Base styles from theme, then element-level overrides */}
-      <style dangerouslySetInnerHTML={{ __html: baseStylesCss }} />
-      {useBg && elementStylesCss && (
-        <style dangerouslySetInnerHTML={{ __html: elementStylesCss }} />
+        <div className="text-sm text-[var(--ui-text-muted)]">
+          {rendered.pageCount} page{rendered.pageCount > 1 ? 's' : ''}
+        </div>
       )}
     </div>
   );
+}
+
+/** Chrome for the sheets themselves — only ever applied inside the preview iframe. */
+function buildPagedCss(geometry: ReturnType<typeof getPrintGeometry>, background: string): string {
+  return `
+.print-page {
+  position: relative;
+  width: ${geometry.paperWidthPx}px;
+  height: ${geometry.paperHeightPx}px;
+  margin: 0 auto ${PAGE_GAP_PX}px;
+  overflow: hidden;
+  background-color: ${background};
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.print-page:last-child { margin-bottom: 0; }
+.print-page-content {
+  position: absolute;
+  top: ${mmToPx(geometry.contentTopMm)}px;
+  left: ${mmToPx(geometry.marginLeftMm)}px;
+  width: ${geometry.contentWidthPx}px;
+  height: ${geometry.pageContentHeightPx}px;
+  overflow: hidden;
+}
+.print-hf {
+  position: absolute;
+  height: ${mmToPx(HEADER_FOOTER_LINE_HEIGHT_MM)}px;
+  line-height: ${mmToPx(HEADER_FOOTER_LINE_HEIGHT_MM)}px;
+  font-size: ${(HEADER_FOOTER_FONT_SIZE_PT * 96) / 72}px;
+  white-space: nowrap;
+}
+.print-hf-left { left: ${mmToPx(geometry.marginLeftMm)}px; }
+.print-hf-right { right: ${mmToPx(geometry.marginRightMm)}px; }
+.print-hf-center { left: 50%; transform: translateX(-50%); }
+`;
+}
+
+interface RenderPagesContext {
+  geometry: ReturnType<typeof getPrintGeometry>;
+  settings: PrintSettings;
+  docTitle: string;
+  headerFooterColor: string;
+}
+
+/**
+ * Turn the measured document into sheets.
+ *
+ * Each sheet holds a clone of the measured root shifted by its break offset, so
+ * every page shows the exact slice the PDF exporter crops from the canvas.
+ */
+function renderPages(
+  doc: Document,
+  root: HTMLElement,
+  breaks: number[],
+  ctx: RenderPagesContext
+): void {
+  const { geometry, settings, docTitle, headerFooterColor } = ctx;
+  const date = new Date().toLocaleDateString();
+
+  const pages = doc.createElement('div');
+
+  for (let page = 0; page < breaks.length; page++) {
+    const sheet = doc.createElement('div');
+    sheet.className = 'print-page';
+
+    const vars = {
+      title: docTitle,
+      date,
+      page: page + 1,
+      pages: breaks.length,
+    };
+
+    if (settings.header.enabled) {
+      appendHeaderFooter(doc, sheet, settings.header, vars, headerFooterColor, {
+        top: mmToPx(geometry.marginTopMm + HEADER_BASELINE_OFFSET_MM - HEADER_FOOTER_LINE_HEIGHT_MM / 2),
+      });
+    }
+
+    const viewport = doc.createElement('div');
+    viewport.className = 'print-page-content';
+
+    const slice = root.cloneNode(true) as HTMLElement;
+    slice.style.transform = `translateY(-${breaks[page]}px)`;
+    viewport.appendChild(slice);
+    sheet.appendChild(viewport);
+
+    if (settings.footer.enabled) {
+      appendHeaderFooter(doc, sheet, settings.footer, vars, headerFooterColor, {
+        top: mmToPx(
+          geometry.paperHeightMm -
+            geometry.marginBottomMm -
+            FOOTER_BASELINE_OFFSET_MM -
+            HEADER_FOOTER_LINE_HEIGHT_MM / 2
+        ),
+      });
+    }
+
+    pages.appendChild(sheet);
+  }
+
+  // Hide the measured root rather than removing it — the clones were taken
+  // from it, and keeping it makes the measurement re-runnable.
+  root.style.display = 'none';
+  doc.body.appendChild(pages);
+}
+
+function appendHeaderFooter(
+  doc: Document,
+  sheet: HTMLElement,
+  config: HeaderFooterConfig,
+  vars: { title: string; date: string; page: number; pages: number },
+  color: string,
+  position: { top: number }
+): void {
+  (['left', 'center', 'right'] as const).forEach((align) => {
+    const template = config[align];
+    if (!template) return;
+
+    const text = resolveTemplate(template, vars);
+    if (!text) return;
+
+    const el = doc.createElement('div');
+    el.className = `print-hf print-hf-${align}`;
+    el.style.cssText = `top: ${position.top}px; color: ${color};`;
+    el.textContent = text;
+    sheet.appendChild(el);
+  });
 }

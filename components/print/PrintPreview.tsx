@@ -5,11 +5,18 @@ import { usePrintStore, useStyleStore } from '@/stores';
 import { PrintSettings } from './PrintSettings';
 import { HeaderFooter } from './HeaderFooter';
 import { PagedPreview } from './PagedPreview';
-import { getPaperDimensions, mmToPx } from '@/lib/print/paperSizes';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
-import { getPdfStyles } from '@/lib/print/pdfStyles';
-import { generateElementStylesCss } from '@/lib/themes';
+import {
+  buildPrintDocument,
+  getPrintGeometry,
+  resolvePrintColors,
+  waitForPrintDocument,
+  HEADER_BASELINE_OFFSET_MM,
+  FOOTER_BASELINE_OFFSET_MM,
+  HEADER_FOOTER_FONT_SIZE_PT,
+  PRINT_ROOT_CLASS,
+} from '@/lib/print/printDocument';
 import {
   resolveTemplate,
   extractTitle,
@@ -36,87 +43,60 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
   const globalStyles = useStyleStore((state) => state.globalStyles);
   const elementStyles = useStyleStore((state) => state.elementStyles);
 
-  const paperDimensions = useMemo(() => {
-    const { width, height } = getPaperDimensions(settings.paperSize, settings.orientation);
-    return {
-      width: mmToPx(width),
-      height: mmToPx(height),
-      widthMm: width,
-      heightMm: height,
-    };
-  }, [settings.paperSize, settings.orientation]);
+  const geometry = useMemo(() => getPrintGeometry(settings), [settings]);
 
   const generatePdf = async () => {
     const html2canvasModule = await import('html2canvas');
     const html2canvas = html2canvasModule.default;
     const { jsPDF } = await import('jspdf');
 
-    const { width, height } = getPaperDimensions(settings.paperSize, settings.orientation);
-    const marginTop = settings.margins.top;
-    const marginRight = settings.margins.right;
-    const marginBottom = settings.margins.bottom;
-    const marginLeft = settings.margins.left;
-    const contentWidthMm = width - marginLeft - marginRight;
+    const { paperWidthMm: width, paperHeightMm: height } = geometry;
+    const {
+      marginTopMm: marginTop,
+      marginRightMm: marginRight,
+      marginBottomMm: marginBottom,
+      marginLeftMm: marginLeft,
+      contentWidthMm,
+      pageContentHeightPx,
+    } = geometry;
 
-    // Resolve colours based on includeBackground setting
-    const bgColor = settings.includeBackground ? globalStyles.backgroundColor : '#ffffff';
-    const textColor = settings.includeBackground ? globalStyles.textColor : '#1a1a1a';
-    const linkColor = settings.includeBackground ? globalStyles.linkColor : '#0366d6';
-    const codeBg = settings.includeBackground ? globalStyles.codeBackground : '#f5f5f5';
+    const colors = resolvePrintColors(globalStyles, settings.includeBackground);
+    const bgColor = colors.background;
 
     const htmlContent = sanitizeHtml(parseMarkdown(content));
 
-    // Generate theme-aware styles
-    const pdfBaseStyles = getPdfStyles({
-      linkColor,
-      codeBackground: codeBg,
-      textColor,
-    });
-    const elementCss = settings.includeBackground
-      ? generateElementStylesCss(elementStyles)
-      : '';
-
     // Render in an isolated iframe to prevent app CSS (preview.css, Tailwind)
-    // from interfering with PDF-specific styles.
+    // from interfering with print-specific styles. PagedPreview writes the same
+    // document, so what the user saw in the preview is what gets exported.
     const iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
     iframe.style.left = '-9999px';
     iframe.style.top = '-9999px';
-    iframe.style.width = `${mmToPx(contentWidthMm) + 50}px`;
+    iframe.style.width = `${geometry.contentWidthPx + 50}px`;
     iframe.style.height = '10000px';
     iframe.style.border = 'none';
     document.body.appendChild(iframe);
 
     const iframeDoc = iframe.contentDocument!;
     iframeDoc.open();
-    iframeDoc.write(`<!DOCTYPE html>
-<html><head><style>
-*, *::before, *::after { box-sizing: border-box; }
-body {
-  width: ${mmToPx(contentWidthMm)}px;
-  background-color: ${bgColor};
-  color: ${textColor};
-  font-family: ${globalStyles.fontFamily};
-  font-size: ${globalStyles.fontSize}px;
-  line-height: ${globalStyles.lineHeight};
-  padding: 0;
-  margin: 0;
-}
-${pdfBaseStyles}
-${elementCss}
-</style></head>
-<body><div class="preview-content">${htmlContent}</div></body></html>`);
+    iframeDoc.write(
+      buildPrintDocument({
+        html: htmlContent,
+        geometry,
+        colors,
+        styles: globalStyles,
+        elementStyles,
+        includeBackground: settings.includeBackground,
+      })
+    );
     iframeDoc.close();
 
-    // Wait for fonts/images to load inside iframe
-    await new Promise((r) => setTimeout(r, 300));
+    await waitForPrintDocument(iframeDoc);
 
-    const container = iframeDoc.body;
+    const container =
+      iframeDoc.querySelector<HTMLElement>(`.${PRINT_ROOT_CLASS}`) ?? iframeDoc.body;
 
     // Scan DOM for keep-together zones before rendering to canvas
-    const pageContentHeightPx = mmToPx(
-      height - marginTop - marginBottom - (settings.header.enabled ? 5 : 0) - (settings.footer.enabled ? 5 : 0)
-    );
     const maxZoneHeight = pageContentHeightPx * 0.4;
     const keepZones = findKeepTogetherZones(container, maxZoneHeight);
     const containerHeightPx = container.scrollHeight;
@@ -142,15 +122,11 @@ ${elementCss}
 
     const docTitle = extractTitle(content);
     const docDate = new Date().toLocaleDateString();
-    const headerFooterFontSize = 9;
-    const hfColor = settings.includeBackground ? textColor : '#666666';
+    const headerFooterFontSize = HEADER_FOOTER_FONT_SIZE_PT;
+    const hfColor = colors.headerFooter;
     const hfFontFamily = globalStyles.fontFamily;
-    // Reserve space for header/footer text within margins
-    const headerHeight = settings.header.enabled ? 5 : 0;
-    const footerHeight = settings.footer.enabled ? 5 : 0;
 
-    const pageContentHeight = height - marginTop - marginBottom - headerHeight - footerHeight;
-    const contentTopMm = marginTop + headerHeight;
+    const contentTopMm = geometry.contentTopMm;
     const imgWidthMm = contentWidthMm;
     const imgHeightMm = (canvas.height / canvas.width) * imgWidthMm;
 
@@ -220,14 +196,14 @@ ${elementCss}
       };
 
       if (settings.header.enabled) {
-        const headerY = marginTop + 3;
+        const headerY = marginTop + HEADER_BASELINE_OFFSET_MM;
         if (settings.header.left) addHFText(settings.header.left, 'left', headerY);
         if (settings.header.center) addHFText(settings.header.center, 'center', headerY);
         if (settings.header.right) addHFText(settings.header.right, 'right', headerY);
       }
 
       if (settings.footer.enabled) {
-        const footerY = height - marginBottom - 1;
+        const footerY = height - marginBottom - FOOTER_BASELINE_OFFSET_MM;
         if (settings.footer.left) addHFText(settings.footer.left, 'left', footerY);
         if (settings.footer.center) addHFText(settings.footer.center, 'center', footerY);
         if (settings.footer.right) addHFText(settings.footer.right, 'right', footerY);
@@ -297,8 +273,8 @@ ${elementCss}
   // Scale factor for preview (fit in viewport)
   // Use a larger base size for better readability
   const scale = Math.min(
-    600 / paperDimensions.width,
-    800 / paperDimensions.height,
+    600 / geometry.paperWidthPx,
+    800 / geometry.paperHeightPx,
     0.8
   );
 
@@ -340,14 +316,12 @@ ${elementCss}
                 markdown={content}
                 styles={globalStyles}
                 settings={settings}
-                paperWidth={paperDimensions.width}
-                paperHeight={paperDimensions.height}
               />
             </div>
 
             {/* Paper info */}
             <div className="text-center mt-4 text-sm text-[var(--ui-text-muted)]">
-              {settings.paperSize} • {settings.orientation} • {paperDimensions.widthMm} × {paperDimensions.heightMm} mm
+              {settings.paperSize} • {settings.orientation} • {geometry.paperWidthMm} × {geometry.paperHeightMm} mm
             </div>
           </div>
 
