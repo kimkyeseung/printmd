@@ -3,7 +3,8 @@
 import { memo, useMemo, useDeferredValue, useRef, useEffect, useCallback, useState } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
-import { generateElementStylesCss, ELEMENT_SELECTORS } from '@/lib/themes';
+import { ELEMENT_SELECTORS } from '@/lib/themes';
+import { ContentStyles } from './ContentStyles';
 import { useStyleStore, useUIStore, useTabsStore } from '@/stores';
 import type { GlobalStyles, EditableElement } from '@/types/style';
 import { SPACING_DEFAULTS } from '@/lib/styles/spacingDefaults';
@@ -165,11 +166,6 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
   const containerRef = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState<EditingState | null>(null);
 
-  const elementStylesCss = useMemo(
-    () => generateElementStylesCss(elementStyles),
-    [elementStyles]
-  );
-
   const highlightCss = useMemo(() => {
     if (!spacingHighlight) return '';
     return generateSpacingHighlightCss(spacingHighlight, elementStyles, styles.padding);
@@ -330,12 +326,10 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
         ...cssVariables,
       }}
     >
-      {elementStylesCss && (
-        <style dangerouslySetInnerHTML={{ __html: elementStylesCss }} />
-      )}
-      {highlightCss && (
+      <ContentStyles styles={styles} />
+      {highlightCss ? (
         <style dangerouslySetInnerHTML={{ __html: highlightCss }} />
-      )}
+      ) : null}
       <article
         ref={articleRef}
         className="preview-content"

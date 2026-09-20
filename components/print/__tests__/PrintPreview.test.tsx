@@ -106,8 +106,8 @@ vi.mock('@/lib/markdown/sanitizer', () => ({
   sanitizeHtml: (html: string) => html,
 }));
 
-vi.mock('@/lib/print/pdfStyles', () => ({
-  getPdfStyles: () => 'body { margin: 0; }',
+vi.mock('@/lib/markdown/contentStyles', () => ({
+  getContentStyles: () => 'body { margin: 0; }',
 }));
 
 vi.mock('@/lib/themes', () => ({

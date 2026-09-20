@@ -1,17 +1,25 @@
-interface PdfStyleOptions {
+interface ContentStyleOptions {
   linkColor?: string;
   codeBackground?: string;
   textColor?: string;
 }
 
 /**
- * Inline CSS styles for PDF generation.
- * html2canvas needs styles inline (or in a <style> tag within the element)
- * because it doesn't reliably pick up external stylesheets for dynamically created elements.
+ * The stylesheet for rendered markdown, shared by every surface that displays
+ * it: the editor preview, the slide view, the paged print preview and the
+ * exported PDF.
  *
- * Accepts optional theme values so the PDF matches the on-screen preset.
+ * This is deliberately a generated string rather than a .css file. The print
+ * pipeline renders into an isolated iframe that inherits no external
+ * stylesheets, and html2canvas does not reliably resolve them either — so the
+ * rules have to travel with the document. Keeping the on-screen surfaces on the
+ * same function is what stops the preview and the PDF drifting apart;
+ * styles/preview.css holds only screen-only affordances (hover, cursor).
+ *
+ * Colours are derived from the active theme so borders and overlays stay
+ * visible on dark backgrounds instead of being hardcoded against white.
  */
-export function getPdfStyles(options?: PdfStyleOptions): string {
+export function getContentStyles(options?: ContentStyleOptions): string {
   const linkColor = options?.linkColor || '#0366d6';
   const codeBg = options?.codeBackground || '#f5f5f5';
   const textColor = options?.textColor || '#1a1a1a';
@@ -21,6 +29,27 @@ export function getPdfStyles(options?: PdfStyleOptions): string {
   const overlayBase = isLightText ? '255, 255, 255' : '0, 0, 0';
 
   return `
+    /* Mirror the two Tailwind preflight rules that reach rendered markdown.
+       The app document gets these from preflight; the print iframe inherits no
+       stylesheets, so without them form controls fall back to the UA's 13.33px
+       control font (shrinking em-sized checkboxes) and element styles that set
+       a border width with no style render solid on screen but nothing in the
+       PDF. Scoped to .preview-content so the app's own UI is untouched. */
+    .preview-content *,
+    .preview-content *::before,
+    .preview-content *::after {
+      border-width: 0;
+      border-style: solid;
+      border-color: currentColor;
+    }
+    .preview-content input,
+    .preview-content button,
+    .preview-content select,
+    .preview-content textarea {
+      font: inherit;
+      color: inherit;
+    }
+
     .preview-content {
       word-wrap: break-word;
       overflow-wrap: break-word;
@@ -112,6 +141,9 @@ export function getPdfStyles(options?: PdfStyleOptions): string {
       line-height: 1.5;
     }
     .preview-content hr {
+      /* The UA gives hr its own grey; inherit so currentColor matches on both
+         surfaces if an element style ever gives it a border. */
+      color: inherit;
       height: 0.25em;
       margin: 1.5em 0;
       padding: 0;
@@ -139,15 +171,45 @@ export function getPdfStyles(options?: PdfStyleOptions): string {
     .preview-content img {
       max-width: 100%;
       height: auto;
+      border-radius: 4px;
     }
+
+    /* Badges (shields.io and friends) read as a row, not one per line.
+       Markdown puts each on its own paragraph, so the paragraphs collapse to
+       inline when they contain nothing but a badge image. */
+    .preview-content p > a > img[src*="shields.io"],
+    .preview-content p > a > img[src*="badge"],
+    .preview-content p > a > img[src*="github.com"][src*="workflows"],
+    .preview-content p > a > img[src*="img.shields"],
+    .preview-content p > img[src*="shields.io"],
+    .preview-content p > img[src*="badge"] {
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    .preview-content p > a:only-child > img,
+    .preview-content p > img:only-child {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .preview-content p:has(> a:only-child > img):has(+ p > a:only-child > img),
+    .preview-content p:has(> a:only-child > img) + p:has(> a:only-child > img) {
+      display: inline;
+      margin-right: 4px;
+    }
+
     .preview-content strong { font-weight: 600; }
     .preview-content em { font-style: italic; }
+    /* markdown-it emits <s> for ~~strikethrough~~; <del> covers raw HTML. */
+    .preview-content s,
     .preview-content del { text-decoration: line-through; }
 
     /* Task list layout: no flex, so nested <ul>/<ol> wrap onto their own lines */
     .preview-content .task-list {
       list-style: none;
       padding-left: 0;
+      margin-top: 0;
+      margin-bottom: 1em;
     }
     .preview-content .task-list-item { margin-bottom: 0.25em; }
     .preview-content .task-list-item-checked { opacity: 0.6; text-decoration: line-through; }
@@ -156,10 +218,10 @@ export function getPdfStyles(options?: PdfStyleOptions): string {
     .preview-content input[type="checkbox"] {
       appearance: none;
       -webkit-appearance: none;
-      width: 1.1em;
-      height: 1.1em;
-      min-width: 1.1em;
-      border: 2px solid rgba(${overlayBase}, 0.45);
+      width: 1.15em;
+      height: 1.15em;
+      min-width: 1.15em;
+      border: 2px solid rgba(${overlayBase}, 0.35);
       border-radius: 3px;
       margin: 0 0.4em 0 0;
       vertical-align: -0.2em;
@@ -175,8 +237,8 @@ export function getPdfStyles(options?: PdfStyleOptions): string {
       position: absolute;
       left: 3px;
       top: 0;
-      width: 4px;
-      height: 8px;
+      width: 5px;
+      height: 9px;
       border: solid white;
       border-width: 0 2px 2px 0;
       transform: rotate(45deg);

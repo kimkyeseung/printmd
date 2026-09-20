@@ -3,8 +3,7 @@
 import { memo, useMemo, useEffect, useRef, useCallback } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
-import { generateElementStylesCss } from '@/lib/themes';
-import { useStyleStore } from '@/stores';
+import { ContentStyles } from './ContentStyles';
 import type { GlobalStyles } from '@/types/style';
 
 interface SlideViewProps {
@@ -28,12 +27,6 @@ export const SlideView = memo(function SlideView({
   onExit,
 }: SlideViewProps) {
   const articleRef = useRef<HTMLElement>(null);
-  const elementStyles = useStyleStore((state) => state.elementStyles);
-
-  const elementStylesCss = useMemo(
-    () => generateElementStylesCss(elementStyles),
-    [elementStyles],
-  );
 
   const html = useMemo(() => {
     const slideContent = slides[currentSlide] || '';
@@ -164,9 +157,7 @@ export const SlideView = memo(function SlideView({
           ...cssVariables,
         }}
       >
-        {elementStylesCss && (
-          <style dangerouslySetInnerHTML={{ __html: elementStylesCss }} />
-        )}
+        <ContentStyles styles={styles} />
         <article
           ref={articleRef}
           className="preview-content"

@@ -8,7 +8,7 @@
  * page geometry or styles locally.
  */
 
-import { getPdfStyles } from './pdfStyles';
+import { getContentStyles } from '@/lib/markdown/contentStyles';
 import { getPaperDimensions, mmToPx } from './paperSizes';
 import { generateElementStylesCss } from '@/lib/themes';
 import { buildFontFaceCss } from '@/lib/fonts/fontFace';
@@ -166,7 +166,7 @@ export function buildPrintDocument(options: PrintDocumentOptions): string {
     extraCss,
   } = options;
 
-  const baseCss = getPdfStyles({
+  const baseCss = getContentStyles({
     linkColor: colors.link,
     codeBackground: colors.codeBackground,
     textColor: colors.text,

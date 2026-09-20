@@ -5,36 +5,39 @@ import { resolve } from 'path';
 describe('preview.css', () => {
   const css = readFileSync(resolve(__dirname, '../preview.css'), 'utf-8');
 
-  it('does NOT contain color-mix() (html2canvas cannot parse it)', () => {
+  it('scopes every rule to .preview-content', () => {
+    const selectors = css.match(/^[^@\s/][^{]*\{/gm) ?? [];
+    expect(selectors.length).toBeGreaterThan(0);
+    for (const selector of selectors) {
+      expect(selector).toContain('.preview-content');
+    }
+  });
+
+  it('holds only screen-only affordances', () => {
+    // Anything that changes how content *looks* belongs in
+    // lib/markdown/contentStyles.ts so the PDF renders it too. Keeping this
+    // file free of visual rules is what stops preview/PDF drift.
+    expect(css).toMatch(/:hover|cursor:/);
+
+    const visualProperties = [
+      'font-size',
+      'font-weight',
+      'margin',
+      'padding',
+      'border-radius',
+      'background-color',
+      'line-height',
+      'display',
+    ];
+    for (const property of visualProperties) {
+      expect(css).not.toContain(`${property}:`);
+    }
+  });
+
+  it('does not hardcode colors against a white background', () => {
+    // These were the source of inverted borders on dark themes; contentStyles
+    // derives them from the active text color instead.
+    expect(css).not.toContain('rgba(0, 0, 0');
     expect(css).not.toContain('color-mix(');
-  });
-
-  it('uses rgba() for opacity values', () => {
-    expect(css).toContain('rgba(0, 0, 0, 0.25)');
-    expect(css).toContain('rgba(0, 0, 0, 0.04)');
-    expect(css).toContain('rgba(0, 0, 0, 0.20)');
-    expect(css).toContain('rgba(0, 0, 0, 0.06)');
-    expect(css).toContain('rgba(0, 0, 0, 0.03)');
-  });
-
-  it('includes .preview-content selectors', () => {
-    expect(css).toContain('.preview-content');
-  });
-
-  it('does not use flex on task-list-item (breaks nested lists)', () => {
-    // flex on li makes nested <ul>/<ol> children lay out as flex items (row)
-    // which pushes them out horizontally. Must use normal flow instead.
-    const taskItemBlock = css.match(
-      /\.preview-content \.task-list-item\s*\{[^}]*\}/
-    )?.[0];
-    expect(taskItemBlock).toBeDefined();
-    expect(taskItemBlock).not.toMatch(/display:\s*flex/);
-  });
-
-  it('styles all preview checkboxes, not just task-list-item ones', () => {
-    // Both list checkboxes AND standalone [ ] in paragraphs need custom styling
-    expect(css).toMatch(
-      /\.preview-content input\[type="checkbox"\]\s*\{/
-    );
   });
 });
