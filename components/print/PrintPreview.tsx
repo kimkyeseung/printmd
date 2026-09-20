@@ -29,10 +29,10 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
   /**
    * Hand the paged preview to the browser's print pipeline.
    *
-   * Both buttons land here: "Print" and "Save PDF" are the same operation to
-   * the browser, which offers a physical printer or "Save as PDF" as
-   * destinations in one dialog. Printing the live document keeps the text as
-   * real text, which rasterising it to an image could not.
+   * Printing and exporting a PDF are one action here, because the browser's
+   * dialog offers a physical printer and "Save as PDF" as destinations of the
+   * same operation. Printing the live document keeps the text as real text,
+   * which rasterising it to an image could not.
    */
   const handlePrint = () => {
     if (!previewRef.current?.print()) {
