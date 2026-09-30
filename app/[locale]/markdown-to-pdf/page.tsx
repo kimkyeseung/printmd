@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -19,7 +20,9 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
   const t = dict.markdownToPdf;
 
-  return {
+  return buildPageMetadata({
+    locale,
+    path: '/markdown-to-pdf',
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
     keywords: locale === 'ko'
@@ -106,20 +109,7 @@ export async function generateMetadata({
           'personalized markdown pdf', 'markdown pdf customization', 'customize markdown pdf',
           'markdown pdf font size', 'markdown pdf color', 'markdown pdf line height',
         ],
-    openGraph: {
-      title: `${t.title} - ${t.subtitle} | printmd`,
-      description: t.hero.description,
-      url: `https://printmd.app/${locale}/markdown-to-pdf`,
-    },
-    alternates: {
-      canonical: `https://printmd.app/${locale}/markdown-to-pdf`,
-      languages: {
-        'ko': 'https://printmd.app/ko/markdown-to-pdf',
-        'en': 'https://printmd.app/en/markdown-to-pdf',
-        'x-default': 'https://printmd.app/en/markdown-to-pdf',
-      },
-    },
-  };
+  });
 }
 
 export default async function MarkdownToPdfPage({

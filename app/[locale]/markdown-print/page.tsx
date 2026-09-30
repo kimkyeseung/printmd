@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -19,26 +20,15 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
   const t = dict.markdownPrint;
 
-  return {
+  return buildPageMetadata({
+    locale,
+    path: '/markdown-print',
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
     keywords: locale === 'ko'
       ? ['마크다운 프린트', '마크다운 인쇄', 'markdown print', 'md 인쇄', '마크다운 출력', '마크다운 프린터', '마크다운 인쇄 도구', 'README 인쇄', '마크다운 문서 인쇄', '마크다운 깔끔하게 인쇄', 'md 파일 인쇄', '무료 마크다운 인쇄']
       : ['print markdown', 'markdown print', 'print md file', 'markdown printer', 'print markdown online', 'markdown print tool', 'print md document', 'print readme', 'markdown to printer', 'print markdown free', 'markdown print format', 'print markdown beautifully'],
-    openGraph: {
-      title: `${t.title} - ${t.subtitle} | printmd`,
-      description: t.hero.description,
-      url: `https://printmd.app/${locale}/markdown-print`,
-    },
-    alternates: {
-      canonical: `https://printmd.app/${locale}/markdown-print`,
-      languages: {
-        'ko': 'https://printmd.app/ko/markdown-print',
-        'en': 'https://printmd.app/en/markdown-print',
-        'x-default': 'https://printmd.app/en/markdown-print',
-      },
-    },
-  };
+  });
 }
 
 export default async function MarkdownPrintPage({

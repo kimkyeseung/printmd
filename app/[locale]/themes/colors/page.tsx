@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { themePresets } from '@/lib/themes/presets';
@@ -215,8 +216,10 @@ export async function generateMetadata({
   if (!isValidLocale(locale)) return {};
   const s = t[locale];
 
-  return {
-    title: `${s.title} - printmd`,
+  return buildPageMetadata({
+    locale,
+    path: '/themes/colors',
+    title: s.title,
     description: s.metaDescription,
     keywords: [
       'markdown color customization',
@@ -226,22 +229,8 @@ export async function generateMetadata({
       'PDF color palette',
       'markdown style guide',
     ],
-    openGraph: {
-      title: `${s.title} | printmd`,
-      description: s.metaDescription,
-      url: `https://printmd.app/${locale}/themes/colors`,
-      siteName: 'printmd',
-      type: 'article',
-    },
-    alternates: {
-      canonical: `https://printmd.app/${locale}/themes/colors`,
-      languages: {
-        ko: 'https://printmd.app/ko/themes/colors',
-        en: 'https://printmd.app/en/themes/colors',
-        'x-default': 'https://printmd.app/en/themes/colors',
-      },
-    },
-  };
+    article: {},
+  });
 }
 
 /* ------------------------------------------------------------------ */

@@ -4,6 +4,7 @@ import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
+import { buildPageMetadata, SITE_NAME } from '@/lib/seo/metadata';
 import { Providers } from '@/components/Providers';
 import { bodyClassName } from '../fonts';
 
@@ -27,25 +28,17 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
 
   return {
-    title: {
-      default: dict.meta.title,
-      template: `%s | printmd`,
-    },
-    description: dict.meta.description,
-    keywords: dict.meta.keywords.split(','),
-    alternates: {
-      canonical: `https://printmd.app/${locale}`,
-      languages: {
-        'ko': 'https://printmd.app/ko',
-        'en': 'https://printmd.app/en',
-        'x-default': 'https://printmd.app/en',
-      },
-    },
-    openGraph: {
+    ...buildPageMetadata({
+      locale,
+      path: '',
       title: dict.meta.title,
       description: dict.meta.description,
-      locale: locale === 'ko' ? 'ko_KR' : 'en_US',
-      alternateLocale: locale === 'ko' ? 'en_US' : 'ko_KR',
+      keywords: dict.meta.keywords.split(','),
+      absoluteTitle: true,
+    }),
+    title: {
+      default: dict.meta.title,
+      template: `%s | ${SITE_NAME}`,
     },
   };
 }

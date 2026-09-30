@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 import { notFound } from 'next/navigation';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -31,27 +32,23 @@ export async function generateMetadata({
   const post = getPostBySlug(slug, locale);
   if (!post) return {};
 
-  return {
-    title: `${post.title} - printmd Blog`,
+  return buildPageMetadata({
+    locale,
+    path: `/blog/${slug}`,
+    title: post.title,
     description: post.description,
     keywords: post.tags,
-    openGraph: {
-      title: post.title,
-      description: post.description,
-      type: 'article',
+    image: {
+      url: `/${locale}/blog/${slug}/opengraph-image`,
+      width: 1200,
+      height: 630,
+      alt: post.title,
+    },
+    article: {
       publishedTime: post.date,
-      url: `https://printmd.app/${locale}/blog/${slug}`,
       tags: post.tags,
     },
-    alternates: {
-      canonical: `https://printmd.app/${locale}/blog/${slug}`,
-      languages: {
-        ko: `https://printmd.app/ko/blog/${slug}`,
-        en: `https://printmd.app/en/blog/${slug}`,
-        'x-default': `https://printmd.app/en/blog/${slug}`,
-      },
-    },
-  };
+  });
 }
 
 export default async function BlogPostPage({

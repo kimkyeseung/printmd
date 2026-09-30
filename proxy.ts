@@ -61,12 +61,19 @@ export function proxy(request: NextRequest) {
   // still 404 — from `/{locale}{pathname}` rather than here — which keeps
   // shared links like /cheatsheet or /blog/<slug> working.
   const locale = getLocale(request);
-  const newUrl = new URL(`/${locale}${pathname}`, request.url);
+  // `/` maps to `/{locale}` directly; `/{locale}/` would cost a second
+  // trailing-slash redirect.
+  const newUrl = new URL(
+    pathname === '/' ? `/${locale}` : `/${locale}${pathname}`,
+    request.url
+  );
 
   // Preserve query parameters
   newUrl.search = request.nextUrl.search;
 
-  return NextResponse.redirect(newUrl, 301);
+  // Temporary: the target depends on Accept-Language, so browsers and CDNs
+  // must not cache it as the permanent destination for this URL.
+  return NextResponse.redirect(newUrl, 307);
 }
 
 export const config = {

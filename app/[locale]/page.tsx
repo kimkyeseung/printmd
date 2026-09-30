@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -21,25 +22,14 @@ export async function generateMetadata({
   const title = dict.meta.title;
   const description = dict.meta.description;
 
-  return {
+  return buildPageMetadata({
+    locale,
+    path: '',
     title,
     description,
     keywords: dict.meta.keywords.split(','),
-    openGraph: {
-      title,
-      description,
-      url: `https://printmd.app/${locale}`,
-      type: 'website',
-    },
-    alternates: {
-      canonical: `https://printmd.app/${locale}`,
-      languages: {
-        'ko': 'https://printmd.app/ko',
-        'en': 'https://printmd.app/en',
-        'x-default': 'https://printmd.app/en',
-      },
-    },
-  };
+    absoluteTitle: true,
+  });
 }
 
 export default async function Home({

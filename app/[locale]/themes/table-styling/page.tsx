@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { themePresets, themeElementStyles, presetKeys } from '@/lib/themes/presets';
@@ -80,8 +81,10 @@ export async function generateMetadata({
   const lang = isValidLocale(locale) ? locale : 'en';
   const strings = t[lang];
 
-  return {
-    title: `${strings.title} - printmd`,
+  return buildPageMetadata({
+    locale: lang,
+    path: '/themes/table-styling',
+    title: strings.title,
     description: strings.description,
     keywords: [
       'markdown table styles',
@@ -91,20 +94,7 @@ export async function generateMetadata({
       'markdown table colors',
       'striped table rows',
     ],
-    openGraph: {
-      title: `${strings.title} | printmd`,
-      description: strings.description,
-      url: `https://printmd.app/${lang}/themes/table-styling`,
-    },
-    alternates: {
-      canonical: `https://printmd.app/${lang}/themes/table-styling`,
-      languages: {
-        ko: 'https://printmd.app/ko/themes/table-styling',
-        en: 'https://printmd.app/en/themes/table-styling',
-        'x-default': 'https://printmd.app/en/themes/table-styling',
-      },
-    },
-  };
+  });
 }
 
 function TablePreview({

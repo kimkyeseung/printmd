@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -107,33 +108,26 @@ export async function generateMetadata({
   const keywords = locale === 'ko' ? THEME_KEYWORDS_KO[theme] : THEME_KEYWORDS_EN[theme];
 
   const title = locale === 'ko'
-    ? `${themeName} 테마 - printmd 마크다운 PDF 테마`
-    : `${themeName} Theme - printmd Markdown PDF Theme`;
+    ? `${themeName} 테마 - 마크다운 PDF 테마`
+    : `${themeName} Theme - Markdown PDF Theme`;
 
   const description = locale === 'ko'
     ? `printmd ${themeName} 테마로 마크다운을 PDF로 변환하세요. ${themeDesc}`
     : `Convert Markdown to PDF with the printmd ${themeName} theme. ${themeDesc}`;
 
-  return {
-    title: `${title} | printmd`,
+  return buildPageMetadata({
+    locale,
+    path: `/presets/${theme}`,
+    title,
     description,
     keywords: `${keywords},printmd,markdown to pdf,markdown theme,${dict.meta.keywords?.split(',').slice(0, 5).join(',') ?? ''}`,
-    openGraph: {
-      title,
-      description,
-      url: `https://printmd.app/${locale}/presets/${theme}`,
-      siteName: 'printmd',
-      type: 'website',
+    image: {
+      url: `/${locale}/presets/opengraph-image`,
+      width: 1200,
+      height: 630,
+      alt: 'printmd Presets - Theme Collection',
     },
-    alternates: {
-      canonical: `https://printmd.app/${locale}/presets/${theme}`,
-      languages: {
-        ko: `https://printmd.app/ko/presets/${theme}`,
-        en: `https://printmd.app/en/presets/${theme}`,
-        'x-default': `https://printmd.app/en/presets/${theme}`,
-      },
-    },
-  };
+  });
 }
 
 function ColorSwatch({ color, label }: { color: string; label: string }) {

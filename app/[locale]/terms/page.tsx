@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -22,23 +23,12 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
   const t = dict.terms;
 
-  return {
-    title: `${t.title} - printmd`,
+  return buildPageMetadata({
+    locale,
+    path: '/terms',
+    title: t.title,
     description: t.description,
-    openGraph: {
-      title: `${t.title} | printmd`,
-      description: t.description,
-      url: `https://printmd.app/${locale}/terms`,
-    },
-    alternates: {
-      canonical: `https://printmd.app/${locale}/terms`,
-      languages: {
-        ko: 'https://printmd.app/ko/terms',
-        en: 'https://printmd.app/en/terms',
-        'x-default': 'https://printmd.app/en/terms',
-      },
-    },
-  };
+  });
 }
 
 export default async function TermsPage({

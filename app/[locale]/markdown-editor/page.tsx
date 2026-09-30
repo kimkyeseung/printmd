@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -19,26 +20,15 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
   const t = dict.markdownEditor;
 
-  return {
+  return buildPageMetadata({
+    locale,
+    path: '/markdown-editor',
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
     keywords: locale === 'ko'
       ? ['마크다운 편집기', '마크다운 에디터', 'markdown editor', '온라인 마크다운 편집기', '무료 마크다운 편집기', '웹 마크다운 편집기', '마크다운 편집', '마크다운 작성', '마크다운 편집 도구', '마크다운 뷰어', '마크다운 미리보기', '마크다운 실시간 편집', '마크다운 라이브 프리뷰', 'md 편집기', 'md 에디터']
       : ['markdown editor', 'online markdown editor', 'md editor', 'free markdown editor', 'markdown editing', 'edit markdown online', 'web markdown editor', 'markdown editor online free', 'markdown live preview', 'markdown writing tool', 'markdown viewer', 'markdown preview editor', 'best free markdown editor', 'browser markdown editor', 'markdown editor no signup'],
-    openGraph: {
-      title: `${t.title} - ${t.subtitle} | printmd`,
-      description: t.hero.description,
-      url: `https://printmd.app/${locale}/markdown-editor`,
-    },
-    alternates: {
-      canonical: `https://printmd.app/${locale}/markdown-editor`,
-      languages: {
-        'ko': 'https://printmd.app/ko/markdown-editor',
-        'en': 'https://printmd.app/en/markdown-editor',
-        'x-default': 'https://printmd.app/en/markdown-editor',
-      },
-    },
-  };
+  });
 }
 
 export default async function MarkdownEditorPage({

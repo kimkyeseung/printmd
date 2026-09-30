@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -21,24 +22,13 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
   const t = dict.cheatsheet;
 
-  return {
+  return buildPageMetadata({
+    locale,
+    path: '/cheatsheet',
     title: `${t.title} - ${t.subtitle}`,
     description: t.description,
     keywords: t.keywords.split(','),
-    openGraph: {
-      title: `${t.title} - ${t.subtitle} | printmd`,
-      description: t.description,
-      url: `https://printmd.app/${locale}/cheatsheet`,
-    },
-    alternates: {
-      canonical: `https://printmd.app/${locale}/cheatsheet`,
-      languages: {
-        ko: 'https://printmd.app/ko/cheatsheet',
-        en: 'https://printmd.app/en/cheatsheet',
-        'x-default': 'https://printmd.app/en/cheatsheet',
-      },
-    },
-  };
+  });
 }
 
 export default async function CheatsheetPage({

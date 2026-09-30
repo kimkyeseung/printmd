@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
@@ -18,23 +19,12 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
   const t = dict.privacy;
 
-  return {
-    title: `${t.title} - printmd`,
+  return buildPageMetadata({
+    locale,
+    path: '/privacy',
+    title: t.title,
     description: t.description,
-    openGraph: {
-      title: `${t.title} | printmd`,
-      description: t.description,
-      url: `https://printmd.app/${locale}/privacy`,
-    },
-    alternates: {
-      canonical: `https://printmd.app/${locale}/privacy`,
-      languages: {
-        'ko': 'https://printmd.app/ko/privacy',
-        'en': 'https://printmd.app/en/privacy',
-        'x-default': 'https://printmd.app/en/privacy',
-      },
-    },
-  };
+  });
 }
 
 export default async function PrivacyPage({
