@@ -63,8 +63,8 @@ const en = {
     presentationMode: 'Presentation mode',
     style: 'Style',
     styleSettings: 'Style settings',
-    print: 'Print',
-    printOrPdf: 'Print / PDF',
+    exportPdf: 'Export PDF',
+    printOrPdf: 'Print or save as PDF',
   },
   tabs: {
     documents: 'Documents',
@@ -232,8 +232,8 @@ const ko: AppStrings = {
     presentationMode: '발표 모드',
     style: '스타일',
     styleSettings: '스타일 설정',
-    print: '인쇄',
-    printOrPdf: '인쇄 / PDF',
+    exportPdf: 'PDF 저장',
+    printOrPdf: '인쇄 또는 PDF로 저장',
   },
   tabs: {
     documents: '문서',

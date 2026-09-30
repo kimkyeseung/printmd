@@ -291,6 +291,7 @@ export default function HomeClient() {
         onDownloadPdf={handleDownloadPdf}
         onShareClick={handleShare}
         onSlideMode={slideMode.toggleSlideMode}
+        isStylePanelOpen={isStylePanelOpen}
         hasCurrentDocument={!!currentDocumentId}
         hasSlides={slideMode.hasSlides}
       />

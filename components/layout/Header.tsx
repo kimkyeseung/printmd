@@ -35,6 +35,7 @@ interface HeaderProps {
   onDownloadPdf: () => void;
   onShareClick: () => void;
   onSlideMode?: () => void;
+  isStylePanelOpen?: boolean;
   hasCurrentDocument?: boolean;
   hasSlides?: boolean;
 }
@@ -74,6 +75,7 @@ export const Header = memo(function Header({
   onDownloadPdf,
   onShareClick,
   onSlideMode,
+  isStylePanelOpen = false,
   hasCurrentDocument = false,
   hasSlides = false,
 }: HeaderProps) {
@@ -158,12 +160,16 @@ export const Header = memo(function Header({
           <button
             onClick={() => setShowShortcuts(!showShortcuts)}
             onBlur={() => setTimeout(() => setShowShortcuts(false), 200)}
-            className="rounded px-2 py-1.5 text-sm text-gray-500 hover:bg-[var(--ui-bg-hover)] hover:text-gray-700"
+            className="rounded px-2 py-1.5 text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)] hover:text-[var(--foreground)]"
             aria-label={t.shortcuts}
+            title={t.shortcuts}
             aria-expanded={showShortcuts}
             aria-haspopup="true"
           >
-            <kbd className="text-xs">⌘</kbd>
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2" y="6" width="20" height="12" rx="2" strokeWidth={2} />
+              <path strokeLinecap="round" strokeWidth={2} d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8" />
+            </svg>
           </button>
           {showShortcuts && (
             <div
@@ -442,24 +448,33 @@ export const Header = memo(function Header({
           </button>
         )}
 
-        {/* Style button (preview document styling) */}
+        {/* Style: secondary. Export is the one primary action in the bar. */}
         <button
           onClick={onStylePanelToggle}
-          className="rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 px-2 py-1.5 text-xs font-medium text-white shadow-sm hover:from-purple-600 hover:to-indigo-600 sm:px-4 sm:py-2 sm:text-sm"
+          className={`ml-0.5 flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-xs font-medium sm:px-3 sm:text-sm ${
+            isStylePanelOpen
+              ? 'border-[var(--printmd-link-color,#2563eb)] bg-[var(--ui-bg-hover)]'
+              : 'border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)]'
+          }`}
           aria-label={t.styleSettings}
+          aria-pressed={isStylePanelOpen}
           title={`${t.styleSettings} (⌘⇧S)`}
         >
-          <span className="sm:hidden">🎨</span>
-          <span className="hidden sm:inline">🎨 {t.style}</span>
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+          </svg>
+          <span className="hidden sm:inline">{t.style}</span>
         </button>
         <button
           onClick={onPrintClick}
-          className="rounded-lg bg-[var(--foreground)] px-2 py-1.5 text-xs font-medium text-[var(--background)] hover:opacity-90 sm:px-4 sm:py-2 sm:text-sm"
+          className="ml-1 flex items-center gap-1.5 rounded-lg bg-blue-600 px-2 py-1.5 text-xs font-medium text-white hover:bg-blue-700 sm:px-3 sm:text-sm"
           aria-label={t.printOrPdf}
           title={`${t.printOrPdf} (⌘P)`}
         >
-          <span className="sm:hidden">🖨️</span>
-          <span className="hidden sm:inline">🖨️ {t.print}</span>
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+          <span className="hidden sm:inline">{t.exportPdf}</span>
         </button>
       </div>
     </header>
