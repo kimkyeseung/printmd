@@ -1,35 +1,15 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useKakaoAd } from '@/hooks/useKakaoAd';
 
 interface AdKakaoSidebarProps {
   className?: string;
+  /** Called when no ad will show, so the caller can collapse the slot. */
+  onNoFill?: () => void;
 }
 
-export function AdKakaoSidebar({ className = '' }: AdKakaoSidebarProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const scriptLoaded = useRef(false);
-
-  useEffect(() => {
-    if (scriptLoaded.current) return;
-    if (!containerRef.current) return;
-
-    scriptLoaded.current = true;
-
-    const ins = document.createElement('ins');
-    ins.className = 'kakao_ad_area';
-    ins.style.display = 'none';
-    ins.setAttribute('data-ad-unit', 'DAN-0fmLNKGB3mREeDek');
-    ins.setAttribute('data-ad-width', '160');
-    ins.setAttribute('data-ad-height', '600');
-    containerRef.current.appendChild(ins);
-
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-    script.async = true;
-    containerRef.current.appendChild(script);
-  }, []);
+export function AdKakaoSidebar({ className = '', onNoFill }: AdKakaoSidebarProps) {
+  const containerRef = useKakaoAd('DAN-0fmLNKGB3mREeDek', 160, 600, onNoFill);
 
   if (process.env.NODE_ENV === 'development') {
     return (

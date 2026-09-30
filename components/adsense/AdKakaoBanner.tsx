@@ -1,41 +1,15 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-
-declare global {
-  interface Window {
-    kakaoPixel?: unknown;
-  }
-}
+import { useKakaoAd } from '@/hooks/useKakaoAd';
 
 interface AdKakaoBannerProps {
   className?: string;
+  /** Called when no ad will show, so the caller can collapse the slot. */
+  onNoFill?: () => void;
 }
 
-export function AdKakaoBanner({ className = '' }: AdKakaoBannerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const scriptLoaded = useRef(false);
-
-  useEffect(() => {
-    if (scriptLoaded.current) return;
-    if (!containerRef.current) return;
-
-    scriptLoaded.current = true;
-
-    const ins = document.createElement('ins');
-    ins.className = 'kakao_ad_area';
-    ins.style.display = 'none';
-    ins.setAttribute('data-ad-unit', 'DAN-NSUrBUs7hoz03eCb');
-    ins.setAttribute('data-ad-width', '728');
-    ins.setAttribute('data-ad-height', '90');
-    containerRef.current.appendChild(ins);
-
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-    script.async = true;
-    containerRef.current.appendChild(script);
-  }, []);
+export function AdKakaoBanner({ className = '', onNoFill }: AdKakaoBannerProps) {
+  const containerRef = useKakaoAd('DAN-NSUrBUs7hoz03eCb', 728, 90, onNoFill);
 
   if (process.env.NODE_ENV === 'development') {
     return (

@@ -106,6 +106,12 @@ export default function HomeClient() {
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isLoadDialogOpen, setIsLoadDialogOpen] = useState(false);
   const text = useAppStrings();
+  // Ad slots reserve their space up front so a served ad doesn't shift the
+  // editor; a slot that won't fill (no inventory, ad blocker) collapses.
+  const [unfilledAds, setUnfilledAds] = useState({ banner: false, sidebar: false, mobile: false });
+  const onBannerNoFill = useCallback(() => setUnfilledAds((s) => ({ ...s, banner: true })), []);
+  const onSidebarNoFill = useCallback(() => setUnfilledAds((s) => ({ ...s, sidebar: true })), []);
+  const onMobileNoFill = useCallback(() => setUnfilledAds((s) => ({ ...s, mobile: true })), []);
 
   // Custom hooks
   useExtensionReceiver();
@@ -257,7 +263,7 @@ export default function HomeClient() {
   }, [isStylePanelOpen, viewMode, displayContent, handleContentChange, previewElement, editorWidth, setEditorWidth, stylePanelWidth, setStylePanelWidth, closeStylePanel]);
 
   return (
-    <div className="flex h-screen max-h-screen flex-col overflow-hidden pb-[50px] md:pb-0">
+    <div className={`flex h-screen max-h-screen flex-col overflow-hidden md:pb-0 ${unfilledAds.mobile ? '' : 'pb-[50px]'}`}>
       <a href="#main-content" className="skip-link">{text.shell.skipToContent}</a>
 
       <input
@@ -293,9 +299,14 @@ export default function HomeClient() {
 
       <ExtensionBanner />
 
-      <div className="hidden md:block border-b border-[var(--ui-border)] h-[90px] shrink-0 overflow-hidden">
-        <AdKakaoBanner className="h-[90px] max-w-[728px] mx-auto flex items-center justify-center" />
-      </div>
+      {!unfilledAds.banner && (
+        <div className="hidden md:block border-b border-[var(--ui-border)] h-[90px] shrink-0 overflow-hidden">
+          <AdKakaoBanner
+            className="h-[90px] max-w-[728px] mx-auto flex items-center justify-center"
+            onNoFill={onBannerNoFill}
+          />
+        </div>
+      )}
 
       <div className="flex flex-1 min-h-0">
         <DocumentSidebar />
@@ -312,7 +323,9 @@ export default function HomeClient() {
         </main>
         <aside className="hidden xl:flex flex-col w-[160px] shrink-0 border-l border-[var(--ui-border)]">
           <div className="sticky top-0 flex flex-col items-center">
-            <AdKakaoSidebar className="w-[160px] h-[600px]" />
+            {!unfilledAds.sidebar && (
+              <AdKakaoSidebar className="w-[160px] h-[600px]" onNoFill={onSidebarNoFill} />
+            )}
             <a
               href="https://buymeacoffee.com/kimkyeseung"
               target="_blank"
@@ -343,9 +356,11 @@ export default function HomeClient() {
         />
       )}
 
-      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[var(--background)] border-t border-[var(--ui-border)] h-[50px] overflow-hidden">
-        <AdKakaoMobile className="h-[50px] flex items-center justify-center" />
-      </div>
+      {!unfilledAds.mobile && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[var(--background)] border-t border-[var(--ui-border)] h-[50px] overflow-hidden">
+          <AdKakaoMobile className="h-[50px] flex items-center justify-center" onNoFill={onMobileNoFill} />
+        </div>
+      )}
 
       {slideMode.isSlideMode && (
         <SlideView

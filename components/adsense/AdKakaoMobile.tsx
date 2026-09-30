@@ -1,35 +1,15 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useKakaoAd } from '@/hooks/useKakaoAd';
 
 interface AdKakaoMobileProps {
   className?: string;
+  /** Called when no ad will show, so the caller can collapse the slot. */
+  onNoFill?: () => void;
 }
 
-export function AdKakaoMobile({ className = '' }: AdKakaoMobileProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const scriptLoaded = useRef(false);
-
-  useEffect(() => {
-    if (scriptLoaded.current) return;
-    if (!containerRef.current) return;
-
-    scriptLoaded.current = true;
-
-    const ins = document.createElement('ins');
-    ins.className = 'kakao_ad_area';
-    ins.style.display = 'none';
-    ins.setAttribute('data-ad-unit', 'DAN-BRzfhtHBdDeIxS6J');
-    ins.setAttribute('data-ad-width', '320');
-    ins.setAttribute('data-ad-height', '50');
-    containerRef.current.appendChild(ins);
-
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
-    script.async = true;
-    containerRef.current.appendChild(script);
-  }, []);
+export function AdKakaoMobile({ className = '', onNoFill }: AdKakaoMobileProps) {
+  const containerRef = useKakaoAd('DAN-BRzfhtHBdDeIxS6J', 320, 50, onNoFill);
 
   if (process.env.NODE_ENV === 'development') {
     return (
