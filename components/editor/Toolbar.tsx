@@ -65,7 +65,9 @@ export const Toolbar = memo(function Toolbar({ onAction }: ToolbarProps) {
             onClick={() => onAction(item.action)}
             className="flex h-7 min-w-7 flex-shrink-0 items-center justify-center rounded px-1.5 text-sm font-medium hover:bg-[var(--ui-bg-hover)] active:bg-[var(--ui-border)]"
             title={item.shortcut ? `${label} (${item.shortcut})` : label}
-            aria-label={label}
+            // Start with the visible glyph (B, H1, 1.) so voice control users
+            // can say what they see, then spell out what it does.
+            aria-label={typeof item.icon === 'string' ? `${item.icon} ${label}` : label}
             type="button"
           >
             {item.icon}

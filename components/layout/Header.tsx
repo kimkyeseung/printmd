@@ -474,7 +474,9 @@ export const Header = memo(function Header({
         <button
           onClick={onPrintClick}
           className="ml-1 flex items-center gap-1.5 rounded-lg bg-blue-600 px-2 py-1.5 text-xs font-medium text-white hover:bg-blue-700 sm:px-3 sm:text-sm"
-          aria-label={t.printOrPdf}
+          // The visible label is the accessible name, so voice control users
+          // can say what they see; the tooltip carries the longer description.
+          aria-label={t.exportPdf}
           title={`${t.printOrPdf} (⌘P)`}
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
