@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useTabsStore } from '../tabsStore';
+import { useTabsStore, serializeTabs, deserializeTabs } from '../tabsStore';
 
 function resetStore() {
   useTabsStore.setState({ tabs: [], activeTabId: null });
@@ -263,6 +263,51 @@ describe('tabsStore', () => {
 
       expect(existing).toBeDefined();
       expect(existing!.title).toBe('Doc 1');
+    });
+  });
+
+  describe('persistence', () => {
+    it('keeps the content of a tab that was never saved as a document', () => {
+      const id = useTabsStore.getState().addTab({ content: '# Draft' });
+      useTabsStore.getState().updateTabContent(id, '# Draft, edited');
+
+      const restored = deserializeTabs(serializeTabs(useTabsStore.getState()));
+
+      expect(restored.tabs[0].content).toBe('# Draft, edited');
+      expect(restored.activeTabId).toBe(id);
+    });
+
+    it('does not store a clean document tab, which is restored from the document', () => {
+      useTabsStore.getState().addTab({ documentId: 'doc-1', content: '# Saved' });
+
+      const persisted = serializeTabs(useTabsStore.getState());
+
+      expect(persisted.tabs[0].content).toBe('');
+      expect(persisted.tabs[0].isDirty).toBe(false);
+    });
+
+    it('keeps unsaved edits to a document across a reload', () => {
+      const id = useTabsStore.getState().addTab({ documentId: 'doc-1', content: '# Saved' });
+      useTabsStore.getState().updateTabContent(id, '# Saved, then edited');
+
+      useTabsStore.setState(deserializeTabs(serializeTabs(useTabsStore.getState())));
+      useTabsStore.getState().restoreTabFromDocument(id, '# Saved');
+      const tab = useTabsStore.getState().tabs[0];
+
+      expect(tab.content).toBe('# Saved, then edited');
+      expect(tab.lastSavedContent).toBe('# Saved');
+      expect(tab.isDirty).toBe(true);
+    });
+
+    it('loads the document content into a clean document tab', () => {
+      const id = useTabsStore.getState().addTab({ documentId: 'doc-1', content: '# Saved' });
+
+      useTabsStore.setState(deserializeTabs(serializeTabs(useTabsStore.getState())));
+      useTabsStore.getState().restoreTabFromDocument(id, '# Saved');
+      const tab = useTabsStore.getState().tabs[0];
+
+      expect(tab.content).toBe('# Saved');
+      expect(tab.isDirty).toBe(false);
     });
   });
 });

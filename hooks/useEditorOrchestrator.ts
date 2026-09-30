@@ -306,15 +306,14 @@ export function useEditorOrchestrator() {
         addTab();
       }
     } else {
-      // Restore content for persisted tabs (content was not persisted)
+      // Document tabs persist only unsaved edits; the saved content lives in
+      // the documents store. Drafts without a document are restored as-is.
       const { tabs: persistedTabs } = state;
       for (const tab of persistedTabs) {
         if (tab.documentId) {
           const doc = getDocument(tab.documentId);
           if (doc) {
-            updateTabContent(tab.id, doc.content);
-            // Reset dirty since we just loaded from source
-            markTabSaved(tab.id);
+            state.restoreTabFromDocument(tab.id, doc.content);
           }
         }
       }

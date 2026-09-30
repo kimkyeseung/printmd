@@ -18,6 +18,8 @@ export interface TabsActions {
   setActiveTab: (tabId: string) => void;
   updateTabContent: (tabId: string, content: string) => void;
   markTabSaved: (tabId: string, documentId?: string, title?: string) => void;
+  /** Sync a document tab with its saved content after a reload, keeping unsaved edits. */
+  restoreTabFromDocument: (tabId: string, savedContent: string) => void;
   updateTabTitle: (tabId: string, title: string) => void;
   getActiveTab: () => Tab | undefined;
 }
