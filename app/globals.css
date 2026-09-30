@@ -98,6 +98,16 @@ body {
   background: var(--ui-text-muted);
 }
 
+/* Horizontal strips that scroll by swipe or trackpad (tab bar, editor
+   toolbar) — a 12px bar under a 40px row is mostly noise. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Focus styles for accessibility */
 :focus-visible {
   outline: 2px solid var(--printmd-link-color);
