@@ -20,6 +20,7 @@ import {
 } from '@/lib/print/printDocument';
 import type { GlobalStyles } from '@/types/style';
 import type { PrintSettings, HeaderFooterConfig } from '@/types/print';
+import { useAppStrings, format } from '@/lib/i18n/appStrings';
 
 export interface PagedPreviewHandle {
   /**
@@ -105,6 +106,7 @@ export function PagedPreview({ markdown, styles, settings, ref }: PagedPreviewPr
   );
 
   const [rendered, setRendered] = useState<{ plan: unknown; pageCount: number } | null>(null);
+  const t = useAppStrings().print;
   const isRendering = rendered === null || rendered.plan !== plan;
 
   useImperativeHandle(
@@ -171,7 +173,7 @@ export function PagedPreview({ markdown, styles, settings, ref }: PagedPreviewPr
       */}
       <iframe
         ref={frameRef}
-        title="Print preview"
+        title={t.frameTitle}
         // allow-modals is what lets the print dialog open from inside the frame.
         sandbox="allow-same-origin allow-modals"
         style={{
@@ -186,11 +188,13 @@ export function PagedPreview({ markdown, styles, settings, ref }: PagedPreviewPr
       {isRendering ? (
         <div className="absolute inset-x-0 top-16 flex items-center justify-center">
           <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
-          <span className="ml-3 text-sm text-gray-500">Rendering pages...</span>
+          <span className="ml-3 text-sm text-gray-500">{t.rendering}</span>
         </div>
       ) : (
         <div className="text-sm text-[var(--ui-text-muted)]">
-          {rendered.pageCount} page{rendered.pageCount > 1 ? 's' : ''}
+          {format(rendered.pageCount > 1 ? t.pageCountMany : t.pageCountOne, {
+            count: String(rendered.pageCount),
+          })}
         </div>
       )}
     </div>

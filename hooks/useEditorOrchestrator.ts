@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 import { useEditorStore, useDocumentsStore, useTabsStore } from '@/stores';
 
 const DEFAULT_CONTENT: Record<string, string> = {
@@ -268,6 +269,7 @@ export function useEditorOrchestrator() {
   const params = useParams();
   const locale = (params.locale as string) || 'en';
   const initRef = useRef(false);
+  const text = useAppStrings();
 
   const sourceUrl = useEditorStore((state) => state.sourceUrl);
   const updateDocument = useDocumentsStore((state) => state.updateDocument);
@@ -331,18 +333,18 @@ export function useEditorOrchestrator() {
     if (activeTab.documentId) {
       updateDocument(activeTab.documentId, displayContent);
       markTabSaved(activeTab.id);
-      toast.success('저장되었습니다');
+      toast.success(text.toast.saved);
       return true;
     }
     return false; // Need Save As dialog
-  }, [activeTab, displayContent, updateDocument, markTabSaved]);
+  }, [activeTab, displayContent, updateDocument, markTabSaved, text]);
 
   const handleSaveComplete = useCallback((id: string) => {
     if (!activeTabId) return;
     const doc = getDocument(id);
     markTabSaved(activeTabId, id, doc?.name);
-    toast.success('저장되었습니다');
-  }, [activeTabId, markTabSaved, getDocument]);
+    toast.success(text.toast.saved);
+  }, [activeTabId, markTabSaved, getDocument, text]);
 
   const handleLoadFromDialog = useCallback((id: string, loadedContent: string) => {
     // Check if this document is already open in a tab
@@ -350,13 +352,13 @@ export function useEditorOrchestrator() {
     const existingTab = state.tabs.find((t) => t.documentId === id);
     if (existingTab) {
       useTabsStore.getState().setActiveTab(existingTab.id);
-      toast.success('문서를 불러왔습니다');
+      toast.success(text.toast.documentLoaded);
       return;
     }
     const doc = getDocument(id);
     addTab({ documentId: id, content: loadedContent, title: doc?.name ?? 'Untitled' });
-    toast.success('문서를 불러왔습니다');
-  }, [addTab, getDocument]);
+    toast.success(text.toast.documentLoaded);
+  }, [addTab, getDocument, text]);
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

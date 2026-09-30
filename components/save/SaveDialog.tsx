@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { FolderTree } from './FolderTree';
 import { useDocumentsStore } from '@/stores/documentsStore';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 
 interface SaveDialogProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ function extractDefaultName(content: string): string {
 
 export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps) {
   const folders = useDocumentsStore((state) => state.folders);
+  const text = useAppStrings();
   const saveDocument = useDocumentsStore((state) => state.saveDocument);
   const createFolder = useDocumentsStore((state) => state.createFolder);
 
@@ -123,12 +125,12 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--ui-border)] px-4 py-3">
           <h2 id="save-dialog-title" className="font-medium">
-            Save Document
+            {text.saveDialog.title}
           </h2>
           <button
             onClick={onClose}
             className="rounded p-1 hover:bg-[var(--ui-bg-hover)]"
-            aria-label="Close"
+            aria-label={text.common.close}
           >
             <svg
               className="h-5 w-5"
@@ -151,7 +153,7 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
         <div className="p-4 space-y-4">
           {/* Folder selection */}
           <div>
-            <label className="block text-sm font-medium mb-2">Location</label>
+            <label className="block text-sm font-medium mb-2">{text.saveDialog.location}</label>
             <div className="border border-[var(--ui-border)] rounded-md max-h-48 overflow-y-auto">
               <FolderTree
                 folders={folders}
@@ -169,7 +171,7 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
                 onKeyDown={handleFolderKeyDown}
-                placeholder="Folder name"
+                placeholder={text.common.folderName}
                 className="min-w-0 flex-1 rounded border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
                 autoFocus
               />
@@ -179,7 +181,7 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
                   disabled={!newFolderName.trim()}
                   className="rounded bg-blue-500 px-3 py-2 text-sm text-white hover:bg-blue-600 disabled:opacity-50"
                 >
-                  Create
+                  {text.common.create}
                 </button>
                 <button
                   onClick={() => {
@@ -188,7 +190,7 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
                   }}
                   className="rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)]"
                 >
-                  Cancel
+                  {text.common.cancel}
                 </button>
               </div>
             </div>
@@ -205,14 +207,14 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              New Folder
+              {text.common.newFolder}
             </button>
           )}
 
           {/* Document name input */}
           <div>
             <label htmlFor="document-name" className="block text-sm font-medium mb-2">
-              Document Name
+              {text.saveDialog.name}
             </label>
             <input
               id="document-name"
@@ -220,7 +222,7 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
               value={documentName}
               onChange={(e) => setDocumentName(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Enter document name"
+              placeholder={text.saveDialog.namePlaceholder}
               className="w-full rounded border border-[var(--ui-border)] px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
             />
           </div>
@@ -232,14 +234,14 @@ export function SaveDialog({ isOpen, content, onClose, onSave }: SaveDialogProps
             onClick={onClose}
             className="rounded border border-[var(--ui-border)] px-4 py-2 text-sm hover:bg-[var(--ui-bg-hover)]"
           >
-            Cancel
+            {text.common.cancel}
           </button>
           <button
             onClick={handleSave}
             disabled={!documentName.trim()}
             className="rounded bg-[var(--foreground)] px-4 py-2 text-sm text-[var(--background)] hover:opacity-90 disabled:opacity-50"
           >
-            Save
+            {text.common.save}
           </button>
         </div>
       </div>

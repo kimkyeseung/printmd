@@ -3,6 +3,7 @@
 import { useCallback, useRef, useEffect } from 'react';
 import { useTabsStore } from '@/stores';
 import type { Tab } from '@/types/editor';
+import { useAppStrings, format } from '@/lib/i18n/appStrings';
 
 function CloseIcon({ className }: { className?: string }) {
   return (
@@ -24,6 +25,7 @@ function TabItem({
   onClose: () => void;
 }) {
   const showDirtyDot = tab.isDirty && tab.documentId !== null;
+  const t = useAppStrings().tabs;
 
   const handleClose = useCallback(
     (e: React.MouseEvent) => {
@@ -68,7 +70,7 @@ function TabItem({
       <button
         onClick={handleClose}
         className="ml-0.5 rounded p-0.5 opacity-0 group-hover:opacity-100 hover:bg-[var(--ui-bg-hover)] transition-opacity"
-        aria-label={`Close ${tab.title}`}
+        aria-label={format(t.closeTab, { title: tab.title })}
       >
         <CloseIcon className="h-3 w-3" />
       </button>
@@ -88,6 +90,7 @@ export function TabBar() {
   const removeTab = useTabsStore((s) => s.removeTab);
   const addTab = useTabsStore((s) => s.addTab);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const t = useAppStrings().tabs;
 
   // Scroll active tab into view
   useEffect(() => {
@@ -101,12 +104,12 @@ export function TabBar() {
   const handleClose = useCallback(
     (tab: Tab) => {
       if (tab.isDirty) {
-        const confirmed = window.confirm('저장하지 않은 변경사항이 있습니다. 닫으시겠습니까?');
+        const confirmed = window.confirm(t.confirmCloseDirty);
         if (!confirmed) return;
       }
       removeTab(tab.id);
     },
-    [removeTab],
+    [removeTab, t.confirmCloseDirty],
   );
 
   const handleNewTab = useCallback(() => {
@@ -121,7 +124,7 @@ export function TabBar() {
         className="flex flex-1 min-w-0 overflow-x-auto scrollbar-none"
       >
         {/* Only tabs may be children of a tablist, so the new-tab button sits outside it. */}
-        <div role="tablist" aria-label="Documents" className="flex">
+        <div role="tablist" aria-label={t.documents} className="flex">
           {tabs.map((tab) => (
             <TabItem
               key={tab.id}
@@ -137,8 +140,8 @@ export function TabBar() {
         <button
           onClick={handleNewTab}
           className="shrink-0 px-2 py-1.5 text-[var(--ui-text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--ui-bg-hover)] transition-colors"
-          title="New Tab (⌥N / ⌘⌥N)"
-          aria-label="New Tab"
+          title={`${t.newTab} (⌥N / ⌘⌥N)`}
+          aria-label={t.newTab}
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

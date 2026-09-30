@@ -6,6 +6,7 @@ import { useDocumentsStore } from '@/stores/documentsStore';
 import { useTabsStore } from '@/stores/tabsStore';
 import { useUIStore } from '@/stores/uiStore';
 import { toast } from 'sonner';
+import { useAppStrings, format } from '@/lib/i18n/appStrings';
 import type { Document } from '@/stores/documentsStore';
 
 function HamburgerIcon({ className }: { className?: string }) {
@@ -79,6 +80,7 @@ export function DocumentSidebar() {
   const currentDocumentId = activeTab?.documentId ?? null;
 
   const [selectedFolderId, setSelectedFolderId] = useState('root');
+  const text = useAppStrings();
   const [isCreatingRootFolder, setIsCreatingRootFolder] = useState(false);
 
   const handleDocumentSelect = useCallback(
@@ -90,17 +92,17 @@ export function DocumentSidebar() {
         return;
       }
       addTab({ documentId: doc.id, content: doc.content, title: doc.name });
-      toast.success('문서를 불러왔습니다');
+      toast.success(text.toast.documentLoaded);
     },
-    [tabsList, setActiveTab, addTab],
+    [tabsList, setActiveTab, addTab, text],
   );
 
   const handleCreateFolder = useCallback(
     (name: string, parentId: string | null) => {
       createFolder(name, parentId);
-      toast.success('폴더가 생성되었습니다');
+      toast.success(text.toast.folderCreated);
     },
-    [createFolder],
+    [createFolder, text],
   );
 
   const deleteDocument = useDocumentsStore((s) => s.deleteDocument);
@@ -114,31 +116,31 @@ export function DocumentSidebar() {
     (id: string) => {
       const doc = documents.find((d) => d.id === id);
       if (!doc) return;
-      if (!window.confirm(`"${doc.name}" 문서를 삭제하시겠습니까?`)) return;
+      if (!window.confirm(format(text.sidebar.confirmDeleteDocument, { name: doc.name }))) return;
       deleteDocument(id);
       // Close any tabs that have this document open
       const tabWithDoc = tabsList.find((t) => t.documentId === id);
       if (tabWithDoc) {
         removeTab(tabWithDoc.id);
       }
-      toast.success('문서가 삭제되었습니다');
+      toast.success(text.toast.documentDeleted);
     },
-    [documents, deleteDocument, tabsList, removeTab],
+    [documents, deleteDocument, tabsList, removeTab, text],
   );
 
   const handleDeleteFolder = useCallback(
     (id: string) => {
       const folder = folders.find((f) => f.id === id);
       if (!folder) return;
-      if (!window.confirm(`"${folder.name}" 폴더를 삭제하시겠습니까?`)) return;
+      if (!window.confirm(format(text.sidebar.confirmDeleteFolder, { name: folder.name }))) return;
       const success = deleteFolder(id);
       if (!success) {
-        toast.error('폴더 안에 문서나 하위 폴더가 있어 삭제할 수 없습니다');
+        toast.error(text.toast.folderNotEmpty);
       } else {
-        toast.success('폴더가 삭제되었습니다');
+        toast.success(text.toast.folderDeleted);
       }
     },
-    [folders, deleteFolder],
+    [folders, deleteFolder, text],
   );
 
   const handleRenameDocument = useCallback(
@@ -149,17 +151,17 @@ export function DocumentSidebar() {
       if (tab) {
         useTabsStore.getState().updateTabTitle(tab.id, newName);
       }
-      toast.success('문서 이름이 변경되었습니다');
+      toast.success(text.toast.documentRenamed);
     },
-    [renameDocument, tabsList],
+    [renameDocument, tabsList, text],
   );
 
   const handleRenameFolder = useCallback(
     (id: string, newName: string) => {
       renameFolder(id, newName);
-      toast.success('폴더 이름이 변경되었습니다');
+      toast.success(text.toast.folderRenamed);
     },
-    [renameFolder],
+    [renameFolder, text],
   );
 
   const handleMoveDocument = useCallback(
@@ -167,21 +169,21 @@ export function DocumentSidebar() {
       const doc = documents.find((d) => d.id === id);
       if (!doc || doc.folderId === newFolderId) return;
       moveDocument(id, newFolderId);
-      toast.success('문서를 이동했습니다');
+      toast.success(text.toast.documentMoved);
     },
-    [documents, moveDocument],
+    [documents, moveDocument, text],
   );
 
   const handleMoveFolder = useCallback(
     (id: string, newParentId: string | null) => {
       const success = moveFolder(id, newParentId);
       if (!success) {
-        toast.error('해당 위치로 이동할 수 없습니다');
+        toast.error(text.toast.cannotMoveThere);
       } else {
-        toast.success('폴더를 이동했습니다');
+        toast.success(text.toast.folderMoved);
       }
     },
-    [moveFolder],
+    [moveFolder, text],
   );
 
   const isEmpty = documents.length === 0 && folders.length === 0;
@@ -194,8 +196,8 @@ export function DocumentSidebar() {
         <button
           onClick={toggleSidebar}
           className="flex h-8 w-8 items-center justify-center rounded hover:bg-[var(--ui-bg-hover)]"
-          title="Open sidebar"
-          aria-label="Open sidebar"
+          title={text.sidebar.open}
+          aria-label={text.sidebar.open}
         >
           <HamburgerIcon className="h-4 w-4 text-[var(--ui-text-muted)]" />
         </button>
@@ -211,18 +213,19 @@ export function DocumentSidebar() {
         <button
           onClick={toggleSidebar}
           className="rounded p-1 hover:bg-[var(--ui-bg-hover)] text-[var(--ui-text-muted)] hover:text-[var(--foreground)]"
-          title="Close sidebar"
+          title={text.sidebar.close}
+          aria-label={text.sidebar.close}
         >
           <HamburgerIcon className="h-4 w-4" />
         </button>
-        <span className="text-sm font-medium">Menu</span>
+        <span className="text-sm font-medium">{text.sidebar.menu}</span>
       </div>
 
       {/* Scrollable sections */}
       <div className="flex-1 overflow-y-auto">
         {/* Documents section */}
         <SidebarSection
-          title="Documents"
+          title={text.sidebar.documents}
           icon={
             <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
@@ -232,7 +235,8 @@ export function DocumentSidebar() {
             <button
               onClick={() => setIsCreatingRootFolder(true)}
               className="rounded p-0.5 hover:bg-[var(--ui-bg-hover)] text-[var(--ui-text-muted)] hover:text-[var(--foreground)]"
-              title="New Folder"
+              title={text.common.newFolder}
+              aria-label={text.common.newFolder}
             >
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -248,7 +252,7 @@ export function DocumentSidebar() {
               </svg>
               <input
                 autoFocus
-                placeholder="Folder name"
+                placeholder={text.common.folderName}
                 className="flex-1 min-w-0 rounded border border-[var(--ui-border)] bg-transparent px-1 py-0 text-xs"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -273,7 +277,7 @@ export function DocumentSidebar() {
 
           {isEmpty ? (
             <div className="px-3 py-6 text-center text-xs text-[var(--ui-text-muted)]">
-              No saved documents
+              {text.common.noSavedDocuments}
             </div>
           ) : (
             <FolderTree

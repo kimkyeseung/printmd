@@ -7,6 +7,7 @@ import { HeaderFooter } from './HeaderFooter';
 import { PagedPreview, type PagedPreviewHandle } from './PagedPreview';
 import { getPrintGeometry } from '@/lib/print/printDocument';
 import { showToast } from '@/components/ui/Toast';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 
 interface PrintPreviewProps {
   isOpen: boolean;
@@ -16,6 +17,8 @@ interface PrintPreviewProps {
 
 export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
   const settings = usePrintStore((state) => state.settings);
+  const text = useAppStrings();
+  const t = text.print;
   const updateSettings = usePrintStore((state) => state.updateSettings);
   const updateHeader = usePrintStore((state) => state.updateHeader);
   const updateFooter = usePrintStore((state) => state.updateFooter);
@@ -36,7 +39,7 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
    */
   const handlePrint = () => {
     if (!previewRef.current?.print()) {
-      showToast('Still laying out pages — try again in a moment.', 'info');
+      showToast(text.toast.stillLayingOut, 'info');
     }
   };
 
@@ -62,11 +65,11 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
       <div className="print-preview-modal fixed inset-0 z-50 flex flex-col bg-[var(--background)] shadow-2xl md:inset-4 md:rounded-lg lg:inset-8 xl:inset-16">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--ui-border)] px-4 py-3 md:px-6 md:py-4">
-          <h2 className="text-base font-semibold md:text-lg">Print Preview</h2>
+          <h2 className="text-base font-semibold md:text-lg">{t.title}</h2>
           <button
             onClick={onClose}
             className="rounded p-1 hover:bg-[var(--ui-bg-hover)]"
-            aria-label="Close"
+            aria-label={text.common.close}
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -94,7 +97,7 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
 
             {/* Paper info */}
             <div className="text-center mt-4 text-sm text-[var(--ui-text-muted)]">
-              {settings.paperSize} • {settings.orientation} • {geometry.paperWidthMm} × {geometry.paperHeightMm} mm
+              {settings.paperSize} • {t[settings.orientation]} • {geometry.paperWidthMm} × {geometry.paperHeightMm} mm
             </div>
           </div>
 
@@ -121,20 +124,20 @@ export function PrintPreview({ isOpen, onClose, content }: PrintPreviewProps) {
         {/* Footer */}
         <div className="flex items-center justify-between gap-3 border-t border-[var(--ui-border)] px-4 py-3 md:px-6 md:py-4">
           <p className="hidden text-xs text-[var(--ui-text-muted)] sm:block">
-            To export a file, pick “Save as PDF” as the destination.
+            {t.hint}
           </p>
           <div className="flex items-center gap-2 md:gap-3">
             <button
               onClick={onClose}
               className="rounded border border-[var(--ui-border)] px-3 py-2 text-sm hover:bg-[var(--ui-bg-hover)] md:px-4"
             >
-              Cancel
+              {text.common.cancel}
             </button>
             <button
               onClick={handlePrint}
               className="rounded border border-blue-600 bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700 md:px-4"
             >
-              Print / Save PDF
+              {t.printOrSave}
             </button>
           </div>
         </div>

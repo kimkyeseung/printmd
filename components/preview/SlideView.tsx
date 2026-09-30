@@ -5,6 +5,7 @@ import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { ContentStyles } from './ContentStyles';
 import type { GlobalStyles } from '@/types/style';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 
 interface SlideViewProps {
   slides: string[];
@@ -27,6 +28,7 @@ export const SlideView = memo(function SlideView({
   onExit,
 }: SlideViewProps) {
   const articleRef = useRef<HTMLElement>(null);
+  const t = useAppStrings().slides;
 
   const html = useMemo(() => {
     const slideContent = slides[currentSlide] || '';
@@ -102,8 +104,8 @@ export const SlideView = memo(function SlideView({
       <button
         onClick={onExit}
         className="absolute top-4 right-4 z-10 rounded-full p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-        aria-label="Exit slide mode (Escape)"
-        title="Exit (Esc)"
+        aria-label={t.exit}
+        title={t.exit}
       >
         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -120,7 +122,7 @@ export const SlideView = memo(function SlideView({
         onClick={onPrev}
         disabled={currentSlide === 0}
         className="absolute left-2 sm:left-6 z-10 rounded-full p-2 sm:p-3 text-white/50 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-20 disabled:cursor-default"
-        aria-label="Previous slide"
+        aria-label={t.previous}
       >
         <svg className="h-6 w-6 sm:h-8 sm:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -137,7 +139,7 @@ export const SlideView = memo(function SlideView({
         onClick={onNext}
         disabled={currentSlide === totalSlides - 1}
         className="absolute right-2 sm:right-6 z-10 rounded-full p-2 sm:p-3 text-white/50 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-20 disabled:cursor-default"
-        aria-label="Next slide"
+        aria-label={t.next}
       >
         <svg className="h-6 w-6 sm:h-8 sm:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path

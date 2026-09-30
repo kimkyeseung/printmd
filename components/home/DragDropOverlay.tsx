@@ -1,14 +1,16 @@
 'use client';
 
 import { memo } from 'react';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 
 export const DragDropOverlay = memo(function DragDropOverlay() {
+  const t = useAppStrings().dropOverlay;
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-blue-500/20 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label="파일 드롭 영역"
+      aria-label={t.label}
     >
       <div className="rounded-2xl border-4 border-dashed border-blue-500 bg-white/90 p-8 text-center shadow-2xl sm:p-12">
         <svg
@@ -26,10 +28,10 @@ export const DragDropOverlay = memo(function DragDropOverlay() {
           />
         </svg>
         <p className="mt-4 text-lg font-semibold text-gray-700 sm:text-xl">
-          마크다운 파일을 여기에 놓으세요
+          {t.title}
         </p>
         <p className="mt-2 text-xs text-gray-500 sm:text-sm">
-          .md, .markdown, .txt 파일 지원
+          {t.formats}
         </p>
       </div>
     </div>

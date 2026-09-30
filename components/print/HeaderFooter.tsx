@@ -1,6 +1,7 @@
 'use client';
 
 import type { HeaderFooterConfig } from '@/types/print';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 
 interface HeaderFooterProps {
   header: HeaderFooterConfig;
@@ -10,11 +11,11 @@ interface HeaderFooterProps {
 }
 
 const VARIABLES = [
-  { value: '{title}', label: 'Document Title' },
-  { value: '{date}', label: 'Current Date' },
-  { value: '{page}', label: 'Page Number' },
-  { value: '{pages}', label: 'Total Pages' },
-];
+  { value: '{title}', key: 'varTitle' },
+  { value: '{date}', key: 'varDate' },
+  { value: '{page}', key: 'varPage' },
+  { value: '{pages}', key: 'varPages' },
+] as const;
 
 function PositionInputs({
   config,
@@ -25,6 +26,7 @@ function PositionInputs({
   onChange: (config: Partial<HeaderFooterConfig>) => void;
   label: string;
 }) {
+  const t = useAppStrings().print;
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
@@ -36,14 +38,14 @@ function PositionInputs({
             onChange={(e) => onChange({ enabled: e.target.checked })}
             className="rounded border-[var(--ui-border)]"
           />
-          <span className="text-xs text-[var(--ui-text-muted)]">Enable</span>
+          <span className="text-xs text-[var(--ui-text-muted)]">{t.enable}</span>
         </label>
       </div>
 
       {config.enabled && (
         <div className="grid grid-cols-3 gap-2">
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-[var(--ui-text-muted)]">Left</label>
+            <label className="text-xs text-[var(--ui-text-muted)]">{t.left}</label>
             <input
               type="text"
               value={config.left}
@@ -53,7 +55,7 @@ function PositionInputs({
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-[var(--ui-text-muted)]">Center</label>
+            <label className="text-xs text-[var(--ui-text-muted)]">{t.center}</label>
             <input
               type="text"
               value={config.center}
@@ -63,7 +65,7 @@ function PositionInputs({
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-[var(--ui-text-muted)]">Right</label>
+            <label className="text-xs text-[var(--ui-text-muted)]">{t.right}</label>
             <input
               type="text"
               value={config.right}
@@ -84,29 +86,30 @@ export function HeaderFooter({
   onHeaderChange,
   onFooterChange,
 }: HeaderFooterProps) {
+  const t = useAppStrings().print;
   return (
     <div className="flex flex-col gap-4">
       <PositionInputs
         config={header}
         onChange={onHeaderChange}
-        label="Header"
+        label={t.header}
       />
 
       <PositionInputs
         config={footer}
         onChange={onFooterChange}
-        label="Footer"
+        label={t.footer}
       />
 
       {/* Variables hint */}
       <div className="rounded bg-[var(--ui-bg-secondary)] p-2">
-        <p className="text-xs text-[var(--ui-text-muted)] mb-1">Available variables:</p>
+        <p className="text-xs text-[var(--ui-text-muted)] mb-1">{t.variables}</p>
         <div className="flex flex-wrap gap-1">
-          {VARIABLES.map(({ value, label }) => (
+          {VARIABLES.map(({ value, key }) => (
             <span
               key={value}
               className="inline-block rounded bg-[var(--ui-bg-hover)] px-1.5 py-0.5 text-xs font-mono"
-              title={label}
+              title={t[key]}
             >
               {value}
             </span>

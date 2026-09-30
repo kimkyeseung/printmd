@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { Folder, Document } from '@/stores/documentsStore';
+import { useAppStrings, format } from '@/lib/i18n/appStrings';
 
 interface FolderTreeProps {
   folders: Folder[];
@@ -79,6 +80,7 @@ export function FolderTree({
   showDocuments = false,
   currentDocumentId,
 }: FolderTreeProps) {
+  const text = useAppStrings().sidebar;
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
     new Set(['root'])
   );
@@ -170,7 +172,7 @@ export function FolderTree({
               e.stopPropagation();
               onDeleteDocument(doc.id);
             }}
-            aria-label={`Delete ${doc.name}`}
+            aria-label={format(text.deleteItem, { name: doc.name })}
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -314,7 +316,7 @@ export function FolderTree({
                     setCreatingInFolderId(folder.id);
                     setExpandedFolders((prev) => new Set(prev).add(folder.id));
                   }}
-                  aria-label={`Add subfolder in ${folder.name}`}
+                  aria-label={format(text.addSubfolder, { name: folder.name })}
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -329,7 +331,7 @@ export function FolderTree({
                     e.stopPropagation();
                     onDeleteFolder(folder.id);
                   }}
-                  aria-label={`Delete ${folder.name}`}
+                  aria-label={format(text.deleteItem, { name: folder.name })}
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -428,7 +430,7 @@ export function FolderTree({
           <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" />
           </svg>
-          Move to root
+          {text.moveToRoot}
         </div>
       )}
     </div>

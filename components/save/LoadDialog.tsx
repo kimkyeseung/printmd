@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { FolderTree } from './FolderTree';
 import { ConfirmDialog } from './ConfirmDialog';
 import { useDocumentsStore, type Document, type Folder } from '@/stores/documentsStore';
+import { useAppStrings, format } from '@/lib/i18n/appStrings';
 
 interface LoadDialogProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface LoadDialogProps {
 
 export function LoadDialog({ isOpen, onClose, onLoad }: LoadDialogProps) {
   const folders = useDocumentsStore((state) => state.folders);
+  const text = useAppStrings();
   const documents = useDocumentsStore((state) => state.documents);
   const deleteDocument = useDocumentsStore((state) => state.deleteDocument);
   const deleteFolder = useDocumentsStore((state) => state.deleteFolder);
@@ -104,12 +106,12 @@ export function LoadDialog({ isOpen, onClose, onLoad }: LoadDialogProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--ui-border)] px-4 py-3">
           <h2 id="load-dialog-title" className="font-medium">
-            Load Document
+            {text.loadDialog.title}
           </h2>
           <button
             onClick={onClose}
             className="rounded p-1 hover:bg-[var(--ui-bg-hover)]"
-            aria-label="Close"
+            aria-label={text.common.close}
           >
             <svg
               className="h-5 w-5"
@@ -145,8 +147,8 @@ export function LoadDialog({ isOpen, onClose, onLoad }: LoadDialogProps) {
                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              <p>No saved documents</p>
-              <p className="mt-1 text-xs">Save a document to see it here</p>
+              <p>{text.common.noSavedDocuments}</p>
+              <p className="mt-1 text-xs">{text.loadDialog.emptyHint}</p>
             </div>
           ) : (
             <div className="border border-[var(--ui-border)] rounded-md max-h-56 overflow-y-auto sm:max-h-72">
@@ -170,7 +172,7 @@ export function LoadDialog({ isOpen, onClose, onLoad }: LoadDialogProps) {
             onClick={onClose}
             className="rounded border border-[var(--ui-border)] px-4 py-2 text-sm hover:bg-[var(--ui-bg-hover)]"
           >
-            Cancel
+            {text.common.cancel}
           </button>
         </div>
       </div>
@@ -180,18 +182,18 @@ export function LoadDialog({ isOpen, onClose, onLoad }: LoadDialogProps) {
         isOpen={!!confirmDelete}
         title={
           confirmDelete?.type === 'document'
-            ? 'Delete Document'
-            : 'Delete Folder'
+            ? text.loadDialog.deleteDocument
+            : text.loadDialog.deleteFolder
         }
         message={
           confirmDelete?.type === 'document'
-            ? `Are you sure you want to delete "${confirmDelete?.name}"?`
+            ? format(text.loadDialog.confirmDeleteDocument, { name: confirmDelete.name })
             : confirmDelete?.hasContent
-              ? `Folder "${confirmDelete?.name}" contains documents or subfolders. Please remove them first.`
-              : `Are you sure you want to delete folder "${confirmDelete?.name}"?`
+              ? format(text.loadDialog.folderNotEmpty, { name: confirmDelete.name })
+              : format(text.loadDialog.confirmDeleteFolder, { name: confirmDelete?.name ?? '' })
         }
-        confirmLabel={confirmDelete?.hasContent ? 'OK' : 'Delete'}
-        cancelLabel={confirmDelete?.hasContent ? 'Cancel' : 'Cancel'}
+        confirmLabel={confirmDelete?.hasContent ? text.common.ok : text.common.delete}
+        cancelLabel={text.common.cancel}
         onConfirm={
           confirmDelete?.hasContent
             ? () => setConfirmDelete(null)

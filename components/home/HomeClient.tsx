@@ -13,6 +13,7 @@ import { useExtensionReceiver, useKeyboardShortcuts, useFullscreen, useEditorOrc
 import { buildDocumentShareUrl } from '@/lib/share/documentUrl';
 import { showToast } from '@/components/ui/Toast';
 import { DragDropOverlay } from './DragDropOverlay';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 import { CustomFontLoader } from '@/components/style/CustomFontLoader';
 import { DocumentSidebar } from '@/components/sidebar/DocumentSidebar';
 import '@/styles/editor.css';
@@ -104,6 +105,7 @@ export default function HomeClient() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isLoadDialogOpen, setIsLoadDialogOpen] = useState(false);
+  const text = useAppStrings();
 
   // Custom hooks
   useExtensionReceiver();
@@ -174,20 +176,20 @@ export default function HomeClient() {
 
     if ('error' in result) {
       if (result.error === 'empty') {
-        showToast('Nothing to share - document is empty.', 'info');
+        showToast(text.toast.nothingToShare, 'info');
       } else if (result.error === 'too_large') {
-        showToast('Document is too large to share via URL.', 'error');
+        showToast(text.toast.tooLargeToShare, 'error');
       }
       return;
     }
 
     try {
       await navigator.clipboard.writeText(result.url);
-      showToast('Share link copied to clipboard!', 'success');
+      showToast(text.toast.shareLinkCopied, 'success');
     } catch {
-      showToast('Failed to copy link to clipboard.', 'error');
+      showToast(text.toast.shareLinkFailed, 'error');
     }
-  }, [displayContent]);
+  }, [displayContent, text]);
 
   // Keyboard shortcuts
   const handleEscape = useCallback(() => {
@@ -256,7 +258,7 @@ export default function HomeClient() {
 
   return (
     <div className="flex h-screen max-h-screen flex-col overflow-hidden pb-[50px] md:pb-0">
-      <a href="#main-content" className="skip-link">본문으로 건너뛰기</a>
+      <a href="#main-content" className="skip-link">{text.shell.skipToContent}</a>
 
       <input
         ref={fileInputRef}
@@ -264,7 +266,7 @@ export default function HomeClient() {
         accept=".md,.markdown,.txt"
         className="hidden"
         onChange={handleFileChange}
-        aria-label="마크다운 파일 선택"
+        aria-label={text.shell.chooseFile}
       />
 
       <Header

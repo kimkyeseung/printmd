@@ -22,6 +22,7 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
   const t = useAppStrings();
   // The view is created once; the locale can't change without a remount.
   const placeholderRef = useRef(t.editor.placeholder);
+  const labelRef = useRef(t.editor.label);
 
   // Keep onChange ref updated
   useEffect(() => {
@@ -92,7 +93,7 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
         checkboxTransactionFilter,
         EditorView.lineWrapping,
         // The contenteditable is a textbox with no visible label.
-        EditorView.contentAttributes.of({ 'aria-label': 'Markdown editor' }),
+        EditorView.contentAttributes.of({ 'aria-label': labelRef.current }),
         placeholder(placeholderRef.current),
         EditorView.theme({
           '&': {

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useStyleStore } from '@/stores/styleStore';
 import { decodePresetFromUrl } from '@/lib/share/presetUrl';
 import { showToast } from '@/components/ui/Toast';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 
 /**
  * On mount, check for ?style= URL parameter.
@@ -14,6 +15,7 @@ export function useSharedPreset() {
   const updateListStyles = useStyleStore((s) => s.updateListStyles);
   const updateHeadingStyles = useStyleStore((s) => s.updateHeadingStyles);
   const updateElementStyle = useStyleStore((s) => s.updateElementStyle);
+  const text = useAppStrings();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -23,7 +25,7 @@ export function useSharedPreset() {
 
     const preset = decodePresetFromUrl(styleParam);
     if (!preset) {
-      showToast('Failed to load shared style.', 'error');
+      showToast(text.toast.sharedStyleFailed, 'error');
       return;
     }
 
@@ -47,10 +49,10 @@ export function useSharedPreset() {
       }
     }
 
-    showToast('Shared style applied!', 'success');
+    showToast(text.toast.sharedStyleApplied, 'success');
 
     // Clean URL without reload
     const cleanUrl = window.location.pathname;
     window.history.replaceState({}, '', cleanUrl);
-  }, [updateGlobalStyles, updateListStyles, updateHeadingStyles, updateElementStyle]);
+  }, [updateGlobalStyles, updateListStyles, updateHeadingStyles, updateElementStyle, text]);
 }

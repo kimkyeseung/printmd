@@ -4,6 +4,7 @@ import { memo, useState, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import type { ViewMode } from '@/stores/uiStore';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 
 /**
  * False while rendering on the server and during hydration, true afterwards.
@@ -83,6 +84,7 @@ export const Header = memo(function Header({
   const [showTheme, setShowTheme] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
   const isHydrated = useIsHydrated();
+  const t = useAppStrings().header;
 
   return (
     <header
@@ -92,7 +94,7 @@ export const Header = memo(function Header({
       {/* Logo */}
       <div className="flex min-w-0 items-center gap-1.5 sm:gap-4">
         <div className="flex items-center gap-1.5">
-          <Image src="/icon.svg" alt="printmd logo" width={24} height={24} className="rounded" />
+          <Image src="/icon.svg" alt={t.logoAlt} width={24} height={24} className="rounded" />
           <span className="hidden text-base font-semibold sm:inline sm:text-lg">printmd</span>
         </div>
 
@@ -100,7 +102,7 @@ export const Header = memo(function Header({
         <nav
           className="flex items-center rounded-md border border-[var(--ui-border)] p-0.5"
           role="tablist"
-          aria-label="View mode"
+          aria-label={t.viewMode}
         >
           <button
             onClick={() => onViewModeChange('editor')}
@@ -114,8 +116,8 @@ export const Header = memo(function Header({
             aria-selected={viewMode === 'editor'}
             aria-controls="view-panel"
           >
-            <span className="hidden sm:inline">Editor</span>
-            <span className="sm:hidden">Ed</span>
+            <span className="hidden sm:inline">{t.editor}</span>
+            <span className="sm:hidden">{t.editorShort}</span>
           </button>
           <button
             onClick={() => onViewModeChange('split')}
@@ -129,7 +131,7 @@ export const Header = memo(function Header({
             aria-selected={viewMode === 'split'}
             aria-controls="view-panel"
           >
-            Split
+            {t.split}
           </button>
           <button
             onClick={() => onViewModeChange('preview')}
@@ -143,8 +145,8 @@ export const Header = memo(function Header({
             aria-selected={viewMode === 'preview'}
             aria-controls="view-panel"
           >
-            <span className="hidden sm:inline">Preview</span>
-            <span className="sm:hidden">Pre</span>
+            <span className="hidden sm:inline">{t.preview}</span>
+            <span className="sm:hidden">{t.previewShort}</span>
           </button>
         </nav>
       </div>
@@ -157,7 +159,7 @@ export const Header = memo(function Header({
             onClick={() => setShowShortcuts(!showShortcuts)}
             onBlur={() => setTimeout(() => setShowShortcuts(false), 200)}
             className="rounded px-2 py-1.5 text-sm text-gray-500 hover:bg-[var(--ui-bg-hover)] hover:text-gray-700"
-            aria-label="Keyboard shortcuts"
+            aria-label={t.shortcuts}
             aria-expanded={showShortcuts}
             aria-haspopup="true"
           >
@@ -169,14 +171,14 @@ export const Header = memo(function Header({
               role="menu"
             >
               <div className="text-xs font-semibold text-[var(--ui-text-muted)] mb-2">
-                키보드 단축키
+                {t.shortcuts}
               </div>
               <div className="space-y-1.5 text-sm">
-                <ShortcutItem keys="⌘S" description="저장" />
-                <ShortcutItem keys="⌘P" description="인쇄" />
-                <ShortcutItem keys="⌘⇧S" description="스타일 패널" />
-                <ShortcutItem keys="F11" description="전체화면" />
-                <ShortcutItem keys="Esc" description="닫기" />
+                <ShortcutItem keys="⌘S" description={t.shortcutSave} />
+                <ShortcutItem keys="⌘P" description={t.shortcutPrint} />
+                <ShortcutItem keys="⌘⇧S" description={t.shortcutStyle} />
+                <ShortcutItem keys="F11" description={t.shortcutFullscreen} />
+                <ShortcutItem keys="Esc" description={t.shortcutClose} />
               </div>
             </div>
           )}
@@ -188,11 +190,11 @@ export const Header = memo(function Header({
             onClick={() => setShowOpen(!showOpen)}
             onBlur={() => setTimeout(() => setShowOpen(false), 200)}
             className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
-            aria-label="Open options"
+            aria-label={t.openOptions}
             aria-expanded={showOpen}
             aria-haspopup="true"
           >
-            <span className="hidden sm:inline">Open</span>
+            <span className="hidden sm:inline">{t.open}</span>
             <span className="sm:hidden">📂</span>
             <svg className="h-3 w-3 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -214,7 +216,7 @@ export const Header = memo(function Header({
                 <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
                 </svg>
-                From File...
+                {t.fromFile}
               </button>
               <button
                 onClick={() => {
@@ -227,7 +229,7 @@ export const Header = memo(function Header({
                 <svg className="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
-                From Saved...
+                {t.fromSaved}
               </button>
             </div>
           )}
@@ -238,11 +240,11 @@ export const Header = memo(function Header({
             onClick={() => setShowSave(!showSave)}
             onBlur={() => setTimeout(() => setShowSave(false), 200)}
             className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
-            aria-label="Save options"
+            aria-label={t.saveOptions}
             aria-expanded={showSave}
             aria-haspopup="true"
           >
-            <span className="hidden sm:inline">Save</span>
+            <span className="hidden sm:inline">{t.save}</span>
             <span className="sm:hidden">💾</span>
             <svg className="h-3 w-3 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -264,7 +266,7 @@ export const Header = memo(function Header({
                 <svg className="h-4 w-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                 </svg>
-                Save
+                {t.save}
                 {hasCurrentDocument && (
                   <span className="ml-auto text-xs text-[var(--ui-text-muted)]">⌘S</span>
                 )}
@@ -280,7 +282,7 @@ export const Header = memo(function Header({
                 <svg className="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Save As...
+                {t.saveAs}
                 {!hasCurrentDocument && (
                   <span className="ml-auto text-xs text-[var(--ui-text-muted)]">⌘S</span>
                 )}
@@ -295,11 +297,11 @@ export const Header = memo(function Header({
             onClick={() => setShowDownload(!showDownload)}
             onBlur={() => setTimeout(() => setShowDownload(false), 200)}
             className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
-            aria-label="Download options"
+            aria-label={t.downloadOptions}
             aria-expanded={showDownload}
             aria-haspopup="true"
           >
-            <span className="hidden sm:inline">Download</span>
+            <span className="hidden sm:inline">{t.download}</span>
             <span className="sm:hidden">⬇️</span>
             <svg className="h-3 w-3 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -344,13 +346,13 @@ export const Header = memo(function Header({
         <button
           onClick={onShareClick}
           className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
-          aria-label="Share document"
-          title="Share document URL"
+          aria-label={t.shareDocument}
+          title={t.shareDocument}
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
           </svg>
-          <span className="hidden sm:inline">Share</span>
+          <span className="hidden sm:inline">{t.share}</span>
         </button>
 
         <div className="mx-0.5 h-5 w-px bg-[var(--ui-border)] sm:mx-1" aria-hidden="true" />
@@ -361,7 +363,7 @@ export const Header = memo(function Header({
             onClick={() => setShowTheme(!showTheme)}
             onBlur={() => setTimeout(() => setShowTheme(false), 200)}
             className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
-            aria-label="Theme"
+            aria-label={t.theme}
             aria-expanded={showTheme}
             aria-haspopup="true"
           >
@@ -388,7 +390,7 @@ export const Header = memo(function Header({
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
-                Light
+                {t.themeLight}
               </button>
               <button
                 onClick={() => {
@@ -403,7 +405,7 @@ export const Header = memo(function Header({
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
-                Dark
+                {t.themeDark}
               </button>
               <button
                 onClick={() => {
@@ -418,7 +420,7 @@ export const Header = memo(function Header({
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                System
+                {t.themeSystem}
               </button>
             </div>
           )}
@@ -429,14 +431,14 @@ export const Header = memo(function Header({
           <button
             onClick={onSlideMode}
             className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
-            aria-label="Start presentation mode"
-            title="Presentation mode"
+            aria-label={t.presentationMode}
+            title={t.presentationMode}
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5l7 5-7 5V5z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v14H3z" />
             </svg>
-            <span className="hidden sm:inline">Slides</span>
+            <span className="hidden sm:inline">{t.slides}</span>
           </button>
         )}
 
@@ -444,20 +446,20 @@ export const Header = memo(function Header({
         <button
           onClick={onStylePanelToggle}
           className="rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 px-2 py-1.5 text-xs font-medium text-white shadow-sm hover:from-purple-600 hover:to-indigo-600 sm:px-4 sm:py-2 sm:text-sm"
-          aria-label="Open style settings (Ctrl+Shift+S)"
-          title="Style settings (⌘⇧S)"
+          aria-label={t.styleSettings}
+          title={`${t.styleSettings} (⌘⇧S)`}
         >
           <span className="sm:hidden">🎨</span>
-          <span className="hidden sm:inline">🎨 Style</span>
+          <span className="hidden sm:inline">🎨 {t.style}</span>
         </button>
         <button
           onClick={onPrintClick}
           className="rounded-lg bg-[var(--foreground)] px-2 py-1.5 text-xs font-medium text-[var(--background)] hover:opacity-90 sm:px-4 sm:py-2 sm:text-sm"
-          aria-label="Print or export to PDF (Ctrl+P)"
-          title="Print / PDF (⌘P)"
+          aria-label={t.printOrPdf}
+          title={`${t.printOrPdf} (⌘P)`}
         >
           <span className="sm:hidden">🖨️</span>
-          <span className="hidden sm:inline">🖨️ Print</span>
+          <span className="hidden sm:inline">🖨️ {t.print}</span>
         </button>
       </div>
     </header>

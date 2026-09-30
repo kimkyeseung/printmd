@@ -1,6 +1,7 @@
 'use client';
 
 import type { PrintSettings as PrintSettingsType, PaperSize, Orientation } from '@/types/print';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 
 interface PrintSettingsProps {
   settings: PrintSettingsType;
@@ -13,17 +14,15 @@ const PAPER_SIZES: { value: PaperSize; label: string }[] = [
   { value: 'A3', label: 'A3 (297 × 420 mm)' },
 ];
 
-const ORIENTATIONS: { value: Orientation; label: string }[] = [
-  { value: 'portrait', label: 'Portrait' },
-  { value: 'landscape', label: 'Landscape' },
-];
+const ORIENTATIONS: Orientation[] = ['portrait', 'landscape'];
 
 export function PrintSettings({ settings, onChange }: PrintSettingsProps) {
+  const t = useAppStrings().print;
   return (
     <div className="flex flex-col gap-4">
       {/* Paper Size */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Paper Size</label>
+        <label className="text-sm font-medium">{t.paperSize}</label>
         <select
           value={settings.paperSize}
           onChange={(e) => onChange({ paperSize: e.target.value as PaperSize })}
@@ -37,9 +36,9 @@ export function PrintSettings({ settings, onChange }: PrintSettingsProps) {
 
       {/* Orientation */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Orientation</label>
+        <label className="text-sm font-medium">{t.orientation}</label>
         <div className="flex gap-2">
-          {ORIENTATIONS.map(({ value, label }) => (
+          {ORIENTATIONS.map((value) => (
             <button
               key={value}
               onClick={() => onChange({ orientation: value })}
@@ -49,7 +48,7 @@ export function PrintSettings({ settings, onChange }: PrintSettingsProps) {
                   : 'border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)]'
               }`}
             >
-              {label}
+              {t[value]}
             </button>
           ))}
         </div>
@@ -57,10 +56,10 @@ export function PrintSettings({ settings, onChange }: PrintSettingsProps) {
 
       {/* Margins */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Margins (mm)</label>
+        <label className="text-sm font-medium">{t.margins}</label>
         <div className="grid grid-cols-2 gap-2">
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-[var(--ui-text-muted)]">Top</label>
+            <label className="text-xs text-[var(--ui-text-muted)]">{t.top}</label>
             <input
               type="number"
               value={settings.margins.top}
@@ -73,7 +72,7 @@ export function PrintSettings({ settings, onChange }: PrintSettingsProps) {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-[var(--ui-text-muted)]">Bottom</label>
+            <label className="text-xs text-[var(--ui-text-muted)]">{t.bottom}</label>
             <input
               type="number"
               value={settings.margins.bottom}
@@ -86,7 +85,7 @@ export function PrintSettings({ settings, onChange }: PrintSettingsProps) {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-[var(--ui-text-muted)]">Left</label>
+            <label className="text-xs text-[var(--ui-text-muted)]">{t.left}</label>
             <input
               type="number"
               value={settings.margins.left}
@@ -99,7 +98,7 @@ export function PrintSettings({ settings, onChange }: PrintSettingsProps) {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-[var(--ui-text-muted)]">Right</label>
+            <label className="text-xs text-[var(--ui-text-muted)]">{t.right}</label>
             <input
               type="number"
               value={settings.margins.right}
@@ -122,7 +121,7 @@ export function PrintSettings({ settings, onChange }: PrintSettingsProps) {
           onChange={(e) => onChange({ includeBackground: e.target.checked })}
           className="rounded border-[var(--ui-border)]"
         />
-        <span className="text-sm">Include background colors</span>
+        <span className="text-sm">{t.includeBackground}</span>
       </label>
     </div>
   );

@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import { Preview } from './Preview';
 import type { GlobalStyles } from '@/types/style';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 
 interface PreviewPanelProps {
   markdown: string;
@@ -11,10 +12,11 @@ interface PreviewPanelProps {
 }
 
 export const PreviewPanel = memo(function PreviewPanel({ markdown, styles, sourceUrl }: PreviewPanelProps) {
+  const t = useAppStrings().previewPanel;
   return (
     <div className="flex h-full w-full flex-col">
       <div className="flex h-10 items-center justify-between border-b border-[var(--ui-border)] px-3">
-        <span className="text-sm text-[var(--ui-text-muted)]">Preview</span>
+        <span className="text-sm text-[var(--ui-text-muted)]">{t.title}</span>
         {sourceUrl && (
           <a
             href={sourceUrl}
@@ -22,7 +24,7 @@ export const PreviewPanel = memo(function PreviewPanel({ markdown, styles, sourc
             rel="noopener noreferrer"
             className="text-xs text-[var(--printmd-link-color)] hover:underline"
           >
-            Source
+            {t.source}
           </a>
         )}
       </div>
