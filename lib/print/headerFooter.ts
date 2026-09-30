@@ -19,12 +19,12 @@ export function resolveTemplate(
 }
 
 /** Extract the document title from the first H1 line in markdown content. */
-export function extractTitle(markdown: string): string {
+export function extractTitle(markdown: string, fallback = 'Untitled'): string {
   return (
     markdown
       .split('\n')
       .find((l) => l.startsWith('# '))
-      ?.replace(/^#\s+/, '') || 'Untitled'
+      ?.replace(/^#\s+/, '') || fallback
   );
 }
 

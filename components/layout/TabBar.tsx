@@ -4,6 +4,7 @@ import { useCallback, useRef, useEffect } from 'react';
 import { useTabsStore } from '@/stores';
 import type { Tab } from '@/types/editor';
 import { useAppStrings, format } from '@/lib/i18n/appStrings';
+import { tabDisplayTitle } from '@/lib/editor/tabTitle';
 
 function CloseIcon({ className }: { className?: string }) {
   return (
@@ -26,6 +27,7 @@ function TabItem({
 }) {
   const showDirtyDot = tab.isDirty && tab.documentId !== null;
   const t = useAppStrings().tabs;
+  const title = tabDisplayTitle(tab) ?? t.untitled;
 
   const handleClose = useCallback(
     (e: React.MouseEvent) => {
@@ -64,13 +66,13 @@ function TabItem({
       )}
 
       {/* Title */}
-      <span className="max-w-[120px] truncate">{tab.title}</span>
+      <span className="max-w-[120px] truncate" title={title}>{title}</span>
 
       {/* Close button */}
       <button
         onClick={handleClose}
         className="ml-0.5 rounded p-0.5 opacity-0 group-hover:opacity-100 hover:bg-[var(--ui-bg-hover)] transition-opacity"
-        aria-label={format(t.closeTab, { title: tab.title })}
+        aria-label={format(t.closeTab, { title })}
       >
         <CloseIcon className="h-3 w-3" />
       </button>

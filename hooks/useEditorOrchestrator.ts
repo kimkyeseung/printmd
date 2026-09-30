@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAppStrings } from '@/lib/i18n/appStrings';
+import { tabDisplayTitle } from '@/lib/editor/tabTitle';
 import { useEditorStore, useDocumentsStore, useTabsStore } from '@/stores';
 
 const DEFAULT_CONTENT: Record<string, string> = {
@@ -380,10 +381,10 @@ export function useEditorOrchestrator() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = (activeTab?.title || 'document') + '.md';
+    a.download = ((activeTab && tabDisplayTitle(activeTab)) || 'document') + '.md';
     a.click();
     URL.revokeObjectURL(url);
-  }, [displayContent, activeTab?.title]);
+  }, [displayContent, activeTab]);
 
   const handleNewTab = useCallback(() => {
     addTab();

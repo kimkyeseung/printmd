@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Tab, TabsState, TabsStore } from '@/types/editor';
 import { createDebouncedStorage } from '@/lib/storage/debouncedStorage';
+import { DEFAULT_TAB_TITLE } from '@/lib/editor/tabTitle';
 
 type PersistedTab = Pick<Tab, 'id' | 'documentId' | 'title' | 'content' | 'isDirty'>;
 
@@ -48,7 +49,7 @@ function createTab(options?: { documentId?: string | null; content?: string; tit
   return {
     id: crypto.randomUUID(),
     documentId: options?.documentId ?? null,
-    title: options?.title ?? 'Untitled',
+    title: options?.title ?? DEFAULT_TAB_TITLE,
     content: options?.content ?? '',
     lastSavedContent: options?.content ?? '',
     isDirty: false,

@@ -67,6 +67,7 @@ const en = {
     printOrPdf: 'Print or save as PDF',
   },
   tabs: {
+    untitled: 'Untitled',
     documents: 'Documents',
     newTab: 'New tab',
     closeTab: 'Close {{title}}',
@@ -236,6 +237,7 @@ const ko: AppStrings = {
     printOrPdf: '인쇄 또는 PDF로 저장',
   },
   tabs: {
+    untitled: '제목 없음',
     documents: '문서',
     newTab: '새 탭',
     closeTab: '{{title}} 닫기',
