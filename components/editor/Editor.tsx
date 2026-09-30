@@ -3,11 +3,12 @@
 import { memo, useEffect, useRef, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { EditorState, type Transaction } from '@codemirror/state';
 import { indentUnit } from '@codemirror/language';
-import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, highlightActiveLine } from '@codemirror/view';
+import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, highlightActiveLine, placeholder } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 import { markdown } from '@codemirror/lang-markdown';
 import { syntaxHighlighting, defaultHighlightStyle, indentOnInput, bracketMatching } from '@codemirror/language';
 import type { EditorProps } from '@/types/editor';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 
 export interface EditorRef {
   insertText: (before: string, after?: string) => void;
@@ -18,6 +19,9 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
   const lastExternalValueRef = useRef(value);
+  const t = useAppStrings();
+  // The view is created once; the locale can't change without a remount.
+  const placeholderRef = useRef(t.editor.placeholder);
 
   // Keep onChange ref updated
   useEffect(() => {
@@ -89,6 +93,7 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
         EditorView.lineWrapping,
         // The contenteditable is a textbox with no visible label.
         EditorView.contentAttributes.of({ 'aria-label': 'Markdown editor' }),
+        placeholder(placeholderRef.current),
         EditorView.theme({
           '&': {
             height: '100%',
@@ -114,6 +119,9 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
           },
           '.cm-activeLine': {
             backgroundColor: 'var(--ui-bg-hover)',
+          },
+          '.cm-placeholder': {
+            color: 'var(--ui-text-muted)',
           },
           '&.cm-focused .cm-cursor': {
             borderLeftColor: 'var(--foreground)',
