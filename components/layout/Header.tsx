@@ -110,8 +110,9 @@ export const Header = memo(function Header({
                 : 'hover:bg-[var(--ui-bg-hover)]'
             }`}
             role="tab"
+            id="view-tab-editor"
             aria-selected={viewMode === 'editor'}
-            aria-controls="editor-panel"
+            aria-controls="view-panel"
           >
             <span className="hidden sm:inline">Editor</span>
             <span className="sm:hidden">Ed</span>
@@ -124,8 +125,9 @@ export const Header = memo(function Header({
                 : 'hover:bg-[var(--ui-bg-hover)]'
             }`}
             role="tab"
+            id="view-tab-split"
             aria-selected={viewMode === 'split'}
-            aria-controls="split-panel"
+            aria-controls="view-panel"
           >
             Split
           </button>
@@ -137,8 +139,9 @@ export const Header = memo(function Header({
                 : 'hover:bg-[var(--ui-bg-hover)]'
             }`}
             role="tab"
+            id="view-tab-preview"
             aria-selected={viewMode === 'preview'}
-            aria-controls="preview-panel"
+            aria-controls="view-panel"
           >
             <span className="hidden sm:inline">Preview</span>
             <span className="sm:hidden">Pre</span>

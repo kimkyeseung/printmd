@@ -79,103 +79,105 @@ export default async function MarkdownPrintPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <div className="h-screen overflow-y-auto bg-gradient-to-b from-green-50 to-white">
-        {/* Hero Section */}
-        <header className="px-4 py-16 text-center sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-            {t.hero.title1}
-            <br />
-            <span className="text-green-600">{t.hero.title2}</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600">
-            {t.hero.description}
-          </p>
-          <div className="mt-10">
+        <main>
+          {/* Hero Section */}
+          <header className="px-4 py-16 text-center sm:px-6 lg:px-8">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+              {t.hero.title1}
+              <br />
+              <span className="text-green-600">{t.hero.title2}</span>
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600">
+              {t.hero.description}
+            </p>
+            <div className="mt-10">
+              <Link
+                href={`/${locale}`}
+                className="rounded-lg bg-green-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition hover:bg-green-700"
+              >
+                {t.hero.cta}
+              </Link>
+            </div>
+          </header>
+
+          {/* Ad Banner */}
+          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+            <AdBanner
+              className="h-[90px] w-full rounded-lg overflow-hidden"
+              slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER}
+            />
+          </div>
+
+          {/* Steps */}
+          <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+            <h2 className="text-center text-3xl font-bold text-gray-900">
+              {t.steps.title}
+            </h2>
+            <div className="mt-12 grid gap-8 sm:grid-cols-3">
+              <Step number={1} title={t.steps.step1} description={t.steps.step1Desc} />
+              <Step number={2} title={t.steps.step2} description={t.steps.step2Desc} />
+              <Step number={3} title={t.steps.step3} description={t.steps.step3Desc} />
+            </div>
+          </section>
+
+          {/* Why */}
+          <section className="bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl">
+              <h2 className="text-center text-3xl font-bold text-gray-900">
+                {t.why.title}
+              </h2>
+              <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <Feature icon="🎨" title={t.why.syntax} description={t.why.syntaxDesc} />
+                <Feature icon="📊" title={t.why.table} description={t.why.tableDesc} />
+                <Feature icon="🖼️" title={t.why.image} description={t.why.imageDesc} />
+                <Feature icon="📄" title={t.why.pageBreak} description={t.why.pageBreakDesc} />
+                <Feature icon="🔢" title={t.why.pageNumber} description={t.why.pageNumberDesc} />
+                <Feature icon="🖨️" title={t.why.optimized} description={t.why.optimizedDesc} />
+              </div>
+            </div>
+          </section>
+
+          {/* Use Cases */}
+          <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
+            <h2 className="text-center text-3xl font-bold text-gray-900">
+              {t.useCases.title}
+            </h2>
+            <div className="mt-12 space-y-6">
+              <UseCase emoji="👨‍💻" title={t.useCases.developer} description={t.useCases.developerDesc} />
+              <UseCase emoji="📚" title={t.useCases.student} description={t.useCases.studentDesc} />
+              <UseCase emoji="✍️" title={t.useCases.writer} description={t.useCases.writerDesc} />
+              <UseCase emoji="👔" title={t.useCases.worker} description={t.useCases.workerDesc} />
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section className="bg-white px-4 py-16 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-3xl">
+              <h2 className="text-center text-3xl font-bold text-gray-900">
+                {t.faq.title}
+              </h2>
+              <div className="mt-12 space-y-4">
+                <FaqItem question={t.faq.q1} answer={t.faq.a1} />
+                <FaqItem question={t.faq.q2} answer={t.faq.a2} />
+                <FaqItem question={t.faq.q3} answer={t.faq.a3} />
+                <FaqItem question={t.faq.q4} answer={t.faq.a4} />
+                <FaqItem question={t.faq.q5} answer={t.faq.a5} />
+              </div>
+            </div>
+          </section>
+
+          {/* CTA */}
+          <section className="px-4 py-16 text-center sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-gray-900">{t.cta.title}</h2>
+            <p className="mt-4 text-lg text-gray-600">{t.cta.subtitle}</p>
             <Link
               href={`/${locale}`}
-              className="rounded-lg bg-green-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition hover:bg-green-700"
+              className="mt-8 inline-block rounded-lg bg-green-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition hover:bg-green-700"
             >
-              {t.hero.cta}
+              {dict.common.tryNow}
             </Link>
-          </div>
-        </header>
-
-        {/* Ad Banner */}
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <AdBanner
-            className="h-[90px] w-full rounded-lg overflow-hidden"
-            slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER}
-          />
-        </div>
-
-        {/* Steps */}
-        <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-          <h2 className="text-center text-3xl font-bold text-gray-900">
-            {t.steps.title}
-          </h2>
-          <div className="mt-12 grid gap-8 sm:grid-cols-3">
-            <Step number={1} title={t.steps.step1} description={t.steps.step1Desc} />
-            <Step number={2} title={t.steps.step2} description={t.steps.step2Desc} />
-            <Step number={3} title={t.steps.step3} description={t.steps.step3Desc} />
-          </div>
-        </section>
-
-        {/* Why */}
-        <section className="bg-gray-50 px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <h2 className="text-center text-3xl font-bold text-gray-900">
-              {t.why.title}
-            </h2>
-            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <Feature icon="🎨" title={t.why.syntax} description={t.why.syntaxDesc} />
-              <Feature icon="📊" title={t.why.table} description={t.why.tableDesc} />
-              <Feature icon="🖼️" title={t.why.image} description={t.why.imageDesc} />
-              <Feature icon="📄" title={t.why.pageBreak} description={t.why.pageBreakDesc} />
-              <Feature icon="🔢" title={t.why.pageNumber} description={t.why.pageNumberDesc} />
-              <Feature icon="🖨️" title={t.why.optimized} description={t.why.optimizedDesc} />
-            </div>
-          </div>
-        </section>
-
-        {/* Use Cases */}
-        <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-          <h2 className="text-center text-3xl font-bold text-gray-900">
-            {t.useCases.title}
-          </h2>
-          <div className="mt-12 space-y-6">
-            <UseCase emoji="👨‍💻" title={t.useCases.developer} description={t.useCases.developerDesc} />
-            <UseCase emoji="📚" title={t.useCases.student} description={t.useCases.studentDesc} />
-            <UseCase emoji="✍️" title={t.useCases.writer} description={t.useCases.writerDesc} />
-            <UseCase emoji="👔" title={t.useCases.worker} description={t.useCases.workerDesc} />
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section className="bg-white px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-center text-3xl font-bold text-gray-900">
-              {t.faq.title}
-            </h2>
-            <div className="mt-12 space-y-4">
-              <FaqItem question={t.faq.q1} answer={t.faq.a1} />
-              <FaqItem question={t.faq.q2} answer={t.faq.a2} />
-              <FaqItem question={t.faq.q3} answer={t.faq.a3} />
-              <FaqItem question={t.faq.q4} answer={t.faq.a4} />
-              <FaqItem question={t.faq.q5} answer={t.faq.a5} />
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="px-4 py-16 text-center sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900">{t.cta.title}</h2>
-          <p className="mt-4 text-lg text-gray-600">{t.cta.subtitle}</p>
-          <Link
-            href={`/${locale}`}
-            className="mt-8 inline-block rounded-lg bg-green-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition hover:bg-green-700"
-          >
-            {dict.common.tryNow}
-          </Link>
-        </section>
+          </section>
+        </main>
         <SiteFooter locale={locale} dict={dict.footer} />
       </div>
     </>

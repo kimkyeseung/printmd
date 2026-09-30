@@ -87,6 +87,8 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
         updateListener,
         checkboxTransactionFilter,
         EditorView.lineWrapping,
+        // The contenteditable is a textbox with no visible label.
+        EditorView.contentAttributes.of({ 'aria-label': 'Markdown editor' }),
         EditorView.theme({
           '&': {
             height: '100%',

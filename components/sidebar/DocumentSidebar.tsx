@@ -186,14 +186,16 @@ export function DocumentSidebar() {
 
   const isEmpty = documents.length === 0 && folders.length === 0;
 
-  // Collapsed: protruding hamburger tab
+  // Collapsed: narrow rail. It takes up its own width so the button never
+  // overlaps the editor toolbar next to it.
   if (!isSidebarOpen) {
     return (
-      <div className="relative hidden md:block h-full shrink-0 w-0">
+      <div className="hidden md:flex h-full w-9 shrink-0 flex-col items-center border-r border-[var(--ui-border)] bg-[var(--background)] pt-1">
         <button
           onClick={toggleSidebar}
-          className="absolute left-0 top-3 z-10 flex h-8 w-7 items-center justify-center rounded-r-lg border border-l-0 border-[var(--ui-border)] bg-[var(--background)] shadow-sm hover:w-9 hover:bg-[var(--ui-bg-hover)] hover:shadow-md transition-all duration-150"
+          className="flex h-8 w-8 items-center justify-center rounded hover:bg-[var(--ui-bg-hover)]"
           title="Open sidebar"
+          aria-label="Open sidebar"
         >
           <HamburgerIcon className="h-4 w-4 text-[var(--ui-text-muted)]" />
         </button>

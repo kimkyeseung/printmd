@@ -118,18 +118,20 @@ export function TabBar() {
       {/* Scrollable tab list + new tab button */}
       <div
         ref={scrollRef}
-        role="tablist"
         className="flex flex-1 min-w-0 overflow-x-auto scrollbar-none"
       >
-        {tabs.map((tab) => (
-          <TabItem
-            key={tab.id}
-            tab={tab}
-            isActive={tab.id === activeTabId}
-            onSelect={() => setActiveTab(tab.id)}
-            onClose={() => handleClose(tab)}
-          />
-        ))}
+        {/* Only tabs may be children of a tablist, so the new-tab button sits outside it. */}
+        <div role="tablist" aria-label="Documents" className="flex">
+          {tabs.map((tab) => (
+            <TabItem
+              key={tab.id}
+              tab={tab}
+              isActive={tab.id === activeTabId}
+              onSelect={() => setActiveTab(tab.id)}
+              onClose={() => handleClose(tab)}
+            />
+          ))}
+        </div>
 
         {/* New tab button — right after the last tab */}
         <button

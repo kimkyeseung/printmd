@@ -298,7 +298,15 @@ export default function HomeClient() {
       <div className="flex flex-1 min-h-0">
         <DocumentSidebar />
         <main id="main-content" className="relative flex-1 overflow-hidden" role="main">
-          {renderedContent}
+          {/* Target of the Editor/Split/Preview tabs in Header. */}
+          <div
+            id="view-panel"
+            role="tabpanel"
+            aria-labelledby={`view-tab-${viewMode}`}
+            className="h-full"
+          >
+            {renderedContent}
+          </div>
         </main>
         <aside className="hidden xl:flex flex-col w-[160px] shrink-0 border-l border-[var(--ui-border)]">
           <div className="sticky top-0 flex flex-col items-center">

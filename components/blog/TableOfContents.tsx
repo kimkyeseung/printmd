@@ -15,8 +15,9 @@ export function TableOfContents({ headings, title = 'Table of Contents' }: Table
   if (headings.length === 0) return null;
 
   return (
-    <nav className="border border-gray-200 rounded-lg p-4 mb-8">
-      <h3 className="text-sm font-semibold text-gray-900 mb-3">{title}</h3>
+    <nav className="border border-gray-200 rounded-lg p-4 mb-8" aria-labelledby="toc-title">
+      {/* h2: it sits directly under the post's h1, before the body's own h2s. */}
+      <h2 id="toc-title" className="text-sm font-semibold text-gray-900 mb-3">{title}</h2>
       <ul className="space-y-1.5 text-sm">
         {headings.map((heading) => (
           <li
