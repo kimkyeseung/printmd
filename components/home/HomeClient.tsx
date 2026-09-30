@@ -79,8 +79,26 @@ function StylePanelResizer({
   );
 }
 
-const StylePanel = dynamic(() => import('@/components/style/StylePanel'), { ssr: false });
-const PrintPreview = dynamic(() => import('@/components/print/PrintPreview'), { ssr: false });
+const loadStylePanel = () => import('@/components/style/StylePanel');
+const loadPrintPreview = () => import('@/components/print/PrintPreview');
+
+/** Stand-in while the style panel chunk loads, so the column isn't blank. */
+function StylePanelSkeleton() {
+  return (
+    <div className="flex h-full w-full flex-col md:w-[360px]" aria-busy="true">
+      <div className="h-[60px] border-b border-[var(--ui-border)]" />
+      <div className="h-12 border-b border-[var(--ui-border)]" />
+      <div className="space-y-3 p-4">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-9 animate-pulse rounded bg-[var(--ui-bg-hover)]" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const StylePanel = dynamic(loadStylePanel, { ssr: false, loading: StylePanelSkeleton });
+const PrintPreview = dynamic(loadPrintPreview, { ssr: false });
 const SaveDialog = dynamic(() => import('@/components/save/SaveDialog'), { ssr: false });
 const LoadDialog = dynamic(() => import('@/components/save/LoadDialog'), { ssr: false });
 const AdKakaoBanner = dynamic(
@@ -137,6 +155,9 @@ export default function HomeClient() {
   const viewMode = useUIStore((state) => state.viewMode);
   const setViewMode = useUIStore((state) => state.setViewMode);
   const isStylePanelOpen = useUIStore((state) => state.isStylePanelOpen);
+  // The style panel always pairs with the preview, whatever mode was active
+  // before it opened, so that's the tab the header should show as selected.
+  const shownViewMode = isStylePanelOpen ? 'preview' : viewMode;
   const toggleStylePanel = useUIStore((state) => state.toggleStylePanel);
   const closeStylePanel = useUIStore((state) => state.closeStylePanel);
   const editorWidth = useUIStore((state) => state.editorWidth);
@@ -161,6 +182,21 @@ export default function HomeClient() {
     mql.addEventListener('change', handler);
     return () => mql.removeEventListener('change', handler);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fetch the style panel and print preview once the page is idle, so opening
+  // them later doesn't wait on the network.
+  useEffect(() => {
+    const preload = () => {
+      void loadStylePanel();
+      void loadPrintPreview();
+    };
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(preload, { timeout: 5000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(preload, 2000);
+    return () => clearTimeout(timer);
   }, []);
 
   // Action handlers
@@ -276,7 +312,7 @@ export default function HomeClient() {
       />
 
       <Header
-        viewMode={viewMode}
+        viewMode={shownViewMode}
         onViewModeChange={(mode) => {
           if (mode !== 'preview' && isStylePanelOpen) closeStylePanel();
           setViewMode(mode);
@@ -316,7 +352,7 @@ export default function HomeClient() {
           <div
             id="view-panel"
             role="tabpanel"
-            aria-labelledby={`view-tab-${viewMode}`}
+            aria-labelledby={`view-tab-${shownViewMode}`}
             className="h-full"
           >
             {renderedContent}
