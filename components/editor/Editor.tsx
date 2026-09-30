@@ -5,8 +5,9 @@ import { EditorState, type Transaction } from '@codemirror/state';
 import { indentUnit } from '@codemirror/language';
 import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, highlightActiveLine, placeholder } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
-import { markdown } from '@codemirror/lang-markdown';
-import { syntaxHighlighting, defaultHighlightStyle, indentOnInput, bracketMatching } from '@codemirror/language';
+import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
+import { syntaxHighlighting, indentOnInput, bracketMatching } from '@codemirror/language';
+import { markdownHighlightStyle } from './markdownHighlight';
 import type { EditorProps } from '@/types/editor';
 import { useAppStrings } from '@/lib/i18n/appStrings';
 
@@ -82,8 +83,9 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
         indentOnInput(),
         bracketMatching(),
         highlightActiveLine(),
-        syntaxHighlighting(defaultHighlightStyle),
-        markdown(),
+        syntaxHighlighting(markdownHighlightStyle),
+        // GFM, like the preview: strikethrough, tables, task lists.
+        markdown({ base: markdownLanguage }),
         keymap.of([
           ...defaultKeymap,
           ...historyKeymap,

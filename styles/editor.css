@@ -7,69 +7,23 @@
   outline: none;
 }
 
-/* Markdown syntax highlighting */
-.cm-header-1 {
-  font-size: 1.5em;
-  font-weight: 700;
+/*
+ * Markdown highlighting colors, used by components/editor/markdownHighlight.ts.
+ * Each is at least 4.5:1 against its theme's background and active-line color.
+ */
+:root {
+  --cm-heading: var(--foreground);
+  --cm-muted: #636b76;
+  --cm-link: #1d4ed8;
+  --cm-code: #9a3412;
+  --cm-label: #6d28d9;
 }
 
-.cm-header-2 {
-  font-size: 1.3em;
-  font-weight: 600;
-}
-
-.cm-header-3 {
-  font-size: 1.1em;
-  font-weight: 600;
-}
-
-.cm-header-4,
-.cm-header-5,
-.cm-header-6 {
-  font-weight: 600;
-}
-
-.cm-strong {
-  font-weight: 700;
-}
-
-.cm-em {
-  font-style: italic;
-}
-
-.cm-strikethrough {
-  text-decoration: line-through;
-}
-
-.cm-link {
-  color: var(--printmd-link-color);
-  text-decoration: underline;
-}
-
-.cm-url {
-  color: var(--ui-text-muted);
-}
-
-.cm-formatting {
-  color: var(--ui-text-muted);
-}
-
-.cm-quote {
-  color: var(--ui-text-muted);
-  font-style: italic;
-}
-
-.cm-hr {
-  color: var(--ui-border);
-}
-
-/* Code */
-.cm-monospace {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-}
-
-.cm-fenced-code {
-  background-color: var(--printmd-code-bg);
+.dark {
+  --cm-muted: #9ca3af;
+  --cm-link: #93c5fd;
+  --cm-code: #fdba74;
+  --cm-label: #c4b5fd;
 }
 
 /* Selection */
