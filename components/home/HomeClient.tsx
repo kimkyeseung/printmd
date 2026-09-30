@@ -299,7 +299,7 @@ export default function HomeClient() {
   }, [isStylePanelOpen, viewMode, displayContent, handleContentChange, previewElement, editorWidth, setEditorWidth, stylePanelWidth, setStylePanelWidth, closeStylePanel]);
 
   return (
-    <div className={`flex h-screen max-h-screen flex-col overflow-hidden md:pb-0 ${unfilledAds.mobile ? '' : 'pb-[50px]'}`}>
+    <div className={`flex h-dvh max-h-dvh flex-col overflow-hidden md:pb-0 ${unfilledAds.mobile ? '' : 'pb-[50px]'}`}>
       <a href="#main-content" className="skip-link">{text.shell.skipToContent}</a>
 
       <input

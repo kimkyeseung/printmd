@@ -1,10 +1,8 @@
 import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/metadata';
-import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import HomeClient from '@/components/home/HomeClient';
-import { SiteFooter } from '@/components/layout';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -78,91 +76,21 @@ export default async function Home({
   const seo = dict.home.seo;
 
   return (
-    // `html, body` are `overflow: hidden` globally, so this container owns the
-    // page scroll — without it the SEO section and footer below the editor are
-    // in the DOM but unreachable.
-    <div className="flex h-screen flex-col overflow-y-auto">
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-
-      {/* SSR SEO content — first in DOM for crawlers, visually after editor */}
-      <section className="order-2 mx-auto max-w-4xl px-6 py-16">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          {seo.heading}
-        </h1>
-        <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-          {seo.description}
-        </p>
-
-        {/* Features */}
-        <h2 className="mt-16 text-2xl font-semibold">{seo.featuresTitle}</h2>
-        <dl className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {([1, 2, 3, 4, 5, 6] as const).map((n) => (
-            <div key={n}>
-              <dt className="font-medium">
-                {seo[`feature${n}` as keyof typeof seo]}
-              </dt>
-              <dd className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                {seo[`feature${n}Desc` as keyof typeof seo]}
-              </dd>
-            </div>
-          ))}
-        </dl>
-
-        {/* How to */}
-        <h2 className="mt-16 text-2xl font-semibold">{seo.howToTitle}</h2>
-        <ol className="mt-6 space-y-6">
-          {([1, 2, 3] as const).map((n) => (
-            <li key={n}>
-              <h3 className="font-medium">
-                {seo[`howToStep${n}Title` as keyof typeof seo]}
-              </h3>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                {seo[`howToStep${n}Desc` as keyof typeof seo]}
-              </p>
-            </li>
-          ))}
-        </ol>
-
-        {/* FAQ */}
-        <h2 className="mt-16 text-2xl font-semibold">{seo.faqTitle}</h2>
-        <dl className="mt-6 space-y-6">
-          {([1, 2, 3, 4, 5, 6] as const).map((n) => (
-            <div key={n}>
-              <dt className="font-medium">
-                {seo[`faq${n}Q` as keyof typeof seo]}
-              </dt>
-              <dd className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {seo[`faq${n}A` as keyof typeof seo]}
-              </dd>
-            </div>
-          ))}
-        </dl>
-
-        {/* Internal link to /markdown-to-pdf */}
-        <p className="mt-16 text-center">
-          <span className="text-gray-600 dark:text-gray-400">
-            {seo.ctaText}
-          </span>{' '}
-          <Link
-            href={`/${locale}/markdown-to-pdf`}
-            className="font-medium text-blue-600 underline hover:text-blue-800 dark:text-blue-400"
-          >
-            {seo.ctaLink}
-          </Link>
-        </p>
-      </section>
-
-      {/* Client-side editor UI — visually first */}
-      <div className="order-1 shrink-0">
-        <HomeClient />
-      </div>
-
-      <div className="order-3">
-        <SiteFooter locale={locale} dict={dict.footer} />
-      </div>
-    </div>
+      {/*
+        The home page is the editor and nothing else — no scrolling past it.
+        The page still needs a top-level heading for screen readers and
+        crawlers; it describes the app on screen, so it is visually hidden
+        rather than duplicated as a visible banner. Long-form copy lives on
+        the landing pages (/markdown-to-pdf, /guide), not hidden here.
+      */}
+      <h1 className="sr-only">{seo.heading}</h1>
+      <p className="sr-only">{seo.description}</p>
+      <HomeClient />
+    </>
   );
 }
