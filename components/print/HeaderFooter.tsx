@@ -1,5 +1,6 @@
 'use client';
 
+import { Fragment, useId } from 'react';
 import type { HeaderFooterConfig } from '@/types/print';
 import { useAppStrings } from '@/lib/i18n/appStrings';
 
@@ -17,6 +18,12 @@ const VARIABLES = [
   { value: '{pages}', key: 'varPages' },
 ] as const;
 
+const SLOTS = [
+  { key: 'left', placeholder: '{title}' },
+  { key: 'center', placeholder: '' },
+  { key: 'right', placeholder: '{date}' },
+] as const;
+
 function PositionInputs({
   config,
   onChange,
@@ -27,6 +34,7 @@ function PositionInputs({
   label: string;
 }) {
   const t = useAppStrings().print;
+  const id = useId();
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
@@ -43,37 +51,24 @@ function PositionInputs({
       </div>
 
       {config.enabled && (
-        <div className="grid grid-cols-3 gap-2">
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-[var(--ui-text-muted)]">{t.left}</label>
-            <input
-              type="text"
-              value={config.left}
-              onChange={(e) => onChange({ left: e.target.value })}
-              placeholder="{title}"
-              className="rounded border border-[var(--ui-border)] bg-[var(--background)] px-2 py-1 text-xs"
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-[var(--ui-text-muted)]">{t.center}</label>
-            <input
-              type="text"
-              value={config.center}
-              onChange={(e) => onChange({ center: e.target.value })}
-              placeholder=""
-              className="rounded border border-[var(--ui-border)] bg-[var(--background)] px-2 py-1 text-xs"
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-[var(--ui-text-muted)]">{t.right}</label>
-            <input
-              type="text"
-              value={config.right}
-              onChange={(e) => onChange({ right: e.target.value })}
-              placeholder="{date}"
-              className="rounded border border-[var(--ui-border)] bg-[var(--background)] px-2 py-1 text-xs"
-            />
-          </div>
+        // One row per slot: three side-by-side columns left ~85px per input,
+        // too narrow for values like "{page} / {pages}".
+        <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1.5">
+          {SLOTS.map(({ key, placeholder }) => (
+            <Fragment key={key}>
+              <label htmlFor={`${id}-${key}`} className="text-xs text-[var(--ui-text-muted)]">
+                {t[key]}
+              </label>
+              <input
+                id={`${id}-${key}`}
+                type="text"
+                value={config[key]}
+                onChange={(e) => onChange({ [key]: e.target.value })}
+                placeholder={placeholder}
+                className="min-w-0 rounded border border-[var(--ui-border)] bg-[var(--background)] px-2 py-1 text-xs font-mono"
+              />
+            </Fragment>
+          ))}
         </div>
       )}
     </div>
