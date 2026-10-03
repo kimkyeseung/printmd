@@ -15,15 +15,6 @@
     "copyright": "All rights reserved."
   },
   "home": {
-    "hero": {
-      "title": "Markdown to PDF",
-      "subtitle": "The easiest way to turn Markdown into beautifully styled PDFs.",
-      "cta": "Get Started"
-    },
-    "dropzone": {
-      "title": "Drop your markdown file here",
-      "subtitle": "Supports .md, .markdown, .txt files"
-    },
     "seo": {
       "heading": "Markdown to PDF — Free Online Converter",
       "description": "Convert your Markdown files to beautifully styled PDFs in seconds. No signup, no install — just open your browser, paste or drag your .md file, pick a theme, and export. printmd runs entirely in your browser so your documents stay private."

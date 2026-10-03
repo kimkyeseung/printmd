@@ -15,15 +15,6 @@
     "copyright": "All rights reserved."
   },
   "home": {
-    "hero": {
-      "title": "마크다운을 PDF로",
-      "subtitle": "마크다운을 가장 예쁜 PDF로 만드는 가장 쉬운 방법",
-      "cta": "시작하기"
-    },
-    "dropzone": {
-      "title": "마크다운 파일을 여기에 놓으세요",
-      "subtitle": ".md, .markdown, .txt 파일 지원"
-    },
     "seo": {
       "heading": "Markdown to PDF — 무료 온라인 변환기",
       "description": "마크다운 파일을 몇 초 만에 스타일이 적용된 아름다운 PDF로 변환하세요. 회원가입도, 설치도 필요 없습니다. 브라우저에서 .md 파일을 열고, 원하는 스타일대로 바로 PDF로 내보내세요. printmd는 브라우저에서 완전히 실행되므로 문서의 프라이버시가 보장됩니다."
