@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useAppStrings } from '@/lib/i18n/appStrings';
 import { tabDisplayTitle } from '@/lib/editor/tabTitle';
 import { useEditorStore, useDocumentsStore, useTabsStore } from '@/stores';
+import { useFileOpener } from './useFileOpener';
 
 const DEFAULT_CONTENT: Record<string, string> = {
   ko: `# printmd
@@ -271,6 +272,7 @@ export function useEditorOrchestrator() {
   const locale = (params.locale as string) || 'en';
   const initRef = useRef(false);
   const text = useAppStrings();
+  const { openFile } = useFileOpener();
 
   const sourceUrl = useEditorStore((state) => state.sourceUrl);
   const updateDocument = useDocumentsStore((state) => state.updateDocument);
@@ -364,17 +366,9 @@ export function useEditorOrchestrator() {
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target?.result;
-      if (typeof text === 'string') {
-        addTab({ content: text, title: file.name.replace(/\.(md|markdown|txt)$/, '') });
-      }
-    };
-    reader.readAsText(file);
+    void openFile(file);
     e.target.value = '';
-  }, [addTab]);
+  }, [openFile]);
 
   const handleDownloadMd = useCallback(() => {
     const blob = new Blob([displayContent], { type: 'text/markdown' });

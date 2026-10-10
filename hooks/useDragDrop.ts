@@ -1,22 +1,17 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useTabsStore } from '@/stores';
-import { createDragDropHandler, type FileInfo } from '@/lib/file';
+import { useState, useEffect, useMemo } from 'react';
+import { createDragDropHandler } from '@/lib/file';
+import { useFileOpener } from './useFileOpener';
 
 export function useDragDrop() {
   const [isDragging, setIsDragging] = useState(false);
-  const addTab = useTabsStore((state) => state.addTab);
-
-  const handleFileDrop = useCallback((file: FileInfo) => {
-    const title = file.name.replace(/\.(md|markdown|txt)$/, '');
-    addTab({ content: file.content, title });
-  }, [addTab]);
+  const { openFileInfo, reportFileError } = useFileOpener();
 
   const dragDropHandlers = useMemo(() => createDragDropHandler({
     onDragEnter: () => setIsDragging(true),
     onDragLeave: () => setIsDragging(false),
-    onDrop: handleFileDrop,
-    onError: (error) => console.error('Drop error:', error),
-  }), [handleFileDrop]);
+    onDrop: openFileInfo,
+    onError: reportFileError,
+  }), [openFileInfo, reportFileError]);
 
   useEffect(() => {
     const handleDragEnter = (e: DragEvent) => dragDropHandlers.handleDragEnter(e);

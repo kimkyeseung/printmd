@@ -1,4 +1,4 @@
-import { readFile, isMarkdownFile, type FileInfo } from './fileHandler';
+import { readFile, isSupportedFile, UnsupportedFileError, type FileInfo } from './fileHandler';
 
 export interface DragDropOptions {
   onDragEnter?: () => void;
@@ -104,8 +104,8 @@ export function createDragDropHandler(options: DragDropOptions) {
 
     const file = files[0];
 
-    if (!isMarkdownFile(file)) {
-      onError?.(new Error('Please drop a markdown file (.md, .markdown, .txt)'));
+    if (!isSupportedFile(file)) {
+      onError?.(new UnsupportedFileError(file.name));
       return;
     }
 

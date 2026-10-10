@@ -305,7 +305,7 @@ export default function HomeClient() {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".md,.markdown,.txt"
+        accept=".md,.markdown,.mdown,.mkd,.mkdn,.txt,.hwpx"
         className="hidden"
         onChange={handleFileChange}
         aria-label={text.shell.chooseFile}
