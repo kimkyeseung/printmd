@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/markdown-to-pdf', priority: 0.9, changeFrequency: 'monthly' as const },
     { path: '/markdown-print', priority: 0.9, changeFrequency: 'monthly' as const },
     { path: '/markdown-editor', priority: 0.9, changeFrequency: 'monthly' as const },
+    { path: '/hwp-to-markdown', priority: 0.9, changeFrequency: 'monthly' as const },
     { path: '/blog', priority: 0.8, changeFrequency: 'weekly' as const },
     { path: '/guide', priority: 0.8, changeFrequency: 'monthly' as const },
     { path: '/about', priority: 0.7, changeFrequency: 'monthly' as const },

@@ -22,6 +22,7 @@ printmd is a free web tool that lets you write or paste Markdown, apply custom s
 - **Custom Fonts** — Upload your own .woff2, .ttf, .otf files
 - **Style Sharing** — Share your custom styles via URL
 - **Drag & Drop** — Drop .md files to open instantly
+- **HWPX Import** — Open Hangul (.hwpx) documents as Markdown, converted entirely in the browser
 - **Undo / Redo** — Full style change history
 - **Slide Mode** — Present Markdown as slides
 - **i18n** — English and Korean
@@ -83,6 +84,7 @@ app/
     markdown-editor/  # Editor landing page
     markdown-to-pdf/  # PDF converter landing page
     markdown-print/   # Print landing page
+    hwp-to-markdown/  # HWPX import landing page
     github/           # GitHub README import
     presets/           # Theme preset gallery
     guide/             # Markdown syntax guide

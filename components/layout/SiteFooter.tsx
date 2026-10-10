@@ -13,6 +13,7 @@ export interface FooterDict {
   markdownToPdf: string;
   markdownPrint: string;
   markdownEditor: string;
+  hwpToMarkdown: string;
   github: string;
   presets: string;
   themeColors: string;
@@ -36,6 +37,7 @@ export function SiteFooter({
         { href: `/${locale}/markdown-to-pdf`, label: dict.markdownToPdf },
         { href: `/${locale}/markdown-print`, label: dict.markdownPrint },
         { href: `/${locale}/markdown-editor`, label: dict.markdownEditor },
+        { href: `/${locale}/hwp-to-markdown`, label: dict.hwpToMarkdown },
         { href: `/${locale}/github`, label: dict.github },
       ],
     },

@@ -13,6 +13,7 @@ printmd is a free, browser-based tool that converts Markdown files to beautifull
 - Instant PDF export and print
 - Custom CSS styling
 - Drag & drop file import
+- HWPX (Hangul) to Markdown conversion in the browser
 - PWA support (works offline)
 - Chrome extension for GitHub README conversion
 - Multilingual (English, Korean)
@@ -23,6 +24,7 @@ printmd is a free, browser-based tool that converts Markdown files to beautifull
 - Markdown to PDF: https://printmd.app/en/markdown-to-pdf
 - Print Markdown: https://printmd.app/en/markdown-print
 - Markdown Editor: https://printmd.app/en/markdown-editor
+- HWP (HWPX) to Markdown: https://printmd.app/en/hwp-to-markdown
 - Markdown Guide: https://printmd.app/en/guide
 - Markdown Cheatsheet: https://printmd.app/en/cheatsheet
 - Theme Presets: https://printmd.app/en/presets

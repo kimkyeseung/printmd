@@ -178,7 +178,7 @@ const en = {
   },
   editor: {
     label: 'Markdown editor',
-    placeholder: 'Type or paste Markdown here, or drop a .md file.',
+    placeholder: 'Type or paste Markdown here, or drop a .md or .hwpx file.',
     toolbar: {
       bold: 'Bold',
       italic: 'Italic',
@@ -363,7 +363,7 @@ const ko: AppStrings = {
   },
   editor: {
     label: '마크다운 편집기',
-    placeholder: '마크다운을 입력하거나 붙여넣으세요. .md 파일을 끌어다 놓아도 됩니다.',
+    placeholder: '마크다운을 입력하거나 붙여넣으세요. .md나 .hwpx 파일을 끌어다 놓아도 됩니다.',
     toolbar: {
       bold: '굵게',
       italic: '기울임',

@@ -17,6 +17,7 @@ GitHub: https://github.com/kimkyeseung/printmd
 - Responsive layout: editor-only, preview-only, or split view
 - Keyboard shortcuts: Ctrl+S (save), Ctrl+P (print), Ctrl+, (style panel), F11 (fullscreen)
 - Drag & drop to open .md, .markdown, .txt files
+- Open Hangul .hwpx documents: converted to Markdown in the browser (headings, tables, bold/italic, images)
 - Auto-save to browser localStorage
 
 ### PDF Conversion
@@ -75,6 +76,7 @@ GitHub: https://github.com/kimkyeseung/printmd
 | Markdown to PDF | https://printmd.app/en/markdown-to-pdf | https://printmd.app/ko/markdown-to-pdf |
 | Print Markdown | https://printmd.app/en/markdown-print | https://printmd.app/ko/markdown-print |
 | Markdown Editor | https://printmd.app/en/markdown-editor | https://printmd.app/ko/markdown-editor |
+| HWP (HWPX) to Markdown | https://printmd.app/en/hwp-to-markdown | https://printmd.app/ko/hwp-to-markdown |
 | Markdown Guide | https://printmd.app/en/guide | https://printmd.app/ko/guide |
 | About | https://printmd.app/en/about | https://printmd.app/ko/about |
 
