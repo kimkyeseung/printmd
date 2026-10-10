@@ -24,6 +24,7 @@ printmd is a free, browser-based tool that converts Markdown files to beautifull
 - Markdown to PDF: https://printmd.app/en/markdown-to-pdf
 - Print Markdown: https://printmd.app/en/markdown-print
 - Markdown Editor: https://printmd.app/en/markdown-editor
+- HWP Viewer (open HWP/HWPX, save as PDF): https://printmd.app/en/hwp-viewer
 - HWP/HWPX to Markdown: https://printmd.app/en/hwp-to-markdown
 - Markdown Guide: https://printmd.app/en/guide
 - Markdown Cheatsheet: https://printmd.app/en/cheatsheet

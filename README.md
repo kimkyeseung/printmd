@@ -84,6 +84,7 @@ app/
     markdown-editor/  # Editor landing page
     markdown-to-pdf/  # PDF converter landing page
     markdown-print/   # Print landing page
+    hwp-viewer/       # HWP viewer / HWP to PDF landing page (opens files itself)
     hwp-to-markdown/  # HWP/HWPX import landing page
     github/           # GitHub README import
     presets/           # Theme preset gallery

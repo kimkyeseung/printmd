@@ -285,6 +285,12 @@ export default async function HwpToMarkdownPage({
                   <FaqItem key={q} question={q} answer={a} />
                 ))}
               </div>
+              <p className="mt-10 text-center text-sm text-gray-600">
+                {t.related}{' '}
+                <Link href={`/${locale}/hwp-viewer`} className="font-semibold text-blue-600 hover:underline">
+                  {t.relatedLink}
+                </Link>
+              </p>
             </div>
           </section>
 

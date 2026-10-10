@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/markdown-to-pdf', lastModified: '2026-09-30', priority: 0.9, changeFrequency: 'monthly' as const },
     { path: '/markdown-print', lastModified: '2026-09-30', priority: 0.9, changeFrequency: 'monthly' as const },
     { path: '/markdown-editor', lastModified: '2026-09-30', priority: 0.9, changeFrequency: 'monthly' as const },
+    { path: '/hwp-viewer', lastModified: '2026-10-10', priority: 0.9, changeFrequency: 'monthly' as const },
     { path: '/hwp-to-markdown', lastModified: '2026-10-10', priority: 0.9, changeFrequency: 'monthly' as const },
     { path: '/blog', lastModified: '2026-09-30', priority: 0.8, changeFrequency: 'weekly' as const },
     { path: '/guide', lastModified: '2026-09-30', priority: 0.8, changeFrequency: 'monthly' as const },

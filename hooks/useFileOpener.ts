@@ -45,11 +45,14 @@ export function useFileOpener() {
     toast.error(errorMessage(error, text));
   }, [text]);
 
-  const openFile = useCallback(async (file: File) => {
+  /** Open a file in a new tab; resolves to whether it opened. */
+  const openFile = useCallback(async (file: File): Promise<boolean> => {
     try {
       openFileInfo(await readFile(file));
+      return true;
     } catch (error) {
       reportFileError(error instanceof Error ? error : new Error(String(error)));
+      return false;
     }
   }, [openFileInfo, reportFileError]);
 

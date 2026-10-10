@@ -315,9 +315,76 @@
       "q6": "Is it free?",
       "a6": "Yes. It's free with no signup and no limit on conversions."
     },
+    "related": "Just want to read an HWP file or save it as PDF? Use the HWP viewer.",
+    "relatedLink": "Open the HWP viewer",
     "cta": {
       "title": "Convert your Hangul file now",
       "subtitle": "Free · No signup · Nothing uploaded"
+    }
+  },
+  "hwpViewer": {
+    "title": "HWP Viewer",
+    "subtitle": "Open Hangul files and convert to PDF, no install",
+    "hero": {
+      "title1": "Open HWP files",
+      "title2": "without installing anything",
+      "description": "Read HWP and HWPX documents on a Mac, Chromebook or locked-down work PC without Hancom Office, and save them as PDF. Files are opened inside your browser and never uploaded. Free, no signup.",
+      "open": "Open an HWP file",
+      "opening": "Opening…",
+      "dropHint": "or drop a .hwp or .hwpx file here",
+      "note": "This isn't a pixel-perfect replica of the original layout. It shows the text, headings and tables in a clean, readable form that you can restyle, print or save as PDF."
+    },
+    "why": {
+      "title": "Why open HWP files with printmd",
+      "noInstall": "Nothing to install",
+      "noInstallDesc": "No Hancom Office or separate viewer needed — it opens right in your browser.",
+      "anyDevice": "Any device",
+      "anyDeviceDesc": "Mac, Chromebook, Linux or tablet: all you need is a browser.",
+      "privacy": "No upload",
+      "privacyDesc": "Files are read inside your browser, so government and internal documents stay on your device.",
+      "pdf": "Save as PDF or print",
+      "pdfDesc": "Save the document as a clean PDF in the theme you like, or print it directly."
+    },
+    "steps": {
+      "title": "HWP to PDF in three steps",
+      "step1": "Open the HWP file",
+      "step1Desc": "Click Open an HWP file above, or drop the file onto the box.",
+      "step2": "Check the content",
+      "step2Desc": "Review the document in the preview; fix text or switch themes if you like.",
+      "step3": "Save as PDF",
+      "step3Desc": "Click Export PDF and choose “Save as PDF” as the print destination."
+    },
+    "useCases": {
+      "title": "When it helps",
+      "mac": "Got an HWP attachment on a Mac",
+      "macDesc": "Read official letters and notices without installing Hancom Office.",
+      "notice": "Checking announcements and application forms",
+      "noticeDesc": "Skim the schedule and eligibility in a grant notice and print just what you need.",
+      "office": "On a work PC that blocks installs",
+      "officeDesc": "Open the file and convert it to PDF with nothing but a browser.",
+      "share": "Sending to someone who can't open HWP",
+      "shareDesc": "Save it as PDF and anyone can read it."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "Can I open HWP files on a Mac?",
+      "a1": "Yes. printmd runs in the browser, so you can read HWP and HWPX files on a Mac, Chromebook or Linux without Hancom Office.",
+      "q2": "Will the PDF look exactly like the original HWP?",
+      "a2": "No. printmd re-flows the text, headings, tables and images into a clean layout. For documents that must keep the original page breaks, fonts and table borders, use Hancom Office or the Hancom viewer.",
+      "q3": "Is my file uploaded to a server?",
+      "a3": "No. The file is read and converted inside your browser and never sent anywhere.",
+      "q4": "Which files can I open?",
+      "a4": ".hwp files from HWP 5.0 onward and .hwpx files. Distribution-only and password-protected documents can't be opened; save HWP 3.0 and older files as HWPX in Hangul first.",
+      "q5": "Does it work on a phone?",
+      "a5": "Yes, you can open files in a mobile browser. Saving as PDF uses the browser's print feature.",
+      "q6": "Is it free?",
+      "a6": "Yes. It's free with no signup and no limits."
+    },
+    "related": "Want Markdown instead — to paste into an AI chat or move into Notion? Use HWP to Markdown.",
+    "relatedLink": "See HWP to Markdown",
+    "cta": {
+      "title": "Open your HWP file now",
+      "subtitle": "Free · Nothing to install · Nothing uploaded"
     }
   },
   "guide": {
@@ -633,6 +700,7 @@
     "markdownToPdf": "Markdown to PDF",
     "markdownPrint": "Print Markdown",
     "markdownEditor": "Markdown Editor",
+    "hwpViewer": "HWP Viewer",
     "hwpToMarkdown": "HWP to Markdown",
     "github": "GitHub README to PDF",
     "presets": "Theme Presets",
