@@ -71,6 +71,26 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
       return tr;
     });
 
+    // Rich pastes (an answer copied out of ChatGPT, Claude or Gemini) arrive
+    // as HTML whose plain-text twin has lost the Markdown structure. Convert
+    // the HTML instead; the converter loads only when such a paste happens.
+    const richPaste = EditorView.domEventHandlers({
+      paste(event, view) {
+        const html = event.clipboardData?.getData('text/html') ?? '';
+        const plain = event.clipboardData?.getData('text/plain') ?? '';
+        if (!html) return false;
+        event.preventDefault();
+        void import('@/lib/editor/htmlPaste').then(({ shouldConvertHtml, htmlToMarkdown }) => {
+          const text = shouldConvertHtml(html, plain) ? htmlToMarkdown(html) : plain;
+          view.dispatch(view.state.replaceSelection(text), {
+            scrollIntoView: true,
+            userEvent: 'input.paste',
+          });
+        });
+        return true;
+      },
+    });
+
     const state = EditorState.create({
       doc: value,
       extensions: [
@@ -93,6 +113,7 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
         ]),
         updateListener,
         checkboxTransactionFilter,
+        richPaste,
         EditorView.lineWrapping,
         // The contenteditable is a textbox with no visible label.
         EditorView.contentAttributes.of({ 'aria-label': labelRef.current }),
