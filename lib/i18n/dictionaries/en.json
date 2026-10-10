@@ -115,7 +115,7 @@
     "why": {
       "title": "Why Print with printmd?",
       "syntax": "Syntax Highlighting",
-      "syntaxDesc": "50+ languages. Code prints in color beautifully.",
+      "syntaxDesc": "20+ popular languages. Code prints in color beautifully.",
       "table": "Perfect Tables",
       "tableDesc": "Markdown tables print as clean formatted tables.",
       "image": "Images Included",
@@ -147,7 +147,7 @@
       "q1": "How do I print a Markdown file?",
       "a1": "Open your .md file in printmd by dragging and dropping it, choose a theme, and press Ctrl+P (or Cmd+P on Mac) to print. The output is optimized for clean printing.",
       "q2": "Does the printed output include syntax highlighting?",
-      "a2": "Yes. Code blocks are printed with full syntax highlighting for 50+ programming languages, preserving colors on your printed pages.",
+      "a2": "Yes. Code blocks are printed with full syntax highlighting for 20+ popular programming languages, preserving colors on your printed pages.",
       "q3": "Can I print tables from Markdown?",
       "a3": "Yes. Markdown tables are rendered as clean, formatted tables in the print output with proper borders and alignment.",
       "q4": "Does printmd support page breaks?",
@@ -172,7 +172,7 @@
       "themes": "15 Themes",
       "themesDesc": "GitHub, Notion, Academic, Minimal, Dark, and more",
       "syntax": "Syntax Highlighting",
-      "syntaxDesc": "50+ programming languages supported",
+      "syntaxDesc": "20+ popular programming languages supported",
       "responsive": "Responsive Layout",
       "responsiveDesc": "Editor only / Preview only / Split view",
       "shortcuts": "Keyboard Shortcuts",
@@ -319,6 +319,79 @@
     "relatedLink": "Open the HWP viewer",
     "cta": {
       "title": "Convert your Hangul file now",
+      "subtitle": "Free · No signup · Nothing uploaded"
+    }
+  },
+  "chatgptToPdf": {
+    "title": "ChatGPT to PDF",
+    "subtitle": "Save AI answers as clean PDFs",
+    "hero": {
+      "title1": "Save ChatGPT, Claude and Gemini answers",
+      "title2": "as clean PDFs",
+      "description": "Copy an AI answer, paste it into printmd, and get a document with its headings, tables and code blocks intact. Pick a theme, then save as PDF or print. Free, no signup, nothing uploaded.",
+      "cta": "Open the editor"
+    },
+    "problem": {
+      "title": "Printing the chat page doesn't work well",
+      "desc": "Printing the ChatGPT page straight from the browser drags in the sidebar and the input box, cuts off long code, and splits answers awkwardly across pages. Paste the answer into printmd instead and you get just the content, laid out like a document."
+    },
+    "methods": {
+      "title": "Two ways to bring answers in",
+      "copyTitle": "1. The answer's copy button",
+      "copyDesc": "The copy icon under an answer copies its Markdown source. Paste it into the printmd editor and it's a document. The most faithful option for a single answer.",
+      "selectTitle": "2. Select and copy",
+      "selectDesc": "Select several questions and answers with the mouse, press Ctrl+C (⌘+C on a Mac) and paste. printmd converts the headings, lists, tables and code blocks to Markdown automatically."
+    },
+    "steps": {
+      "title": "A PDF in three steps",
+      "step1": "Copy the answer",
+      "step1Desc": "Use the copy button, or select the part you want and copy it.",
+      "step2": "Paste into printmd",
+      "step2Desc": "Paste into the editor and check the preview; switch themes if you like.",
+      "step3": "Save as PDF",
+      "step3Desc": "Click Export PDF and choose “Save as PDF” as the print destination."
+    },
+    "kept": {
+      "title": "What carries over",
+      "headings": "Headings and subheadings",
+      "lists": "Numbered and bulleted lists, nested too",
+      "tables": "Tables",
+      "code": "Code blocks with their language",
+      "emphasis": "Bold, italic and strikethrough",
+      "links": "Links",
+      "math": "Math as LaTeX source (not rendered yet)",
+      "highlight": "Syntax highlighting for 20+ popular languages",
+      "themes": "15 document themes"
+    },
+    "useCases": {
+      "title": "When it helps",
+      "report": "Assignments and reports",
+      "reportDesc": "Turn research you did with an AI into a clean document to hand in or share.",
+      "study": "Study notes",
+      "studyDesc": "Collect questions and answers in one document and keep it as a PDF to revisit later.",
+      "code": "Sharing code explanations",
+      "codeDesc": "Keep syntax-highlighted code blocks and their explanations together in a PDF.",
+      "meeting": "Meeting and planning material",
+      "meetingDesc": "Polish an AI-drafted outline and print it like any company document."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "What's the easiest way to save a ChatGPT conversation as PDF?",
+      "a1": "Copy the answer with its copy button, paste it into the printmd editor and click Export PDF. To move several answers at once, select the conversation, copy it and paste.",
+      "q2": "Does it work with Claude and Gemini?",
+      "a2": "Yes. Any AI service whose answers you can copy works the same way — Claude, Gemini, Perplexity and more. Content copied from ordinary web pages is converted to Markdown too.",
+      "q3": "Will math show up in the PDF?",
+      "a3": "Math comes over as LaTeX source (like $...$). printmd doesn't render formulas yet, so math-heavy answers show the source.",
+      "q4": "Is my conversation sent to a server?",
+      "a4": "No. What you paste is processed inside your browser and never sent anywhere.",
+      "q5": "Are images included?",
+      "a5": "Images link to their original address. Some, such as AI-generated images, use addresses that expire, so save important images separately.",
+      "q6": "Is it free?",
+      "a6": "Yes. It's free with no signup and no limits."
+    },
+    "disclaimer": "printmd is an independent service, not affiliated with OpenAI, Anthropic or Google. ChatGPT, Claude and Gemini are trademarks of their respective owners.",
+    "cta": {
+      "title": "Paste an answer now",
       "subtitle": "Free · No signup · Nothing uploaded"
     }
   },
@@ -702,6 +775,7 @@
     "markdownEditor": "Markdown Editor",
     "hwpViewer": "HWP Viewer",
     "hwpToMarkdown": "HWP to Markdown",
+    "chatgptToPdf": "ChatGPT to PDF",
     "github": "GitHub README to PDF",
     "presets": "Theme Presets",
     "themeColors": "Color Customization",

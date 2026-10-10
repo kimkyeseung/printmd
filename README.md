@@ -22,6 +22,7 @@ printmd is a free web tool that lets you write or paste Markdown, apply custom s
 - **Custom Fonts** — Upload your own .woff2, .ttf, .otf files
 - **Style Sharing** — Share your custom styles via URL
 - **Drag & Drop** — Drop .md files to open instantly
+- **Rich Paste** — Paste answers copied from ChatGPT, Claude or Gemini (or any web page); headings, lists, tables, code blocks and math become Markdown
 - **Hangul Import** — Open Hangul (.hwp, .hwpx) documents as Markdown, converted entirely in the browser
 - **Undo / Redo** — Full style change history
 - **Slide Mode** — Present Markdown as slides
@@ -86,6 +87,7 @@ app/
     markdown-print/   # Print landing page
     hwp-viewer/       # HWP viewer / HWP to PDF landing page (opens files itself)
     hwp-to-markdown/  # HWP/HWPX import landing page
+    chatgpt-to-pdf/   # AI answer (paste) to PDF landing page
     github/           # GitHub README import
     presets/           # Theme preset gallery
     guide/             # Markdown syntax guide

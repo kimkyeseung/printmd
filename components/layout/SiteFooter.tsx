@@ -15,6 +15,7 @@ export interface FooterDict {
   markdownEditor: string;
   hwpViewer: string;
   hwpToMarkdown: string;
+  chatgptToPdf: string;
   github: string;
   presets: string;
   themeColors: string;
@@ -40,6 +41,7 @@ export function SiteFooter({
         { href: `/${locale}/markdown-editor`, label: dict.markdownEditor },
         { href: `/${locale}/hwp-viewer`, label: dict.hwpViewer },
         { href: `/${locale}/hwp-to-markdown`, label: dict.hwpToMarkdown },
+        { href: `/${locale}/chatgpt-to-pdf`, label: dict.chatgptToPdf },
         { href: `/${locale}/github`, label: dict.github },
       ],
     },

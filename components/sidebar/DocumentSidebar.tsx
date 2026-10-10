@@ -27,6 +27,7 @@ const LINK_ICONS = {
   markdownEditor: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z',
   hwpViewer: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z',
   hwpToMarkdown: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4',
+  chatgptToPdf: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z',
   github: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
   // Learn
   guide: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
@@ -53,6 +54,7 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
     { key: 'markdownEditor', href: `/${locale}/markdown-editor` },
     { key: 'hwpViewer', href: `/${locale}/hwp-viewer` },
     { key: 'hwpToMarkdown', href: `/${locale}/hwp-to-markdown` },
+    { key: 'chatgptToPdf', href: `/${locale}/chatgpt-to-pdf` },
     { key: 'github', href: `/${locale}/github` },
   ] as const;
   const main = [

@@ -17,6 +17,7 @@ GitHub: https://github.com/kimkyeseung/printmd
 - Responsive layout: editor-only, preview-only, or split view
 - Keyboard shortcuts: Ctrl+S (save), Ctrl+P (print), Ctrl+, (style panel), F11 (fullscreen)
 - Drag & drop to open .md, .markdown, .txt files
+- Paste rich text (e.g. answers copied from ChatGPT, Claude or Gemini): headings, lists, tables, code blocks and LaTeX math are converted to Markdown
 - Open Hangul .hwp and .hwpx documents: converted to Markdown in the browser (headings, tables, bold/italic, text boxes, images)
 - Auto-save to browser localStorage
 
@@ -77,6 +78,7 @@ GitHub: https://github.com/kimkyeseung/printmd
 | Print Markdown | https://printmd.app/en/markdown-print | https://printmd.app/ko/markdown-print |
 | Markdown Editor | https://printmd.app/en/markdown-editor | https://printmd.app/ko/markdown-editor |
 | HWP Viewer / HWP to PDF | https://printmd.app/en/hwp-viewer | https://printmd.app/ko/hwp-viewer |
+| ChatGPT to PDF | https://printmd.app/en/chatgpt-to-pdf | https://printmd.app/ko/chatgpt-to-pdf |
 | HWP/HWPX to Markdown | https://printmd.app/en/hwp-to-markdown | https://printmd.app/ko/hwp-to-markdown |
 | Markdown Guide | https://printmd.app/en/guide | https://printmd.app/ko/guide |
 | About | https://printmd.app/en/about | https://printmd.app/ko/about |

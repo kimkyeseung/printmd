@@ -25,6 +25,7 @@ printmd is a free, browser-based tool that converts Markdown files to beautifull
 - Print Markdown: https://printmd.app/en/markdown-print
 - Markdown Editor: https://printmd.app/en/markdown-editor
 - HWP Viewer (open HWP/HWPX, save as PDF): https://printmd.app/en/hwp-viewer
+- ChatGPT/Claude/Gemini answers to PDF (paste with formatting kept): https://printmd.app/en/chatgpt-to-pdf
 - HWP/HWPX to Markdown: https://printmd.app/en/hwp-to-markdown
 - Markdown Guide: https://printmd.app/en/guide
 - Markdown Cheatsheet: https://printmd.app/en/cheatsheet
