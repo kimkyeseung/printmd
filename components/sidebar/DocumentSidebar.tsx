@@ -21,6 +21,13 @@ function HamburgerIcon({ className }: { className?: string }) {
 
 /** Line icons for the site links, 24×24 stroke paths. */
 const LINK_ICONS = {
+  // Tools
+  markdownToPdf: 'M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+  markdownPrint: 'M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z',
+  markdownEditor: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z',
+  hwpToMarkdown: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4',
+  github: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
+  // Learn
   guide: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
   cheatsheet: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
   presets: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01',
@@ -29,14 +36,23 @@ const LINK_ICONS = {
 
 /**
  * Links to the rest of the site. The home page is the editor alone, so this
- * is where it links out to the guides and presets — for visitors, and for
- * crawlers, which is why the collapsed rail (the default, and what the
- * server renders) carries the main ones as icon links too.
+ * is where it links out to the tool landing pages, guides and presets — for
+ * visitors, and for crawlers, which is why the collapsed rail (the default,
+ * and what the server renders) carries them all as icon links too. The home
+ * page is the site's strongest page; without these links the landing pages
+ * are reachable only through each other's footers.
  */
 function SiteLinks({ collapsed }: { collapsed: boolean }) {
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
   const t = useAppStrings().sidebar;
+  const tools = [
+    { key: 'markdownToPdf', href: `/${locale}/markdown-to-pdf` },
+    { key: 'markdownPrint', href: `/${locale}/markdown-print` },
+    { key: 'markdownEditor', href: `/${locale}/markdown-editor` },
+    { key: 'hwpToMarkdown', href: `/${locale}/hwp-to-markdown` },
+    { key: 'github', href: `/${locale}/github` },
+  ] as const;
   const main = [
     { key: 'guide', href: `/${locale}/guide` },
     { key: 'cheatsheet', href: `/${locale}/cheatsheet` },
@@ -45,22 +61,29 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
   ] as const;
 
   if (collapsed) {
+    const iconLink = ({ key, href }: (typeof tools)[number] | (typeof main)[number]) => (
+      <Link
+        key={key}
+        href={href}
+        title={t[key]}
+        aria-label={t[key]}
+        className="flex h-8 w-8 items-center justify-center rounded text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)] hover:text-[var(--foreground)]"
+      >
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={LINK_ICONS[key]} />
+        </svg>
+      </Link>
+    );
     return (
-      <nav aria-label={t.linksHeading} className="mt-auto flex flex-col items-center gap-1 pb-2">
-        {main.map(({ key, href }) => (
-          <Link
-            key={key}
-            href={href}
-            title={t[key]}
-            aria-label={t[key]}
-            className="flex h-8 w-8 items-center justify-center rounded text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)] hover:text-[var(--foreground)]"
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={LINK_ICONS[key]} />
-            </svg>
-          </Link>
-        ))}
-      </nav>
+      <div className="mt-auto flex flex-col items-center gap-1 pb-2">
+        <nav aria-label={t.toolsHeading} className="flex flex-col items-center gap-1">
+          {tools.map(iconLink)}
+        </nav>
+        <span className="my-1 h-px w-5 bg-[var(--ui-border)]" aria-hidden="true" />
+        <nav aria-label={t.linksHeading} className="flex flex-col items-center gap-1">
+          {main.map(iconLink)}
+        </nav>
+      </div>
     );
   }
 
@@ -70,17 +93,28 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
     { key: 'terms', href: `/${locale}/terms` },
   ] as const;
 
+  const linkList = (links: readonly ((typeof tools)[number] | (typeof main)[number])[]) => (
+    <ul>
+      {links.map(({ key, href }) => (
+        <li key={key}>
+          <Link href={href} className="inline-block py-1 text-[var(--ui-text-muted)] hover:text-[var(--foreground)] hover:underline">
+            {t[key]}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+
   return (
-    <nav aria-label={t.linksHeading} className="border-t border-[var(--ui-border)] px-3 py-3 text-xs">
-      <ul>
-        {[...main, { key: 'github', href: `/${locale}/github` } as const].map(({ key, href }) => (
-          <li key={key}>
-            <Link href={href} className="inline-block py-1 text-[var(--ui-text-muted)] hover:text-[var(--foreground)] hover:underline">
-              {t[key]}
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <div className="border-t border-[var(--ui-border)] px-3 py-3 text-xs">
+      <nav aria-label={t.toolsHeading}>
+        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ui-text-muted)]">{t.toolsHeading}</h2>
+        {linkList(tools)}
+      </nav>
+      <nav aria-label={t.linksHeading} className="mt-3">
+        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ui-text-muted)]">{t.linksHeading}</h2>
+        {linkList(main)}
+      </nav>
       <p className="mt-2 flex flex-wrap items-center gap-x-2 text-[11px] text-[var(--ui-text-muted)]">
         {secondary.map(({ key, href }, i) => (
           <span key={key} className="flex gap-2">
@@ -91,7 +125,7 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
           </span>
         ))}
       </p>
-    </nav>
+    </div>
   );
 }
 
