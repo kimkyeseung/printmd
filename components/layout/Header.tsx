@@ -9,9 +9,10 @@ import { useAppStrings } from '@/lib/i18n/appStrings';
 /**
  * False while rendering on the server and during hydration, true afterwards.
  *
- * Used to hold back the theme icon until the client knows the resolved theme,
- * which would otherwise be a hydration mismatch. Done without an effect so the
- * component doesn't cascade a render just to record that it mounted.
+ * Used to hold back what only the client can know — the resolved theme, and
+ * whether the document restored from localStorage has slides — which would
+ * otherwise be a hydration mismatch. Done without an effect so the component
+ * doesn't cascade a render just to record that it mounted.
  */
 const subscribeToNothing = () => () => {};
 function useIsHydrated(): boolean {
@@ -439,7 +440,7 @@ export const Header = memo(function Header({
         </div>
 
         {/* Slide mode button - only show when content has slides */}
-        {hasSlides && (
+        {isHydrated && hasSlides && (
           <button
             onClick={onSlideMode}
             className="rounded px-2 py-1.5 text-xs hover:bg-[var(--ui-bg-hover)] sm:px-3 sm:text-sm flex items-center gap-1"
