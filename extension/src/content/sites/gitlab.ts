@@ -3,6 +3,7 @@
  */
 
 import type { PageInfo, SiteDetector } from '../types';
+import { titleHeading } from '../../utils/handoff';
 
 const MARKDOWN_EXTENSIONS = ['.md', '.markdown', '.mdown', '.mkd', '.mkdn'];
 
@@ -57,9 +58,7 @@ function extractIssueMrContent(): string | null {
   const bodyEl = document.querySelector<HTMLElement>('.description .md');
   if (!bodyEl) return null;
 
-  let content = '';
-  if (title) content += `# ${title}\n\n`;
-  content += bodyEl.innerHTML;
+  const content = titleHeading(title) + bodyEl.innerHTML;
   return content || null;
 }
 

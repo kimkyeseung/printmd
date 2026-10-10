@@ -3,7 +3,8 @@
  */
 
 import { type PageInfo } from './types';
-import { transferViaUrl, transferViaStorage, TransferError } from '../utils/transfer';
+import { transferViaUrl, TransferError } from '../utils/transfer';
+import { handOff, titleHeading } from '../utils/handoff';
 import { addRecentFile } from '../utils/storage';
 
 const BUTTON_ID = 'printmd-open-button';
@@ -48,12 +49,12 @@ function createButton(pageInfo: PageInfo): HTMLButtonElement {
         transferViaUrl(pageInfo.rawUrl);
       } else if (pageInfo.htmlContent) {
         // Sites without raw URLs (npm, PyPI, Notion, Issue/PR pages)
-        transferViaStorage(pageInfo.htmlContent, pageInfo.url);
+        await handOff({ content: pageInfo.htmlContent, format: 'html', sourceUrl: pageInfo.url, title: pageInfo.fileName });
       } else if (pageInfo.type === 'issue-pr') {
         // GitHub Issue/PR fallback - extract from DOM
         const content = extractIssuePrContent();
         if (content) {
-          transferViaStorage(content, pageInfo.url);
+          await handOff({ content, format: 'html', sourceUrl: pageInfo.url, title: pageInfo.fileName });
         } else {
           showToast(chrome.i18n.getMessage('toastNoMarkdownBody'), 'error');
         }
@@ -115,7 +116,7 @@ export function isButtonInjected(): boolean {
 }
 
 /**
- * Extract markdown content from GitHub Issue/PR page (legacy fallback)
+ * Extract the HTML of a GitHub Issue/PR description (legacy fallback)
  */
 function extractIssuePrContent(): string | null {
   const titleEl = document.querySelector<HTMLElement>('.gh-header-title .js-issue-title');
@@ -123,10 +124,8 @@ function extractIssuePrContent(): string | null {
   const bodyEl = document.querySelector<HTMLElement>('.comment-body .markdown-body');
   if (!bodyEl) return null;
 
-  let markdown = '';
-  if (title) markdown += `# ${title}\n\n`;
-  markdown += bodyEl.innerHTML;
-  return markdown || null;
+  const html = titleHeading(title) + bodyEl.innerHTML;
+  return html || null;
 }
 
 /**

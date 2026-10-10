@@ -4,6 +4,7 @@
 
 import { getRecentFiles, removeRecentFile, clearRecentFiles, type RecentFile } from '../utils/storage';
 import { toRawUrl } from '../utils/github-api';
+import { printmdSrcUrl } from '../utils/config';
 
 const msg = chrome.i18n.getMessage.bind(chrome.i18n);
 
@@ -95,10 +96,7 @@ function updatePageInfo(info: TabInfo): void {
     const openButton = document.getElementById('open-button')!;
     openButton.textContent = msg('popupOpenButton');
     openButton.addEventListener('click', () => {
-      const encodedUrl = encodeURIComponent(info.rawUrl!);
-      chrome.tabs.create({
-        url: `https://printmd.app/?src=${encodedUrl}`,
-      });
+      chrome.tabs.create({ url: printmdSrcUrl(info.rawUrl!) });
       window.close();
     });
   } else {
@@ -158,10 +156,7 @@ async function updateRecentFiles(): Promise<void> {
       const url = decodeURIComponent(li.getAttribute('data-url')!);
       const rawUrl = toRawUrl(url);
       if (rawUrl) {
-        const encodedUrl = encodeURIComponent(rawUrl);
-        chrome.tabs.create({
-          url: `https://printmd.app/?src=${encodedUrl}`,
-        });
+        chrome.tabs.create({ url: printmdSrcUrl(rawUrl) });
         window.close();
       }
     });

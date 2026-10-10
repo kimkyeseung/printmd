@@ -3,6 +3,7 @@
  */
 
 import type { PageInfo, SiteDetector } from '../types';
+import { titleHeading } from '../../utils/handoff';
 
 function isPublicPage(): boolean {
   return !!document.querySelector('.notion-page-content') ||
@@ -25,10 +26,7 @@ function extractPageContent(): string | null {
 
   if (!contentEl) return null;
 
-  const title = getPageTitle();
-  let content = '';
-  if (title) content += `# ${title}\n\n`;
-  content += contentEl.innerHTML;
+  const content = titleHeading(getPageTitle() ?? '') + contentEl.innerHTML;
   return content || null;
 }
 

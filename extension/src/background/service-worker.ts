@@ -2,6 +2,10 @@
  * Background service worker for printmd extension
  */
 
+import { printmdHandoffUrl, printmdSrcUrl } from '../utils/config';
+import type { HandoffPayload } from '../utils/handoff';
+import { storeHandoff, takeHandoff } from './handoff-store';
+
 // All supported site URL patterns for context menus
 const SUPPORTED_SITE_PATTERNS = [
   '*://github.com/*',
@@ -79,6 +83,51 @@ chrome.runtime.onInstalled.addListener((details) => {
   });
 });
 
+/** Content a site's content script extracted for the "open in printmd" action. */
+interface PageContentResponse {
+  rawUrl: string | null;
+  htmlContent: string | null;
+  fileName: string | null;
+}
+
+/** Open printmd with content that has no raw URL to fetch. */
+async function openWithContent(payload: HandoffPayload): Promise<void> {
+  const id = await storeHandoff(payload);
+  await chrome.tabs.create({ url: printmdHandoffUrl(id) });
+}
+
+/**
+ * Open what a content script found on the page: a raw file by URL, otherwise
+ * its extracted HTML. Returns false when there was nothing to open.
+ */
+async function openPageContent(response: PageContentResponse | null, pageUrl?: string): Promise<boolean> {
+  if (response?.rawUrl) {
+    await chrome.tabs.create({ url: printmdSrcUrl(response.rawUrl) });
+    return true;
+  }
+  if (response?.htmlContent) {
+    await openWithContent({
+      content: response.htmlContent,
+      format: 'html',
+      sourceUrl: pageUrl,
+      title: response.fileName,
+    });
+    return true;
+  }
+  return false;
+}
+
+/** Ask the tab's content script what to open; fall back to the page URL. */
+function openFromTab(tab: chrome.tabs.Tab): void {
+  if (!tab.id) return;
+  chrome.tabs.sendMessage(tab.id, { type: 'CONTEXT_MENU_OPEN' }, async (response: PageContentResponse | null) => {
+    if (chrome.runtime.lastError || !(await openPageContent(response, tab.url))) {
+      // No content script on this page (or nothing detected): try its URL.
+      if (tab.url) await chrome.tabs.create({ url: printmdSrcUrl(toRawUrl(tab.url)) });
+    }
+  });
+}
+
 // Listen for messages from content scripts
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'GET_TAB_INFO') {
@@ -88,75 +137,44 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         title: sender.tab.title,
       });
     }
+    return false;
   }
 
   if (message.type === 'OPEN_PRINTMD') {
     const { rawUrl } = message;
-    if (rawUrl) {
-      const encodedUrl = encodeURIComponent(rawUrl);
-      chrome.tabs.create({
-        url: `https://printmd.app/?src=${encodedUrl}`,
-      });
-    }
+    if (rawUrl) chrome.tabs.create({ url: printmdSrcUrl(rawUrl) });
     sendResponse({ success: true });
+    return false;
   }
 
-  return true;
+  // A source page hands over extracted content (utils/handoff.ts).
+  if (message.type === 'HANDOFF_CONTENT') {
+    const { content, format, sourceUrl, title } = message;
+    openWithContent({ content, format, sourceUrl, title })
+      .then(() => sendResponse({ ok: true }))
+      .catch(() => sendResponse({ ok: false }));
+    return true;
+  }
+
+  // The printmd tab collects it (content/marker.ts).
+  if (message.type === 'TAKE_HANDOFF') {
+    takeHandoff(message.id)
+      .then(sendResponse)
+      .catch(() => sendResponse(null));
+    return true;
+  }
+
+  return false;
 });
 
 // Context menu click handler
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'open-in-printmd-link' && info.linkUrl) {
-    const rawUrl = toRawUrl(info.linkUrl);
-    const encodedUrl = encodeURIComponent(rawUrl);
-    chrome.tabs.create({
-      url: `https://printmd.app/?src=${encodedUrl}`,
-    });
+    chrome.tabs.create({ url: printmdSrcUrl(toRawUrl(info.linkUrl)) });
   }
 
-  if (info.menuItemId === 'open-in-printmd-page' && tab?.id) {
-    // Ask content script to detect and handle the page
-    chrome.tabs.sendMessage(tab.id, { type: 'CONTEXT_MENU_OPEN' }, (response) => {
-      if (chrome.runtime.lastError) {
-        // Content script not available, try URL-based fallback
-        if (tab.url) {
-          const rawUrl = toRawUrl(tab.url);
-          const encodedUrl = encodeURIComponent(rawUrl);
-          chrome.tabs.create({
-            url: `https://printmd.app/?src=${encodedUrl}`,
-          });
-        }
-        return;
-      }
-
-      if (response?.rawUrl) {
-        const encodedUrl = encodeURIComponent(response.rawUrl);
-        chrome.tabs.create({
-          url: `https://printmd.app/?src=${encodedUrl}`,
-        });
-      } else if (response?.htmlContent) {
-        // For sites without raw URLs, open printmd and pass content
-        chrome.tabs.create({
-          url: 'https://printmd.app/',
-        }, (newTab) => {
-          // Wait for tab to load then send content
-          if (newTab?.id) {
-            const tabId = newTab.id;
-            const listener = (updatedTabId: number, changeInfo: chrome.tabs.TabChangeInfo) => {
-              if (updatedTabId === tabId && changeInfo.status === 'complete') {
-                chrome.tabs.onUpdated.removeListener(listener);
-                chrome.tabs.sendMessage(tabId, {
-                  type: 'PRINTMD_CONTENT',
-                  content: response.htmlContent,
-                  sourceUrl: tab.url,
-                });
-              }
-            };
-            chrome.tabs.onUpdated.addListener(listener);
-          }
-        });
-      }
-    });
+  if (info.menuItemId === 'open-in-printmd-page' && tab) {
+    openFromTab(tab);
   }
 });
 
@@ -164,29 +182,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 chrome.commands?.onCommand?.addListener((command) => {
   if (command === 'open-in-printmd') {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-      if (tab?.id) {
-        // Try content script first
-        chrome.tabs.sendMessage(tab.id, { type: 'CONTEXT_MENU_OPEN' }, (response) => {
-          if (chrome.runtime.lastError || !response) {
-            // Fallback to URL
-            if (tab.url) {
-              const rawUrl = toRawUrl(tab.url);
-              const encodedUrl = encodeURIComponent(rawUrl);
-              chrome.tabs.create({
-                url: `https://printmd.app/?src=${encodedUrl}`,
-              });
-            }
-            return;
-          }
-
-          if (response.rawUrl) {
-            const encodedUrl = encodeURIComponent(response.rawUrl);
-            chrome.tabs.create({
-              url: `https://printmd.app/?src=${encodedUrl}`,
-            });
-          }
-        });
-      }
+      if (tab) openFromTab(tab);
     });
   }
 });
