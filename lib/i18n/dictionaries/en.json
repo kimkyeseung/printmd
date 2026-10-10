@@ -237,11 +237,11 @@
     "title": "HWP to Markdown",
     "subtitle": "Convert Hangul documents to Markdown",
     "hero": {
-      "title1": "Convert HWPX documents",
+      "title1": "Convert Hangul (HWP/HWPX) documents",
       "title2": "to Markdown",
-      "description": "Drop a Hangul (HWPX) file and get Markdown that keeps its headings, tables and bold text. The file never leaves your browser. Free, no signup.",
-      "cta": "Convert an HWPX file",
-      "hint": "Drop a .hwpx file onto the editor, or choose Open → From file… to pick one."
+      "description": "Drop an HWP or HWPX file and get Markdown that keeps its headings, tables and bold text. The file never leaves your browser. Free, no signup.",
+      "cta": "Convert a Hangul file",
+      "hint": "Drop a .hwp or .hwpx file onto the editor, or choose Open → From file… to pick one."
     },
     "why": {
       "title": "Why convert with printmd?",
@@ -256,8 +256,8 @@
     },
     "steps": {
       "title": "Three simple steps",
-      "step1": "Open the HWPX file",
-      "step1Desc": "Drop a .hwpx file onto the editor, or choose Open → From file… to pick one.",
+      "step1": "Open the Hangul file",
+      "step1Desc": "Drop a .hwp or .hwpx file onto the editor, or choose Open → From file… to pick one.",
       "step2": "Check the result",
       "step2Desc": "The Markdown opens in a new tab next to a live preview, ready for touch-ups.",
       "step3": "Save or reuse it",
@@ -273,21 +273,21 @@
       "boxes": "Single-cell box tables → paragraphs",
       "lineBreaks": "Line breaks",
       "images": "Images, embedded in the document",
-      "sections": "Multi-section documents, in order"
+      "sections": "Text boxes → paragraphs"
     },
     "limits": {
       "title": "Good to know",
       "merged": "Markdown tables can't merge cells, so merged content goes in the top-left cell only.",
       "numbering": "Automatic outline numbers (1., a.) aren't stored as text in the file, so they're left out.",
       "images": "Images are embedded up to about 2 MB per document. Any that don't fit are left out, and you're told how many.",
-      "hwp": "Legacy .hwp files aren't supported yet. Save them as HWPX first, as shown below."
+      "hwp": "Distribution-only and password-protected documents can't be opened. Equations, charts and OLE objects are left out; everything else is converted."
     },
     "hwpGuide": {
-      "title": "How to save an HWP file as HWPX",
-      "step1": "Open the .hwp document in Hancom Office Hangul.",
+      "title": "When an HWP file won't open",
+      "step1": "Open the document in Hancom Office Hangul. If it has a password, enter it and then remove the document password.",
       "step2": "Choose File → Save As.",
-      "step3": "In the file type list, pick the format ending in *.hwpx and save.",
-      "step4": "Drop the saved .hwpx file onto the printmd editor."
+      "step3": "In the file type list, pick the format ending in *.hwpx and save. This also works for old HWP 3.0 files.",
+      "step4": "Drop the saved .hwpx file onto the printmd editor. Distribution-only documents can't be converted this way either."
     },
     "useCases": {
       "title": "When it helps",
@@ -303,9 +303,9 @@
     "faq": {
       "title": "Frequently Asked Questions",
       "q1": "Can I convert HWP files too?",
-      "a1": "Only HWPX is supported for now. Save a legacy .hwp file as HWPX in Hangul (File → Save As), then open it in printmd.",
+      "a1": "Yes. Both .hwp files (HWP 5.0 and later) and .hwpx files are supported. Distribution-only and password-protected documents can't be opened; save HWP 3.0 and older files as HWPX in Hangul first.",
       "q2": "Is my file uploaded to a server?",
-      "a2": "No. The HWPX file is read and converted inside your browser and is never sent anywhere, so it's safe for government and internal documents.",
+      "a2": "No. HWP and HWPX files are read and converted inside your browser and never sent anywhere, so they're safe for government and internal documents.",
       "q3": "How are tables and headings converted?",
       "a3": "Outline styles and short paragraphs set in a noticeably larger font become headings, and tables become Markdown tables. Single-cell box tables are unwrapped into paragraphs, and banner tables holding only a number and a title become headings.",
       "q4": "Are images included?",
@@ -316,7 +316,7 @@
       "a6": "Yes. It's free with no signup and no limit on conversions."
     },
     "cta": {
-      "title": "Convert your HWPX file now",
+      "title": "Convert your Hangul file now",
       "subtitle": "Free · No signup · Nothing uploaded"
     }
   },

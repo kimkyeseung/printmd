@@ -99,6 +99,11 @@ describe('hwpxToMarkdown', () => {
     expect(md).toContain('## 둘째 수준');
   });
 
+  it('does not turn large-font sentences or dates into headings', async () => {
+    const md = await convert(p(run('다음과 같이 공고합니다.', 2)) + p(run('2026. 1. 2.', 2)) + p(run('본문 내용')));
+    expect(md).toBe('**다음과 같이 공고합니다.**\n\n**2026. 1. 2.**\n\n본문 내용\n');
+  });
+
   it('treats a short paragraph in a much larger font as a heading', async () => {
     const md = await convert(p(run('큰 제목', 2)) + p(run('본문 내용이 이어집니다.')));
     expect(md.startsWith('# 큰 제목\n')).toBe(true);
@@ -109,14 +114,19 @@ describe('hwpxToMarkdown', () => {
     expect(md.trim()).toBe('들여쓴 줄\n다음 줄');
   });
 
+  it('keeps numbered lines and dates from becoming ordered lists', async () => {
+    const md = await convert(p(run('2026. 1. 2.')) + p(run('1) 첫째 항목')));
+    expect(md).toBe('2026\\. 1. 2.\n\n1\\) 첫째 항목\n');
+  });
+
   it('escapes Markdown syntax in document text', async () => {
     const md = await convert(p(run('# 샵 * 별 &lt;태그&gt;')));
     expect(md.trim()).toBe('\\# 샵 \\* 별 \\<태그\\>');
   });
 
-  it('drops Private Use Area placeholders', async () => {
-    const md = await convert(p(run(' - 항목')));
-    expect(md.trim()).toBe('- 항목');
+  it('drops Private Use Area placeholders and symbols', async () => {
+    const md = await convert(p(run('\uF000 - 항목')) + p(run('\u{F02B1} 자금지원방식')));
+    expect(md).toBe('- 항목\n\n자금지원방식\n');
   });
 
   it('converts tables to GFM, placing merged cells in their top-left slot', async () => {
@@ -147,6 +157,15 @@ describe('hwpxToMarkdown', () => {
       cell(1, 0, p('')) + cell(1, 1, p('')) + cell(1, 2, p('')) + cell(1, 3, p('')),
     ])));
     expect(md.trim()).toBe('## 1. 사업 개요');
+  });
+
+  it('reads text boxes, including ones grouped with other shapes', async () => {
+    const box = (content: string) =>
+      `<hp:rect><hp:drawText><hp:subList>${p(run(content))}</hp:subList></hp:drawText></hp:rect>`;
+    const md = await convert(p(
+      run('본문') + `<hp:run charPrIDRef="0">${box('글상자')}<hp:container>${box('묶인 글상자')}</hp:container></hp:run>`
+    ));
+    expect(md).toBe('본문\n\n글상자\n\n묶인 글상자\n');
   });
 
   it('embeds displayable images as data URIs', async () => {

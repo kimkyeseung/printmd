@@ -28,7 +28,7 @@ const en = {
   },
   shell: {
     skipToContent: 'Skip to content',
-    chooseFile: 'Choose a Markdown or HWPX file',
+    chooseFile: 'Choose a Markdown or Hangul (HWP/HWPX) file',
   },
   header: {
     logoAlt: 'printmd logo',
@@ -112,17 +112,20 @@ const en = {
     sharedStyleFailed: "Couldn't load the shared style.",
     sharedStyleApplied: 'Shared style applied',
     stillLayingOut: 'Still laying out pages. Try again in a moment.',
-    hwpxConverted: 'Converted the HWPX document to Markdown',
-    hwpxConvertedSkippedImages: 'Converted the HWPX document. {{count}} image(s) couldn’t be included.',
+    hangulConverted: 'Converted the Hangul document to Markdown',
+    hangulConvertedSkippedImages: 'Converted the Hangul document. {{count}} image(s) couldn’t be included.',
     hwpxFailed: "Couldn't read this HWPX file.",
-    hwpNotSupported: "HWP files aren't supported yet. Save the document as HWPX in Hangul and open that instead.",
-    unsupportedFile: 'Only .md, .markdown, .txt and .hwpx files can be opened.',
+    hwpFailed: "Couldn't read this HWP file. Save it as HWPX in Hangul and try again.",
+    hwpEncrypted: 'This HWP file is password-protected. Remove the password in Hangul, save, and open it again.',
+    hwpDistribution: "Distribution-only HWP documents restrict copying, so they can't be converted.",
+    hwpOldVersion: 'This is an HWP 3.0 or older file. Save it as HWPX in Hangul and open that instead.',
+    unsupportedFile: 'Only .md, .markdown, .txt, .hwp and .hwpx files can be opened.',
     fileOpenFailed: "Couldn't open the file.",
   },
   dropOverlay: {
     label: 'File drop area',
-    title: 'Drop your Markdown or HWPX file here',
-    formats: '.md, .markdown, .txt and .hwpx files',
+    title: 'Drop your Markdown or Hangul file here',
+    formats: '.md, .markdown, .txt, .hwp and .hwpx files',
   },
   print: {
     title: 'Print Preview',
@@ -178,7 +181,7 @@ const en = {
   },
   editor: {
     label: 'Markdown editor',
-    placeholder: 'Type or paste Markdown here, or drop a .md or .hwpx file.',
+    placeholder: 'Type or paste Markdown here, or drop a .md, .hwp or .hwpx file.',
     toolbar: {
       bold: 'Bold',
       italic: 'Italic',
@@ -213,7 +216,7 @@ const ko: AppStrings = {
   },
   shell: {
     skipToContent: '본문으로 건너뛰기',
-    chooseFile: '마크다운 또는 HWPX 파일 선택',
+    chooseFile: '마크다운 또는 한글(HWP·HWPX) 파일 선택',
   },
   header: {
     logoAlt: 'printmd 로고',
@@ -297,17 +300,20 @@ const ko: AppStrings = {
     sharedStyleFailed: '공유된 스타일을 불러오지 못했습니다.',
     sharedStyleApplied: '공유된 스타일을 적용했습니다',
     stillLayingOut: '아직 페이지를 배치하는 중입니다. 잠시 후 다시 시도해 주세요.',
-    hwpxConverted: 'HWPX 문서를 마크다운으로 변환했습니다',
-    hwpxConvertedSkippedImages: 'HWPX 문서를 변환했습니다. 이미지 {{count}}개는 넣지 못했습니다.',
+    hangulConverted: '한글 문서를 마크다운으로 변환했습니다',
+    hangulConvertedSkippedImages: '한글 문서를 변환했습니다. 이미지 {{count}}개는 넣지 못했습니다.',
     hwpxFailed: 'HWPX 파일을 읽지 못했습니다.',
-    hwpNotSupported: 'HWP 파일은 아직 지원하지 않습니다. 한글에서 HWPX로 저장한 뒤 열어 주세요.',
-    unsupportedFile: '.md, .markdown, .txt, .hwpx 파일만 열 수 있습니다.',
+    hwpFailed: 'HWP 파일을 읽지 못했습니다. 한글에서 HWPX로 저장한 뒤 다시 열어 주세요.',
+    hwpEncrypted: '암호가 걸린 HWP 파일입니다. 한글에서 암호를 해제하고 저장한 뒤 다시 열어 주세요.',
+    hwpDistribution: '배포용 HWP 문서는 복사가 제한되어 있어 변환할 수 없습니다.',
+    hwpOldVersion: 'HWP 3.0 이하 형식의 파일입니다. 한글에서 HWPX로 저장한 뒤 열어 주세요.',
+    unsupportedFile: '.md, .markdown, .txt, .hwp, .hwpx 파일만 열 수 있습니다.',
     fileOpenFailed: '파일을 열지 못했습니다.',
   },
   dropOverlay: {
     label: '파일 드롭 영역',
-    title: '마크다운 또는 HWPX 파일을 여기에 놓으세요',
-    formats: '.md, .markdown, .txt, .hwpx 파일 지원',
+    title: '마크다운 또는 한글 파일을 여기에 놓으세요',
+    formats: '.md, .markdown, .txt, .hwp, .hwpx 파일 지원',
   },
   print: {
     title: '인쇄 미리보기',
@@ -363,7 +369,7 @@ const ko: AppStrings = {
   },
   editor: {
     label: '마크다운 편집기',
-    placeholder: '마크다운을 입력하거나 붙여넣으세요. .md나 .hwpx 파일을 끌어다 놓아도 됩니다.',
+    placeholder: '마크다운을 입력하거나 붙여넣으세요. .md, .hwp, .hwpx 파일을 끌어다 놓아도 됩니다.',
     toolbar: {
       bold: '굵게',
       italic: '기울임',

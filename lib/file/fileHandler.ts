@@ -4,7 +4,7 @@ export interface FileInfo {
   size: number;
   lastModified: number;
   /** Set when the content was converted from another format. */
-  convertedFrom?: 'hwpx';
+  convertedFrom?: 'hwpx' | 'hwp';
   /** Images left out during conversion. */
   skippedImages?: number;
 }
@@ -19,16 +19,18 @@ export class UnsupportedFileError extends Error {
 }
 
 export async function readFile(file: File): Promise<FileInfo> {
-  if (isHwpxFile(file)) {
-    // Loaded on demand so the converter stays out of the editor's first load.
-    const { importHwpxFile } = await import('@/lib/import');
-    const { markdown, skippedImages } = await importHwpxFile(file);
+  const hangulFormat = isHwpxFile(file) ? 'hwpx' : isHwpFile(file) ? 'hwp' : null;
+  if (hangulFormat) {
+    // Loaded on demand so the converters stay out of the editor's first load.
+    const { importHwpxFile, importHwpFile } = await import('@/lib/import');
+    const convert = hangulFormat === 'hwpx' ? importHwpxFile : importHwpFile;
+    const { markdown, skippedImages } = await convert(file);
     return {
       name: file.name,
       content: markdown,
       size: file.size,
       lastModified: file.lastModified,
-      convertedFrom: 'hwpx',
+      convertedFrom: hangulFormat,
       skippedImages,
     };
   }
@@ -68,16 +70,16 @@ export function isHwpxFile(file: File): boolean {
   return file.name.toLowerCase().endsWith('.hwpx');
 }
 
-/** Legacy binary HWP, which can't be converted yet. */
+/** Legacy binary HWP 5.0. */
 export function isHwpFile(file: File): boolean {
   return file.name.toLowerCase().endsWith('.hwp');
 }
 
 export function isSupportedFile(file: File): boolean {
-  return isMarkdownFile(file) || isHwpxFile(file);
+  return isMarkdownFile(file) || isHwpxFile(file) || isHwpFile(file);
 }
 
 /** Tab title for an opened file: its name without the extension. */
 export function fileTitle(name: string): string {
-  return name.replace(/\.(md|markdown|mdown|mkd|mkdn|txt|hwpx)$/i, '');
+  return name.replace(/\.(md|markdown|mdown|mkd|mkdn|txt|hwpx|hwp)$/i, '');
 }

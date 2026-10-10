@@ -1,6 +1,10 @@
-import { hwpxToMarkdown, type HwpxConversion } from './hwpx';
+import { hwpxToMarkdown } from './hwpx';
+import { hwpToMarkdown } from './hwp';
+import type { ImportResult } from './document';
 
-export { hwpxToMarkdown, HwpxError, type HwpxConversion, type HwpxOptions } from './hwpx';
+export { hwpxToMarkdown, HwpxError } from './hwpx';
+export { hwpToMarkdown, HwpError, type HwpErrorCode } from './hwp';
+export type { ImportOptions, ImportResult } from './document';
 
 /** Wider than this is more detail than a printed page can show, even at 2×. */
 const MAX_IMAGE_WIDTH = 1600;
@@ -37,6 +41,11 @@ async function reencodeImage(bytes: Uint8Array, mediaType: string): Promise<stri
 }
 
 /** Convert an uploaded .hwpx file to Markdown in the browser. */
-export async function importHwpxFile(file: File): Promise<HwpxConversion> {
+export async function importHwpxFile(file: File): Promise<ImportResult> {
   return hwpxToMarkdown(await file.arrayBuffer(), { convertImage: reencodeImage });
+}
+
+/** Convert an uploaded legacy .hwp file to Markdown in the browser. */
+export async function importHwpFile(file: File): Promise<ImportResult> {
+  return hwpToMarkdown(await file.arrayBuffer(), { convertImage: reencodeImage });
 }

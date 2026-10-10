@@ -100,7 +100,7 @@ export default async function HwpToMarkdownPage({
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
-    name: locale === 'ko' ? '한글(HWPX) 문서를 마크다운으로 변환하는 방법' : 'How to Convert an HWPX Document to Markdown',
+    name: locale === 'ko' ? '한글(HWP·HWPX) 문서를 마크다운으로 변환하는 방법' : 'How to Convert an HWP or HWPX Document to Markdown',
     description: t.hero.description,
     totalTime: 'PT1M',
     tool: {
