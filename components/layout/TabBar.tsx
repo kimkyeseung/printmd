@@ -25,7 +25,6 @@ function TabItem({
   onSelect: () => void;
   onClose: () => void;
 }) {
-  const showDirtyDot = tab.isDirty && tab.documentId !== null;
   const t = useAppStrings().tabs;
   const title = tabDisplayTitle(tab) ?? t.untitled;
 
@@ -60,9 +59,9 @@ function TabItem({
           : 'bg-[var(--ui-bg-secondary,var(--ui-bg-hover))] text-[var(--ui-text-muted)] hover:bg-[var(--background)] hover:text-[var(--foreground)]'
       }`}
     >
-      {/* Dirty dot */}
-      {showDirtyDot && (
-        <span className="h-2 w-2 shrink-0 rounded-full bg-red-500" />
+      {/* Unsaved-changes dot: a new draft with text, or a saved document with edits */}
+      {tab.isDirty && (
+        <span className="h-2 w-2 shrink-0 rounded-full bg-red-500" aria-label={t.unsaved} title={t.unsaved} />
       )}
 
       {/* Title */}

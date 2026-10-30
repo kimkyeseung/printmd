@@ -31,9 +31,26 @@ interface DocumentsActions {
   deleteFolder: (id: string) => boolean; // returns false if has documents
   renameFolder: (id: string, newName: string) => void;
   moveFolder: (id: string, newParentId: string | null) => boolean; // returns false on circular ref
+  reorderDocument: (id: string, targetId: string, position: DropPosition) => void;
+  reorderFolder: (id: string, targetId: string, position: DropPosition) => boolean; // returns false on circular ref
   getDocumentsInFolder: (folderId: string) => Document[];
   getFoldersInFolder: (parentId: string | null) => Folder[];
   getDocument: (id: string) => Document | undefined;
+}
+
+/** Where a dragged item lands relative to the item it is dropped on. */
+export type DropPosition = 'before' | 'after';
+
+/**
+ * Move `item` next to the item with `targetId`. Arrays are the display order,
+ * so this is how the sidebar's order is changed.
+ */
+function placeNextTo<T extends { id: string }>(list: T[], item: T, targetId: string, position: DropPosition): T[] {
+  const rest = list.filter((x) => x.id !== item.id);
+  const targetIndex = rest.findIndex((x) => x.id === targetId);
+  if (targetIndex === -1) return list;
+  rest.splice(position === 'before' ? targetIndex : targetIndex + 1, 0, item);
+  return rest;
 }
 
 type DocumentsStore = DocumentsState & DocumentsActions;
@@ -147,6 +164,29 @@ export const useDocumentsStore = create<DocumentsStore>()(
             folder.id === id ? { ...folder, parentId: newParentId } : folder
           ),
         }));
+        return true;
+      },
+
+      // Dropping next to a document in another folder also moves it there.
+      reorderDocument: (id: string, targetId: string, position: DropPosition) => {
+        if (id === targetId) return;
+        const { documents } = get();
+        const doc = documents.find((d) => d.id === id);
+        const target = documents.find((d) => d.id === targetId);
+        if (!doc || !target) return;
+        const moved = doc.folderId === target.folderId ? doc : { ...doc, folderId: target.folderId, updatedAt: Date.now() };
+        set({ documents: placeNextTo(documents, moved, targetId, position) });
+      },
+
+      reorderFolder: (id: string, targetId: string, position: DropPosition) => {
+        if (id === targetId) return true;
+        const { folders } = get();
+        const folder = folders.find((f) => f.id === id);
+        const target = folders.find((f) => f.id === targetId);
+        if (!folder || !target) return false;
+        if (folder.parentId !== target.parentId && !get().moveFolder(id, target.parentId)) return false;
+        const moved = { ...folder, parentId: target.parentId };
+        set({ folders: placeNextTo(get().folders, moved, targetId, position) });
         return true;
       },
 

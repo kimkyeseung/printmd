@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { Folder, Document } from '@/stores/documentsStore';
+import type { Folder, Document, DropPosition } from '@/stores/documentsStore';
 import { useAppStrings, format } from '@/lib/i18n/appStrings';
 
 interface FolderTreeProps {
@@ -17,9 +17,41 @@ interface FolderTreeProps {
   onMoveDocument?: (id: string, newFolderId: string) => void;
   onMoveFolder?: (id: string, newParentId: string | null) => void;
   onCreateFolder?: (name: string, parentId: string | null) => void;
+  /** Drop a document before/after another one; enables reordering by drag. */
+  onReorderDocument?: (id: string, targetId: string, position: DropPosition) => void;
+  /** Drop a folder before/after another one; enables reordering by drag. */
+  onReorderFolder?: (id: string, targetId: string, position: DropPosition) => void;
   showDocuments?: boolean;
   currentDocumentId?: string | null;
+  /** Documents open in a tab with unsaved edits; they get a dot. */
+  dirtyDocumentIds?: ReadonlySet<string>;
 }
+
+type DragItem = { kind: 'doc' | 'folder'; id: string };
+type DropTarget = { id: string; position: DropPosition | 'inside' };
+
+/** Above or below the middle of the row under the pointer. */
+function halfOf(e: React.DragEvent): DropPosition {
+  const rect = e.currentTarget.getBoundingClientRect();
+  return e.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
+}
+
+/**
+ * For a folder row: the top and bottom quarters drop next to the folder, the
+ * middle drops into it.
+ */
+function zoneOf(e: React.DragEvent): DropPosition | 'inside' {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+  if (y < rect.height / 4) return 'before';
+  if (y > (rect.height * 3) / 4) return 'after';
+  return 'inside';
+}
+
+const DROP_LINE: Record<DropPosition, string> = {
+  before: 'shadow-[inset_0_2px_0_0_#60a5fa]',
+  after: 'shadow-[inset_0_-2px_0_0_#60a5fa]',
+};
 
 function InlineRenameInput({
   defaultValue,
@@ -77,18 +109,37 @@ export function FolderTree({
   onMoveDocument,
   onMoveFolder,
   onCreateFolder,
+  onReorderDocument,
+  onReorderFolder,
   showDocuments = false,
   currentDocumentId,
+  dirtyDocumentIds,
 }: FolderTreeProps) {
   const text = useAppStrings().sidebar;
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
     new Set(['root'])
   );
   const [renamingId, setRenamingId] = useState<string | null>(null);
-  const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
+  // dataTransfer can't be read during dragover, so remember what is dragged.
+  const dragItemRef = useRef<DragItem | null>(null);
   const [creatingInFolderId, setCreatingInFolderId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isDragOverRoot, setIsDragOverRoot] = useState(false);
+
+  const startDrag = (e: React.DragEvent, item: DragItem) => {
+    e.dataTransfer.setData(item.kind === 'doc' ? 'application/x-doc-id' : 'application/x-folder-id', item.id);
+    e.dataTransfer.effectAllowed = 'move';
+    dragItemRef.current = item;
+    setIsDragging(true);
+  };
+
+  const endDrag = () => {
+    dragItemRef.current = null;
+    setIsDragging(false);
+    setIsDragOverRoot(false);
+    setDropTarget(null);
+  };
 
   const toggleExpand = useCallback((folderId: string) => {
     setExpandedFolders((prev) => {
@@ -110,6 +161,39 @@ export function FolderTree({
     return documents.filter((d) => d.folderId === folderId);
   };
 
+  // Moving a focused row in the DOM drops its focus, so after a keyboard
+  // reorder the row is focused again by its data-tree-id.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const refocusIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!refocusIdRef.current) return;
+    containerRef.current?.querySelector<HTMLElement>(`[data-tree-id="${refocusIdRef.current}"]`)?.focus();
+    refocusIdRef.current = null;
+  }, [documents, folders]);
+
+  /**
+   * Alt+↑ / Alt+↓ moves a row one place among its siblings — the keyboard
+   * counterpart of dragging. Returns true when the key was handled.
+   */
+  const handleReorderKey = <T extends { id: string }>(
+    e: React.KeyboardEvent,
+    item: T,
+    siblings: T[],
+    reorder: ((id: string, targetId: string, position: DropPosition) => void) | undefined,
+    treeId: string,
+  ) => {
+    if (!reorder || !e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return false;
+    e.preventDefault();
+    const index = siblings.findIndex((x) => x.id === item.id);
+    const up = e.key === 'ArrowUp';
+    const neighbor = siblings[up ? index - 1 : index + 1];
+    if (neighbor) {
+      reorder(item.id, neighbor.id, up ? 'before' : 'after');
+      refocusIdRef.current = treeId;
+    }
+    return true;
+  };
+
   const renderDocument = (doc: Document, depth: number) => {
     const isRenaming = renamingId === `doc-${doc.id}`;
 
@@ -117,17 +201,45 @@ export function FolderTree({
       <div
         key={doc.id}
         draggable={!isRenaming && !!onMoveDocument}
-        onDragStart={(e) => {
-          e.dataTransfer.setData('application/x-doc-id', doc.id);
-          e.dataTransfer.effectAllowed = 'move';
-          setIsDragging(true);
+        onDragStart={(e) => startDrag(e, { kind: 'doc', id: doc.id })}
+        onDragEnd={endDrag}
+        onDragOver={(e) => {
+          const item = dragItemRef.current;
+          if (item?.kind !== 'doc' || !onReorderDocument) return;
+          e.preventDefault();
+          e.stopPropagation();
+          e.dataTransfer.dropEffect = 'move';
+          const position = item.id === doc.id ? null : halfOf(e);
+          setDropTarget(position ? { id: doc.id, position } : null);
         }}
-        onDragEnd={() => { setIsDragging(false); setIsDragOverRoot(false); }}
+        onDragLeave={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropTarget(null);
+        }}
+        onDrop={(e) => {
+          const item = dragItemRef.current;
+          if (item?.kind !== 'doc' || !onReorderDocument) return;
+          e.preventDefault();
+          e.stopPropagation();
+          if (item.id !== doc.id) onReorderDocument(item.id, doc.id, halfOf(e));
+          endDrag();
+        }}
         className={`group flex items-center gap-1 rounded px-2 py-1.5 cursor-pointer hover:bg-[var(--ui-bg-hover)] ${
           currentDocumentId === doc.id ? 'bg-[var(--ui-bg-hover)] font-medium' : ''
-        }`}
+        } ${dropTarget?.id === doc.id && dropTarget.position !== 'inside' ? DROP_LINE[dropTarget.position] : ''}`}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
         onClick={() => !isRenaming && onDocumentSelect?.(doc)}
+        role="button"
+        tabIndex={0}
+        data-tree-id={`doc-${doc.id}`}
+        aria-keyshortcuts={onReorderDocument ? 'Alt+ArrowUp Alt+ArrowDown' : undefined}
+        onKeyDown={(e) => {
+          if (isRenaming || e.target !== e.currentTarget) return;
+          if (handleReorderKey(e, doc, getDocumentsInFolder(doc.folderId), onReorderDocument, `doc-${doc.id}`)) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onDocumentSelect?.(doc);
+          }
+        }}
       >
         <span className="w-3" />
         <svg
@@ -165,6 +277,13 @@ export function FolderTree({
             {doc.name}
           </span>
         )}
+        {!isRenaming && dirtyDocumentIds?.has(doc.id) && (
+          <span
+            className="h-2 w-2 shrink-0 rounded-full bg-red-500"
+            aria-label={text.unsaved}
+            title={text.unsaved}
+          />
+        )}
         {!isRenaming && onDeleteDocument && (
           <button
             className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-100 text-red-500"
@@ -199,7 +318,7 @@ export function FolderTree({
     const hasChildren = subfolders.length > 0 || folderDocuments.length > 0;
     const isRenaming = renamingId === `folder-${folder.id}`;
 
-    const isDragOver = dragOverFolderId === folder.id;
+    const folderDrop = dropTarget?.id === folder.id ? dropTarget.position : null;
 
     return (
       <div key={folder.id}>
@@ -207,37 +326,45 @@ export function FolderTree({
           role="button"
           tabIndex={0}
           draggable={!isRenaming && folder.id !== 'root' && !!onMoveFolder}
-          onDragStart={(e) => {
-            e.dataTransfer.setData('application/x-folder-id', folder.id);
-            e.dataTransfer.effectAllowed = 'move';
-            setIsDragging(true);
-          }}
-          onDragEnd={() => { setIsDragging(false); setIsDragOverRoot(false); }}
+          onDragStart={(e) => startDrag(e, { kind: 'folder', id: folder.id })}
+          onDragEnd={endDrag}
           onDragOver={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             e.dataTransfer.dropEffect = 'move';
-            setDragOverFolderId(folder.id);
+            const item = dragItemRef.current;
+            if (item?.kind === 'folder' && item.id === folder.id) {
+              setDropTarget(null);
+              return;
+            }
+            const position = item?.kind === 'folder' && onReorderFolder && folder.id !== 'root' ? zoneOf(e) : 'inside';
+            setDropTarget({ id: folder.id, position });
           }}
           onDragLeave={(e) => {
             if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-              setDragOverFolderId(null);
+              setDropTarget(null);
             }
           }}
           onDrop={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            setDragOverFolderId(null);
             const docId = e.dataTransfer.getData('application/x-doc-id');
             const folderId = e.dataTransfer.getData('application/x-folder-id');
+            const position = folderId && onReorderFolder && folder.id !== 'root' ? zoneOf(e) : 'inside';
+            endDrag();
             if (docId && onMoveDocument) {
               onMoveDocument(docId, folder.id);
-            } else if (folderId && folderId !== folder.id && onMoveFolder) {
-              onMoveFolder(folderId, folder.id === 'root' ? null : folder.id);
+            } else if (folderId && folderId !== folder.id) {
+              if (position !== 'inside') {
+                onReorderFolder?.(folderId, folder.id, position);
+              } else if (onMoveFolder) {
+                onMoveFolder(folderId, folder.id === 'root' ? null : folder.id);
+              }
             }
           }}
           className={`group flex items-center gap-1 rounded px-2 py-1.5 cursor-pointer hover:bg-[var(--ui-bg-hover)] ${
             isSelected ? 'bg-[var(--ui-bg-hover)]' : ''
-          } ${isDragOver ? 'ring-2 ring-blue-400 bg-blue-50/30' : ''}`}
+          } ${folderDrop === 'inside' ? 'ring-2 ring-blue-400 bg-blue-50/30' : folderDrop ? DROP_LINE[folderDrop] : ''}`}
           style={{ paddingLeft: `${depth * 16 + 8}px` }}
           onClick={() => {
             if (!isRenaming) {
@@ -245,7 +372,16 @@ export function FolderTree({
               toggleExpand(folder.id);
             }
           }}
+          data-tree-id={`folder-${folder.id}`}
+          aria-keyshortcuts={onReorderFolder && folder.id !== 'root' ? 'Alt+ArrowUp Alt+ArrowDown' : undefined}
           onKeyDown={(e) => {
+            if (isRenaming || e.target !== e.currentTarget) return;
+            if (
+              folder.id !== 'root' &&
+              handleReorderKey(e, folder, getSubfolders(folder.parentId), onReorderFolder, `folder-${folder.id}`)
+            ) {
+              return;
+            }
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               onFolderSelect(folder.id);
@@ -383,8 +519,7 @@ export function FolderTree({
   const handleRootDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragOverFolderId(null);
-    setIsDragOverRoot(false);
+    endDrag();
     const docId = e.dataTransfer.getData('application/x-doc-id');
     const folderId = e.dataTransfer.getData('application/x-folder-id');
     if (docId && onMoveDocument) {
@@ -396,6 +531,7 @@ export function FolderTree({
 
   return (
     <div
+      ref={containerRef}
       className="text-sm"
       onDragOver={(e) => {
         e.preventDefault();

@@ -217,16 +217,22 @@ describe('tabsStore', () => {
   });
 
   describe('dirty dot logic', () => {
-    it('new tab (no documentId) is never dirty even with content changes', () => {
+    it('new tab (no documentId) shows the dot once text is typed', () => {
       const id = useTabsStore.getState().addTab();
       useTabsStore.getState().updateTabContent(id, 'some text');
       const tab = useTabsStore.getState().tabs.find((t) => t.id === id)!;
 
-      // isDirty is true but the red dot condition is: isDirty && documentId !== null
-      expect(tab.isDirty).toBe(true);
       expect(tab.documentId).toBeNull();
-      // So the UI should NOT show the red dot
-      expect(tab.isDirty && tab.documentId !== null).toBe(false);
+      expect(tab.isDirty).toBe(true);
+    });
+
+    it('new tab hides the dot after it is saved as a document', () => {
+      const id = useTabsStore.getState().addTab();
+      useTabsStore.getState().updateTabContent(id, 'some text');
+      useTabsStore.getState().markTabSaved(id, 'doc-1', 'Doc 1');
+      const tab = useTabsStore.getState().tabs.find((t) => t.id === id)!;
+
+      expect(tab.isDirty).toBe(false);
     });
 
     it('saved document shows dirty dot when modified', () => {
@@ -237,7 +243,7 @@ describe('tabsStore', () => {
       useTabsStore.getState().updateTabContent(id, 'modified');
       const tab = useTabsStore.getState().tabs.find((t) => t.id === id)!;
 
-      expect(tab.isDirty && tab.documentId !== null).toBe(true);
+      expect(tab.isDirty).toBe(true);
     });
 
     it('saved document hides dirty dot after save', () => {
@@ -249,7 +255,7 @@ describe('tabsStore', () => {
       useTabsStore.getState().markTabSaved(id);
       const tab = useTabsStore.getState().tabs.find((t) => t.id === id)!;
 
-      expect(tab.isDirty && tab.documentId !== null).toBe(false);
+      expect(tab.isDirty).toBe(false);
     });
   });
 
