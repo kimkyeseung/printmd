@@ -72,6 +72,7 @@ const en = {
     newTab: 'New tab',
     closeTab: 'Close {{title}}',
     confirmCloseDirty: 'You have unsaved changes. Close this tab anyway?',
+    unsaved: 'Unsaved changes',
   },
   sidebar: {
     open: 'Open sidebar',
@@ -80,6 +81,7 @@ const en = {
     documents: 'Documents',
     moveToRoot: 'Move to root',
     deleteItem: 'Delete {{name}}',
+    unsaved: 'Unsaved changes',
     addSubfolder: 'Add subfolder in {{name}}',
     confirmDeleteDocument: 'Delete the document "{{name}}"?',
     confirmDeleteFolder: 'Delete the folder "{{name}}"?',
@@ -267,6 +269,7 @@ const ko: AppStrings = {
     newTab: '새 탭',
     closeTab: '{{title}} 닫기',
     confirmCloseDirty: '저장하지 않은 변경사항이 있습니다. 닫으시겠습니까?',
+    unsaved: '저장되지 않은 변경 사항',
   },
   sidebar: {
     open: '사이드바 열기',
@@ -275,6 +278,7 @@ const ko: AppStrings = {
     documents: '문서',
     moveToRoot: '최상위로 이동',
     deleteItem: '{{name}} 삭제',
+    unsaved: '저장되지 않은 변경 사항',
     addSubfolder: '{{name}}에 하위 폴더 추가',
     confirmDeleteDocument: '"{{name}}" 문서를 삭제하시겠습니까?',
     confirmDeleteFolder: '"{{name}}" 폴더를 삭제하시겠습니까?',

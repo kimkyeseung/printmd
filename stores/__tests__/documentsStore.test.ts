@@ -162,4 +162,66 @@ describe('documentsStore', () => {
       expect(folderC?.parentId).toBe(b);
     });
   });
+
+  describe('reorderDocument', () => {
+    const names = () => useDocumentsStore.getState().documents.map((d) => d.name);
+
+    beforeEach(() => {
+      const { saveDocument } = useDocumentsStore.getState();
+      saveDocument('A', '', 'root');
+      saveDocument('B', '', 'root');
+      saveDocument('C', '', 'root');
+    });
+
+    const idOf = (name: string) => useDocumentsStore.getState().documents.find((d) => d.name === name)!.id;
+
+    it('moves a document before another', () => {
+      useDocumentsStore.getState().reorderDocument(idOf('C'), idOf('A'), 'before');
+      expect(names()).toEqual(['C', 'A', 'B']);
+    });
+
+    it('moves a document after another', () => {
+      useDocumentsStore.getState().reorderDocument(idOf('A'), idOf('B'), 'after');
+      expect(names()).toEqual(['B', 'A', 'C']);
+    });
+
+    it('takes the target document\'s folder', () => {
+      const folderId = useDocumentsStore.getState().createFolder('F', null);
+      useDocumentsStore.getState().saveDocument('D', '', folderId);
+      useDocumentsStore.getState().reorderDocument(idOf('A'), idOf('D'), 'before');
+      const a = useDocumentsStore.getState().documents.find((d) => d.name === 'A')!;
+      expect(a.folderId).toBe(folderId);
+      expect(names()).toEqual(['B', 'C', 'A', 'D']);
+    });
+  });
+
+  describe('reorderFolder', () => {
+    const names = () => useDocumentsStore.getState().folders.map((f) => f.name);
+
+    it('moves a folder before a sibling', () => {
+      const { createFolder } = useDocumentsStore.getState();
+      const a = createFolder('A', null);
+      createFolder('B', null);
+      const c = createFolder('C', null);
+      expect(useDocumentsStore.getState().reorderFolder(c, a, 'before')).toBe(true);
+      expect(names()).toEqual(['C', 'A', 'B']);
+    });
+
+    it('moves a folder next to a folder under another parent', () => {
+      const { createFolder } = useDocumentsStore.getState();
+      const a = createFolder('A', null);
+      const child = createFolder('Child', a);
+      const b = createFolder('B', null);
+      expect(useDocumentsStore.getState().reorderFolder(b, child, 'after')).toBe(true);
+      expect(useDocumentsStore.getState().folders.find((f) => f.id === b)!.parentId).toBe(a);
+    });
+
+    it('refuses to move a folder next to its own descendant', () => {
+      const { createFolder } = useDocumentsStore.getState();
+      const a = createFolder('A', null);
+      const child = createFolder('Child', a);
+      expect(useDocumentsStore.getState().reorderFolder(a, child, 'before')).toBe(false);
+      expect(useDocumentsStore.getState().folders.find((f) => f.id === a)!.parentId).toBeNull();
+    });
+  });
 });

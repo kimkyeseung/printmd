@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, createEvent } from '@testing-library/react';
 import { FolderTree } from '../FolderTree';
 import type { Folder, Document } from '@/stores/documentsStore';
 
@@ -209,6 +209,79 @@ describe('FolderTree', () => {
       });
 
       expect(folderRow.className).toContain('ring-2');
+    });
+  });
+
+  describe('reordering', () => {
+    const rowRect = { top: 0, height: 40, bottom: 40, left: 0, right: 200, width: 200, x: 0, y: 0, toJSON: () => ({}) };
+
+    function dragTo(source: Element, target: Element, clientY: number, kind: 'doc' | 'folder', id: string) {
+      target.getBoundingClientRect = () => rowRect as DOMRect;
+      const type = kind === 'doc' ? 'application/x-doc-id' : 'application/x-folder-id';
+      const dataTransfer = { setData: vi.fn(), getData: (t: string) => (t === type ? id : ''), dropEffect: '', effectAllowed: '' };
+      fireEvent.dragStart(source, { dataTransfer });
+      // jsdom's drag events don't take clientY from the init dict.
+      for (const create of [createEvent.dragOver, createEvent.drop]) {
+        const event = create(target, { dataTransfer });
+        Object.defineProperty(event, 'clientY', { value: clientY });
+        fireEvent(target, event);
+      }
+    }
+
+    const docs: Document[] = [
+      { id: 'a', name: 'Doc A', content: '', folderId: 'root', createdAt: 1, updatedAt: 1 },
+      { id: 'b', name: 'Doc B', content: '', folderId: 'root', createdAt: 2, updatedAt: 2 },
+    ];
+
+    it('drops a document above another document', () => {
+      const onReorderDocument = vi.fn();
+      render(<FolderTree {...defaultProps} documents={docs} onReorderDocument={onReorderDocument} />);
+      const a = screen.getByText('Doc A').closest('[draggable]')!;
+      const b = screen.getByText('Doc B').closest('[draggable]')!;
+      dragTo(b, a, 5, 'doc', 'b');
+      expect(onReorderDocument).toHaveBeenCalledWith('b', 'a', 'before');
+      expect(defaultProps.onMoveDocument).not.toHaveBeenCalled();
+    });
+
+    it('drops a document below another document', () => {
+      const onReorderDocument = vi.fn();
+      render(<FolderTree {...defaultProps} documents={docs} onReorderDocument={onReorderDocument} />);
+      const a = screen.getByText('Doc A').closest('[draggable]')!;
+      const b = screen.getByText('Doc B').closest('[draggable]')!;
+      dragTo(a, b, 35, 'doc', 'a');
+      expect(onReorderDocument).toHaveBeenCalledWith('a', 'b', 'after');
+    });
+
+    it('drops a folder next to another folder near its edge', () => {
+      const onReorderFolder = vi.fn();
+      render(<FolderTree {...defaultProps} onReorderFolder={onReorderFolder} />);
+      const f1 = screen.getByText('Folder 1').closest('[role="button"]')!;
+      const f2 = screen.getByText('Folder 2').closest('[role="button"]')!;
+      dragTo(f2, f1, 2, 'folder', 'f2');
+      expect(onReorderFolder).toHaveBeenCalledWith('f2', 'f1', 'before');
+      expect(defaultProps.onMoveFolder).not.toHaveBeenCalled();
+    });
+
+    it('drops a folder into another folder over its middle', () => {
+      const onReorderFolder = vi.fn();
+      render(<FolderTree {...defaultProps} onReorderFolder={onReorderFolder} />);
+      const f1 = screen.getByText('Folder 1').closest('[role="button"]')!;
+      const f2 = screen.getByText('Folder 2').closest('[role="button"]')!;
+      dragTo(f2, f1, 20, 'folder', 'f2');
+      expect(onReorderFolder).not.toHaveBeenCalled();
+      expect(defaultProps.onMoveFolder).toHaveBeenCalledWith('f2', 'f1');
+    });
+  });
+
+  describe('unsaved dot', () => {
+    it('marks documents with unsaved edits', () => {
+      render(<FolderTree {...defaultProps} dirtyDocumentIds={new Set(['d2'])} />);
+      expect(screen.getByLabelText('Unsaved changes')).toBeInTheDocument();
+    });
+
+    it('shows no dot when nothing is dirty', () => {
+      render(<FolderTree {...defaultProps} />);
+      expect(screen.queryByLabelText('Unsaved changes')).not.toBeInTheDocument();
     });
   });
 

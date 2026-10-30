@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { FolderTree } from '@/components/save/FolderTree';
@@ -9,7 +9,7 @@ import { useTabsStore } from '@/stores/tabsStore';
 import { useUIStore } from '@/stores/uiStore';
 import { toast } from 'sonner';
 import { useAppStrings, format } from '@/lib/i18n/appStrings';
-import type { Document } from '@/stores/documentsStore';
+import type { Document, DropPosition } from '@/stores/documentsStore';
 
 function HamburgerIcon({ className }: { className?: string }) {
   return (
@@ -227,6 +227,13 @@ export function DocumentSidebar() {
   const renameFolder = useDocumentsStore((s) => s.renameFolder);
   const moveDocument = useDocumentsStore((s) => s.moveDocument);
   const moveFolder = useDocumentsStore((s) => s.moveFolder);
+  const reorderDocument = useDocumentsStore((s) => s.reorderDocument);
+  const reorderFolder = useDocumentsStore((s) => s.reorderFolder);
+
+  const dirtyDocumentIds = useMemo(
+    () => new Set(tabsList.flatMap((t) => (t.isDirty && t.documentId ? [t.documentId] : []))),
+    [tabsList],
+  );
 
   const handleDeleteDocument = useCallback(
     (id: string) => {
@@ -300,6 +307,15 @@ export function DocumentSidebar() {
       }
     },
     [moveFolder, text],
+  );
+
+  const handleReorderFolder = useCallback(
+    (id: string, targetId: string, position: DropPosition) => {
+      if (!reorderFolder(id, targetId, position)) {
+        toast.error(text.toast.cannotMoveThere);
+      }
+    },
+    [reorderFolder, text],
   );
 
   const isEmpty = documents.length === 0 && folders.length === 0;
@@ -411,6 +427,9 @@ export function DocumentSidebar() {
               onMoveDocument={handleMoveDocument}
               onMoveFolder={handleMoveFolder}
               onCreateFolder={handleCreateFolder}
+              onReorderDocument={reorderDocument}
+              onReorderFolder={handleReorderFolder}
+              dirtyDocumentIds={dirtyDocumentIds}
               showDocuments
             />
           )}
