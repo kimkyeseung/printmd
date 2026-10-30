@@ -100,7 +100,7 @@ export function SiteFooter({
           <p>&copy; {new Date().getFullYear()} printmd. {dict.allRights}</p>
           <div className="flex items-center gap-4">
             <a
-              href="mailto:contact@printmd.app"
+              href="mailto:kimkyeseung@gmail.com"
               className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
             >
               {dict.contact}
