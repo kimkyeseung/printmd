@@ -32,6 +32,8 @@ const en = {
     feedback: 'Send feedback',
     feedbackHint: 'Bugs, ideas, anything',
     feedbackSubject: '[printmd] Feedback',
+    feedbackBodyIntro: 'Write your message here:',
+    feedbackEnvHeading: '--- For bug reports (feel free to delete) ---',
   },
   header: {
     logoAlt: 'printmd logo',
@@ -232,6 +234,8 @@ const ko: AppStrings = {
     feedback: '의견 보내기',
     feedbackHint: '버그, 아이디어 무엇이든',
     feedbackSubject: '[printmd] 의견',
+    feedbackBodyIntro: '여기에 내용을 적어 주세요:',
+    feedbackEnvHeading: '--- 버그 확인용 정보 (지워도 됩니다) ---',
   },
   header: {
     logoAlt: 'printmd 로고',

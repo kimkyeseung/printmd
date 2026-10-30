@@ -273,6 +273,48 @@ describe('FolderTree', () => {
     });
   });
 
+  describe('keyboard reordering', () => {
+    const docs: Document[] = [
+      { id: 'a', name: 'Doc A', content: '', folderId: 'root', createdAt: 1, updatedAt: 1 },
+      { id: 'b', name: 'Doc B', content: '', folderId: 'root', createdAt: 2, updatedAt: 2 },
+    ];
+    const rowOf = (name: string) => screen.getByText(name).closest('[data-tree-id]') as HTMLElement;
+
+    it('Alt+ArrowUp moves a document above its previous sibling', () => {
+      const onReorderDocument = vi.fn();
+      render(<FolderTree {...defaultProps} documents={docs} onReorderDocument={onReorderDocument} />);
+      fireEvent.keyDown(rowOf('Doc B'), { key: 'ArrowUp', altKey: true });
+      expect(onReorderDocument).toHaveBeenCalledWith('b', 'a', 'before');
+    });
+
+    it('Alt+ArrowDown moves a document below its next sibling', () => {
+      const onReorderDocument = vi.fn();
+      render(<FolderTree {...defaultProps} documents={docs} onReorderDocument={onReorderDocument} />);
+      fireEvent.keyDown(rowOf('Doc A'), { key: 'ArrowDown', altKey: true });
+      expect(onReorderDocument).toHaveBeenCalledWith('a', 'b', 'after');
+    });
+
+    it('does nothing at the edge of the list', () => {
+      const onReorderDocument = vi.fn();
+      render(<FolderTree {...defaultProps} documents={docs} onReorderDocument={onReorderDocument} />);
+      fireEvent.keyDown(rowOf('Doc A'), { key: 'ArrowUp', altKey: true });
+      expect(onReorderDocument).not.toHaveBeenCalled();
+    });
+
+    it('Alt+ArrowDown moves a folder below its next sibling', () => {
+      const onReorderFolder = vi.fn();
+      render(<FolderTree {...defaultProps} onReorderFolder={onReorderFolder} />);
+      fireEvent.keyDown(rowOf('Folder 1'), { key: 'ArrowDown', altKey: true });
+      expect(onReorderFolder).toHaveBeenCalledWith('f1', 'f2', 'after');
+    });
+
+    it('Enter opens a document', () => {
+      render(<FolderTree {...defaultProps} />);
+      fireEvent.keyDown(rowOf('Doc 2'), { key: 'Enter' });
+      expect(defaultProps.onDocumentSelect).toHaveBeenCalledWith(mockDocuments[1]);
+    });
+  });
+
   describe('unsaved dot', () => {
     it('marks documents with unsaved edits', () => {
       render(<FolderTree {...defaultProps} dirtyDocumentIds={new Set(['d2'])} />);

@@ -14,6 +14,7 @@ import { buildDocumentShareUrl } from '@/lib/share/documentUrl';
 import { showToast } from '@/components/ui/Toast';
 import { DragDropOverlay } from './DragDropOverlay';
 import { useAppStrings } from '@/lib/i18n/appStrings';
+import { FeedbackLink } from '@/components/layout/FeedbackLink';
 import { CustomFontLoader } from '@/components/style/CustomFontLoader';
 import { DocumentSidebar } from '@/components/sidebar/DocumentSidebar';
 import '@/styles/editor.css';
@@ -372,8 +373,7 @@ export default function HomeClient() {
               <span className="text-2xl">☕</span>
               <span>Buy me a coffee</span>
             </a>
-            <a
-              href={`mailto:kimkyeseung@gmail.com?subject=${encodeURIComponent(text.shell.feedbackSubject)}`}
+            <FeedbackLink
               className="group mt-4 flex w-[136px] flex-col items-center gap-1.5 rounded-xl border border-[var(--ui-border)] px-3 py-3 text-xs text-[var(--ui-text-muted)] transition-all hover:-translate-y-0.5 hover:border-[var(--printmd-link-color,#2563eb)] hover:text-[var(--foreground)] hover:shadow-md"
             >
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--ui-bg-hover)] text-[var(--ui-text-muted)] transition-colors group-hover:bg-[var(--printmd-link-color,#2563eb)] group-hover:text-white">
@@ -383,7 +383,7 @@ export default function HomeClient() {
               </span>
               <span className="font-medium">{text.shell.feedback}</span>
               <span className="text-[10px] leading-tight opacity-80">{text.shell.feedbackHint}</span>
-            </a>
+            </FeedbackLink>
           </div>
         </aside>
       </div>

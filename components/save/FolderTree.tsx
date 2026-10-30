@@ -161,6 +161,39 @@ export function FolderTree({
     return documents.filter((d) => d.folderId === folderId);
   };
 
+  // Moving a focused row in the DOM drops its focus, so after a keyboard
+  // reorder the row is focused again by its data-tree-id.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const refocusIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!refocusIdRef.current) return;
+    containerRef.current?.querySelector<HTMLElement>(`[data-tree-id="${refocusIdRef.current}"]`)?.focus();
+    refocusIdRef.current = null;
+  }, [documents, folders]);
+
+  /**
+   * Alt+↑ / Alt+↓ moves a row one place among its siblings — the keyboard
+   * counterpart of dragging. Returns true when the key was handled.
+   */
+  const handleReorderKey = <T extends { id: string }>(
+    e: React.KeyboardEvent,
+    item: T,
+    siblings: T[],
+    reorder: ((id: string, targetId: string, position: DropPosition) => void) | undefined,
+    treeId: string,
+  ) => {
+    if (!reorder || !e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return false;
+    e.preventDefault();
+    const index = siblings.findIndex((x) => x.id === item.id);
+    const up = e.key === 'ArrowUp';
+    const neighbor = siblings[up ? index - 1 : index + 1];
+    if (neighbor) {
+      reorder(item.id, neighbor.id, up ? 'before' : 'after');
+      refocusIdRef.current = treeId;
+    }
+    return true;
+  };
+
   const renderDocument = (doc: Document, depth: number) => {
     const isRenaming = renamingId === `doc-${doc.id}`;
 
@@ -195,6 +228,18 @@ export function FolderTree({
         } ${dropTarget?.id === doc.id && dropTarget.position !== 'inside' ? DROP_LINE[dropTarget.position] : ''}`}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
         onClick={() => !isRenaming && onDocumentSelect?.(doc)}
+        role="button"
+        tabIndex={0}
+        data-tree-id={`doc-${doc.id}`}
+        aria-keyshortcuts={onReorderDocument ? 'Alt+ArrowUp Alt+ArrowDown' : undefined}
+        onKeyDown={(e) => {
+          if (isRenaming || e.target !== e.currentTarget) return;
+          if (handleReorderKey(e, doc, getDocumentsInFolder(doc.folderId), onReorderDocument, `doc-${doc.id}`)) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onDocumentSelect?.(doc);
+          }
+        }}
       >
         <span className="w-3" />
         <svg
@@ -327,7 +372,16 @@ export function FolderTree({
               toggleExpand(folder.id);
             }
           }}
+          data-tree-id={`folder-${folder.id}`}
+          aria-keyshortcuts={onReorderFolder && folder.id !== 'root' ? 'Alt+ArrowUp Alt+ArrowDown' : undefined}
           onKeyDown={(e) => {
+            if (isRenaming || e.target !== e.currentTarget) return;
+            if (
+              folder.id !== 'root' &&
+              handleReorderKey(e, folder, getSubfolders(folder.parentId), onReorderFolder, `folder-${folder.id}`)
+            ) {
+              return;
+            }
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               onFolderSelect(folder.id);
@@ -477,6 +531,7 @@ export function FolderTree({
 
   return (
     <div
+      ref={containerRef}
       className="text-sm"
       onDragOver={(e) => {
         e.preventDefault();

@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { FolderTree } from '@/components/save/FolderTree';
+import { FeedbackLink } from '@/components/layout/FeedbackLink';
 import { useDocumentsStore } from '@/stores/documentsStore';
 import { useTabsStore } from '@/stores/tabsStore';
 import { useUIStore } from '@/stores/uiStore';
@@ -33,6 +34,7 @@ const LINK_ICONS = {
   guide: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
   cheatsheet: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
   presets: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01',
+  feedback: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
   blog: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z',
 } as const;
 
@@ -47,7 +49,8 @@ const LINK_ICONS = {
 function SiteLinks({ collapsed }: { collapsed: boolean }) {
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
-  const t = useAppStrings().sidebar;
+  const strings = useAppStrings();
+  const t = strings.sidebar;
   const tools = [
     { key: 'markdownToPdf', href: `/${locale}/markdown-to-pdf` },
     { key: 'markdownPrint', href: `/${locale}/markdown-print` },
@@ -87,6 +90,16 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
         <nav aria-label={t.linksHeading} className="flex flex-col items-center gap-1">
           {main.map(iconLink)}
         </nav>
+        <span className="my-1 h-px w-5 bg-[var(--ui-border)]" aria-hidden="true" />
+        <FeedbackLink
+          title={strings.shell.feedback}
+          aria-label={strings.shell.feedback}
+          className="flex h-8 w-8 items-center justify-center rounded text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)] hover:text-[var(--foreground)]"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={LINK_ICONS.feedback} />
+          </svg>
+        </FeedbackLink>
       </div>
     );
   }
@@ -119,6 +132,12 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
         <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ui-text-muted)]">{t.linksHeading}</h2>
         {linkList(main)}
       </nav>
+      <FeedbackLink title={strings.shell.feedbackHint} className="mt-3 flex items-center gap-2 rounded-md border border-[var(--ui-border)] px-2 py-1.5 text-[var(--ui-text-muted)] transition-colors hover:border-[var(--printmd-link-color,#2563eb)] hover:text-[var(--foreground)]">
+        <svg className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={LINK_ICONS.feedback} />
+        </svg>
+        <span className="whitespace-nowrap font-medium">{strings.shell.feedback}</span>
+      </FeedbackLink>
       <p className="mt-2 flex flex-wrap items-center gap-x-2 text-[11px] text-[var(--ui-text-muted)]">
         {secondary.map(({ key, href }, i) => (
           <span key={key} className="flex gap-2">
