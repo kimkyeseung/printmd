@@ -372,6 +372,18 @@ export default function HomeClient() {
               <span className="text-2xl">☕</span>
               <span>Buy me a coffee</span>
             </a>
+            <a
+              href={`mailto:kimkyeseung@gmail.com?subject=${encodeURIComponent(text.shell.feedbackSubject)}`}
+              className="group mt-4 flex w-[136px] flex-col items-center gap-1.5 rounded-xl border border-[var(--ui-border)] px-3 py-3 text-xs text-[var(--ui-text-muted)] transition-all hover:-translate-y-0.5 hover:border-[var(--printmd-link-color,#2563eb)] hover:text-[var(--foreground)] hover:shadow-md"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--ui-bg-hover)] text-[var(--ui-text-muted)] transition-colors group-hover:bg-[var(--printmd-link-color,#2563eb)] group-hover:text-white">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </span>
+              <span className="font-medium">{text.shell.feedback}</span>
+              <span className="text-[10px] leading-tight opacity-80">{text.shell.feedbackHint}</span>
+            </a>
           </div>
         </aside>
       </div>

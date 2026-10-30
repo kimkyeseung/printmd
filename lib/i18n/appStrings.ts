@@ -29,6 +29,9 @@ const en = {
   shell: {
     skipToContent: 'Skip to content',
     chooseFile: 'Choose a Markdown or Hangul (HWP/HWPX) file',
+    feedback: 'Send feedback',
+    feedbackHint: 'Bugs, ideas, anything',
+    feedbackSubject: '[printmd] Feedback',
   },
   header: {
     logoAlt: 'printmd logo',
@@ -226,6 +229,9 @@ const ko: AppStrings = {
   shell: {
     skipToContent: '본문으로 건너뛰기',
     chooseFile: '마크다운 또는 한글(HWP·HWPX) 파일 선택',
+    feedback: '의견 보내기',
+    feedbackHint: '버그, 아이디어 무엇이든',
+    feedbackSubject: '[printmd] 의견',
   },
   header: {
     logoAlt: 'printmd 로고',
