@@ -5,6 +5,7 @@ import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
 import { ELEMENT_SELECTORS } from '@/lib/themes';
 import { ContentStyles } from './ContentStyles';
+import { PreviewWidthRuler } from './PreviewWidthRuler';
 import { useStyleStore, useUIStore, useTabsStore } from '@/stores';
 import type { GlobalStyles, EditableElement } from '@/types/style';
 import { SPACING_DEFAULTS } from '@/lib/styles/spacingDefaults';
@@ -165,6 +166,19 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
   const articleRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState<EditingState | null>(null);
+  const updateGlobalStyles = useStyleStore((state) => state.updateGlobalStyles);
+  // Held locally mid-drag so a whole drag is one undo step and one save.
+  const [draggedWidth, setDraggedWidth] = useState<number | null>(null);
+  const contentWidth = draggedWidth ?? styles.maxWidth;
+
+  const handleWidthCommit = useCallback(
+    (maxWidth: number) => {
+      setDraggedWidth(null);
+      updateGlobalStyles({ maxWidth });
+    },
+    [updateGlobalStyles],
+  );
+  const handleWidthCancel = useCallback(() => setDraggedWidth(null), []);
 
   const highlightCss = useMemo(() => {
     if (!spacingHighlight) return '';
@@ -330,11 +344,17 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
       {highlightCss ? (
         <style dangerouslySetInnerHTML={{ __html: highlightCss }} />
       ) : null}
+      <PreviewWidthRuler
+        width={contentWidth}
+        onDrag={setDraggedWidth}
+        onCommit={handleWidthCommit}
+        onCancel={handleWidthCancel}
+      />
       <article
         ref={articleRef}
         className="preview-content"
         style={{
-          maxWidth: styles.maxWidth,
+          maxWidth: contentWidth,
           margin: '0 auto',
           padding: `${styles.padding.top}px ${styles.padding.right}px ${styles.padding.bottom}px ${styles.padding.left}px`,
           fontFamily: styles.fontFamily,

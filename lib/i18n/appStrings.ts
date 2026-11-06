@@ -187,6 +187,10 @@ const en = {
   previewPanel: {
     title: 'Preview',
     source: 'Source',
+    widthHandle: 'Preview width',
+    widthHandleHint: 'Drag to resize. Double-click for full width.',
+    printWidth: 'Print width',
+    printWidthHint: 'Match the text width of the current paper, so lines wrap as they will in print.',
   },
   slides: {
     exit: 'Exit slide mode (Esc)',
@@ -389,6 +393,10 @@ const ko: AppStrings = {
   previewPanel: {
     title: '미리보기',
     source: '원본',
+    widthHandle: '미리보기 폭',
+    widthHandleHint: '드래그해서 폭을 조절합니다. 더블클릭하면 전체 폭으로 바뀝니다.',
+    printWidth: '인쇄 폭',
+    printWidthHint: '현재 용지의 본문 폭에 맞춰, 인쇄될 때와 같은 위치에서 줄이 바뀌게 합니다.',
   },
   slides: {
     exit: '슬라이드 모드 종료 (Esc)',

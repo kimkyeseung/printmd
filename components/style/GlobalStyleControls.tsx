@@ -3,6 +3,7 @@
 import { ColorPicker } from './ColorPicker';
 import { Slider } from './Slider';
 import { FONT_OPTIONS } from '@/lib/fonts/constants';
+import { PREVIEW_WIDTH_MIN, PREVIEW_WIDTH_MAX } from '@/lib/styles/previewWidth';
 import type { GlobalStyles } from '@/types/style';
 
 interface GlobalStyleControlsProps {
@@ -88,8 +89,8 @@ export function GlobalStyleControls({ styles, onChange }: GlobalStyleControlsPro
           label="Max Width"
           value={styles.maxWidth}
           onChange={(maxWidth) => onChange({ maxWidth })}
-          min={500}
-          max={1200}
+          min={PREVIEW_WIDTH_MIN}
+          max={PREVIEW_WIDTH_MAX}
           step={50}
           unit="px"
         />

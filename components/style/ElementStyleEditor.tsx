@@ -8,6 +8,7 @@ import { FONT_OPTIONS_WITH_DEFAULT as FONT_OPTIONS } from '@/lib/fonts/constants
 import { showToast } from '@/components/ui/Toast';
 import type { EditableElement, ElementStyle } from '@/types/style';
 import { SPACING_DEFAULTS } from '@/lib/styles/spacingDefaults';
+import { PREVIEW_WIDTH_MIN, PREVIEW_WIDTH_MAX } from '@/lib/styles/previewWidth';
 import { useClientDictionary } from '@/hooks/useClientLocale';
 
 const ELEMENT_KEYS: EditableElement[] = [
@@ -298,8 +299,8 @@ export function ElementStyleEditor() {
                 label={t.maxWidth}
                 value={globalStyles.maxWidth}
                 onChange={(maxWidth) => updateGlobalStyles({ maxWidth })}
-                min={500}
-                max={1200}
+                min={PREVIEW_WIDTH_MIN}
+                max={PREVIEW_WIDTH_MAX}
                 step={50}
                 unit="px"
               />
