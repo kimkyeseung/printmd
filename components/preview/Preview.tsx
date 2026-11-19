@@ -9,6 +9,21 @@ import { PreviewWidthRuler } from './PreviewWidthRuler';
 import { useStyleStore, useUIStore, useTabsStore } from '@/stores';
 import type { GlobalStyles, EditableElement } from '@/types/style';
 import { SPACING_DEFAULTS } from '@/lib/styles/spacingDefaults';
+import { CodeBlockToolbar } from './CodeBlockToolbar';
+import { readFenceLanguage, setFenceLanguage } from '@/lib/markdown/codeLanguages';
+import type { CodeThemeId } from '@/lib/markdown/codeThemes';
+
+/** The code block under the pointer, positioned in the container's coordinates. */
+interface HoveredCode {
+  line: number;
+  top: number;
+  right: number;
+}
+
+/** Inset of the toolbar from the code block's top-right corner. */
+const CODE_TOOLBAR_INSET = 6;
+/** Grace period for moving the pointer from a code block onto its toolbar. */
+const CODE_TOOLBAR_HIDE_DELAY = 150;
 
 interface PreviewProps {
   markdown: string;
@@ -306,16 +321,129 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
     setEditing(null);
   }, []);
 
+  // --- Code block hover toolbar -------------------------------------------
+  const [hoveredCode, setHoveredCode] = useState<HoveredCode | null>(null);
+  const codeToolbarFocused = useRef(false);
+  /** Pointer is over a code block or the toolbar itself. */
+  const codePointerInside = useRef(false);
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelHideCodeToolbar = useCallback(() => {
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    hideTimer.current = null;
+  }, []);
+
+  const scheduleHideCodeToolbar = useCallback(() => {
+    cancelHideCodeToolbar();
+    hideTimer.current = setTimeout(() => {
+      if (!codeToolbarFocused.current && !codePointerInside.current) setHoveredCode(null);
+    }, CODE_TOOLBAR_HIDE_DELAY);
+  }, [cancelHideCodeToolbar]);
+
+  const handleCodePointerLeave = useCallback(() => {
+    codePointerInside.current = false;
+    scheduleHideCodeToolbar();
+  }, [scheduleHideCodeToolbar]);
+
+  const handleToolbarPointerEnter = useCallback(() => {
+    codePointerInside.current = true;
+    cancelHideCodeToolbar();
+  }, [cancelHideCodeToolbar]);
+
+  useEffect(() => cancelHideCodeToolbar, [cancelHideCodeToolbar]);
+
+  const handleCodeMouseOver = useCallback((e: MouseEvent) => {
+    const pre = (e.target as HTMLElement).closest('pre[data-line]') as HTMLElement | null;
+    const container = containerRef.current;
+    if (!pre || !container) {
+      handleCodePointerLeave();
+      return;
+    }
+    codePointerInside.current = true;
+    cancelHideCodeToolbar();
+    const line = parseInt(pre.getAttribute('data-line') ?? '', 10);
+    if (isNaN(line)) return;
+    const c = container.getBoundingClientRect();
+    const r = pre.getBoundingClientRect();
+    const next = {
+      line,
+      top: r.top - c.top + container.scrollTop + CODE_TOOLBAR_INSET,
+      right: r.right - c.left + container.scrollLeft - CODE_TOOLBAR_INSET,
+    };
+    setHoveredCode((prev) =>
+      prev && prev.line === next.line && prev.top === next.top && prev.right === next.right ? prev : next,
+    );
+  }, [cancelHideCodeToolbar, handleCodePointerLeave]);
+
+  const hoveredLanguage = useMemo(() => {
+    if (!hoveredCode) return null;
+    const line = getActiveTab()?.content.split('\n')[hoveredCode.line];
+    return line === undefined ? null : readFenceLanguage(line);
+    // `markdown` is listed so the label follows edits to the fence line.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hoveredCode, getActiveTab, markdown]);
+
+  const handleCodeLanguageChange = useCallback((lang: string) => {
+    if (!hoveredCode) return;
+    const activeTab = getActiveTab();
+    if (!activeTab) return;
+    const lines = activeTab.content.split('\n');
+    const line = lines[hoveredCode.line];
+    if (line === undefined || readFenceLanguage(line) === null) return;
+    lines[hoveredCode.line] = setFenceLanguage(line, lang);
+    updateTabContent(activeTab.id, lines.join('\n'));
+  }, [hoveredCode, getActiveTab, updateTabContent]);
+
+  const handleCodeThemeChange = useCallback(
+    (codeTheme: CodeThemeId) => updateGlobalStyles({ codeTheme }),
+    [updateGlobalStyles],
+  );
+
+  const handleCodeCopy = useCallback(async () => {
+    if (!hoveredCode) return;
+    const pre = articleRef.current?.querySelector(`pre[data-line="${hoveredCode.line}"]`);
+    const code = pre?.querySelector('code') ?? pre;
+    await navigator.clipboard.writeText(code?.textContent ?? '');
+  }, [hoveredCode]);
+
+  const handleCodeToolbarFocus = useCallback((focused: boolean) => {
+    codeToolbarFocused.current = focused;
+    if (!focused) scheduleHideCodeToolbar();
+  }, [scheduleHideCodeToolbar]);
+
   useEffect(() => {
     const article = articleRef.current;
     if (!article) return;
     article.addEventListener('click', handleCheckboxClick);
     article.addEventListener('dblclick', handleDblClick);
+    article.addEventListener('mouseover', handleCodeMouseOver);
+    article.addEventListener('mouseleave', handleCodePointerLeave);
     return () => {
       article.removeEventListener('click', handleCheckboxClick);
       article.removeEventListener('dblclick', handleDblClick);
+      article.removeEventListener('mouseover', handleCodeMouseOver);
+      article.removeEventListener('mouseleave', handleCodePointerLeave);
     };
-  }, [handleCheckboxClick, handleDblClick]);
+  }, [handleCheckboxClick, handleDblClick, handleCodeMouseOver, handleCodePointerLeave]);
+
+  // The article's HTML was just rewritten (this runs after the innerHTML
+  // effect above): re-anchor the toolbar to the block on the same source line,
+  // e.g. after changing its language, or drop it if that block is gone.
+  useEffect(() => {
+    const article = articleRef.current;
+    if (!article) return;
+    setHoveredCode((prev) => {
+      if (!prev) return prev;
+      const pre = article.querySelector(`pre[data-line="${prev.line}"]`);
+      const container = containerRef.current;
+      if (!pre || !container) return null;
+      const c = container.getBoundingClientRect();
+      const r = pre.getBoundingClientRect();
+      const top = r.top - c.top + container.scrollTop + CODE_TOOLBAR_INSET;
+      const right = r.right - c.left + container.scrollLeft - CODE_TOOLBAR_INSET;
+      return top === prev.top && right === prev.right ? prev : { line: prev.line, top, right };
+    });
+  }, [html]);
 
   const cssVariables = useMemo(() => ({
     '--preview-font-size': `${styles.fontSize}px`,
@@ -365,6 +493,20 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
           color: styles.textColor,
         }}
       />
+      {hoveredCode && !editing && draggedWidth === null && (
+        <CodeBlockToolbar
+          top={hoveredCode.top}
+          right={hoveredCode.right}
+          language={hoveredLanguage}
+          codeTheme={styles.codeTheme ?? 'auto'}
+          onLanguageChange={handleCodeLanguageChange}
+          onThemeChange={handleCodeThemeChange}
+          onCopy={handleCodeCopy}
+          onMouseEnter={handleToolbarPointerEnter}
+          onMouseLeave={handleCodePointerLeave}
+          onFocusChange={handleCodeToolbarFocus}
+        />
+      )}
       {editing && (
         <InlineEditor
           editing={editing}
