@@ -359,7 +359,11 @@ export default function HomeClient() {
             {renderedContent}
           </div>
         </main>
-        <aside className="hidden xl:flex flex-col w-[160px] shrink-0 border-l border-[var(--ui-border)]">
+        {/* Hidden (not unmounted) while styling, so the ad isn't reloaded each
+            time the panel opens; the style panel gets the width instead. */}
+        <aside
+          className={`hidden ${isStylePanelOpen ? '' : 'xl:flex'} flex-col w-[160px] shrink-0 border-l border-[var(--ui-border)]`}
+        >
           <div className="sticky top-0 flex flex-col items-center">
             {!unfilledAds.sidebar && (
               <AdKakaoSidebar className="w-[160px] h-[600px]" onNoFill={onSidebarNoFill} />
