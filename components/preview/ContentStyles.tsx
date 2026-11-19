@@ -27,8 +27,9 @@ export function ContentStyles({ styles }: ContentStylesProps) {
         linkColor: styles.linkColor,
         codeBackground: styles.codeBackground,
         textColor: styles.textColor,
+        codeTheme: styles.codeTheme,
       }),
-    [styles.linkColor, styles.codeBackground, styles.textColor]
+    [styles.linkColor, styles.codeBackground, styles.textColor, styles.codeTheme]
   );
 
   const elementCss = useMemo(

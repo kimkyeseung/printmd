@@ -103,3 +103,21 @@ describe('syntax highlight styles', () => {
     expect(css).not.toContain('#d73a49');
   });
 });
+
+describe('code theme option', () => {
+  it('paints the block with a named theme background and text colour', () => {
+    const css = getContentStyles({ codeBackground: '#f5f5f5', codeTheme: 'one-dark' });
+    expect(css).toContain('pre.hljs { background-color: #282c34; color: #abb2bf; }');
+    expect(css).toMatch(/\.hljs-keyword[^{]*\{ color: #c678dd; \}/);
+  });
+
+  it('leaves the block background alone in auto mode', () => {
+    const css = getContentStyles({ codeBackground: '#f5f5f5', codeTheme: 'auto' });
+    expect(css).not.toMatch(/pre\.hljs \{ background-color/);
+  });
+
+  it('adds no token colours for none', () => {
+    const css = getContentStyles({ codeTheme: 'none' });
+    expect(css).not.toContain('.hljs-keyword');
+  });
+});

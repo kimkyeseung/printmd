@@ -111,12 +111,28 @@ export const ELEMENT_SELECTORS: Record<EditableElement, string> = {
   blockquote: '.preview-content blockquote',
   hr: '.preview-content hr',
   image: '.preview-content img',
-  code: '.preview-content pre, .preview-content code',
+  code: '.preview-content pre, .preview-content pre code',
+  inlineCode: '.preview-content :not(pre) > code',
   table: '.preview-content table',
   tableHeader: '.preview-content table th',
   tableCell: '.preview-content table td',
   tableEvenRow: '.preview-content table tr:nth-child(even)',
   strong: '.preview-content strong',
+};
+
+/**
+ * Narrower selectors for elements whose editor entry covers several DOM nodes.
+ * A fenced block is `<pre><code>…</code></pre>` and that inner `<code>` is
+ * inline: box properties on it are drawn once per wrapped line. So for `code`
+ * (the block) margin, padding, background and border go on `<pre>` only, while
+ * text properties keep the full selector so the inner `<code>` still gets
+ * them (its base rule sets its own font and line-height).
+ */
+export const ELEMENT_BOX_SELECTORS: Partial<Record<EditableElement, { box: string; surface: string }>> = {
+  code: {
+    box: '.preview-content pre',
+    surface: '.preview-content pre',
+  },
 };
 
 export function generateElementStylesCss(styles: ElementStyles): string {
@@ -133,12 +149,16 @@ export function generateElementStylesCss(styles: ElementStyles): string {
       ? `border-bottom: ${style.borderBottomWidth ?? 1}px ${sanitizeCssValue(style.borderBottomStyle!)} ${style.borderBottomColor ? sanitizeCssValue(style.borderBottomColor) : 'currentColor'}`
       : style.borderBottomStyle === 'none' ? 'border-bottom: none' : undefined;
 
-    const props = [
+    const textProps = [
       style.color && `color: ${sanitizeCssValue(style.color)}`,
       style.fontFamily && `font-family: ${sanitizeFontFamily(style.fontFamily)}`,
       style.fontSize && `font-size: ${style.fontSize}px`,
       style.fontWeight && `font-weight: ${sanitizeCssValue(style.fontWeight)}`,
-      style.backgroundColor && `background-color: ${sanitizeCssValue(style.backgroundColor)}`,
+      style.textIndent !== undefined && `text-indent: ${style.textIndent}px`,
+      style.imageWidth && `width: ${style.imageWidth}`,
+      style.lineHeight !== undefined && `line-height: ${style.lineHeight}`,
+    ];
+    const boxProps = [
       style.marginTop !== undefined && `margin-top: ${style.marginTop}px`,
       style.marginBottom !== undefined && `margin-bottom: ${style.marginBottom}px`,
       style.paddingTop !== undefined && `padding-top: ${style.paddingTop}px`,
@@ -146,16 +166,29 @@ export function generateElementStylesCss(styles: ElementStyles): string {
       style.paddingBottom !== undefined ? `padding-bottom: ${style.paddingBottom}px`
         : hasBorderBottom ? 'padding-bottom: 0.3em' : undefined,
       style.paddingLeft !== undefined && `padding-left: ${style.paddingLeft}px`,
-      style.textIndent !== undefined && `text-indent: ${style.textIndent}px`,
+    ];
+    const surfaceProps = [
+      style.backgroundColor && `background-color: ${sanitizeCssValue(style.backgroundColor)}`,
       borderBottomShorthand,
-      style.imageWidth && `width: ${style.imageWidth}`,
       style.borderWidth !== undefined && `border-width: ${style.borderWidth}px`,
       style.borderColor && `border-color: ${sanitizeCssValue(style.borderColor)}`,
       style.borderStyle && `border-style: ${sanitizeCssValue(style.borderStyle)}`,
       style.borderRadius !== undefined && `border-radius: ${style.borderRadius}px`,
-      style.lineHeight !== undefined && `line-height: ${style.lineHeight}`,
-    ].filter(Boolean).join('; ');
+    ];
 
+    const join = (list: unknown[]) => list.filter(Boolean).join('; ');
+    const split = ELEMENT_BOX_SELECTORS[element];
+    if (split) {
+      const text = join(textProps);
+      const surface = join(surfaceProps);
+      const box = join(boxProps);
+      if (text) rules.push(`${selector} { ${text} }`);
+      if (surface) rules.push(`${split.surface} { ${surface} }`);
+      if (box) rules.push(`${split.box} { ${box} }`);
+      return;
+    }
+
+    const props = join([...textProps, ...boxProps, ...surfaceProps]);
     if (props) rules.push(`${selector} { ${props} }`);
   });
 

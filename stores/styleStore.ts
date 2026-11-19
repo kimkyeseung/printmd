@@ -4,6 +4,13 @@ import { temporal } from 'zundo';
 import type { StyleStore, ThemePreset, GlobalStyles, ListStyles, HeadingStyles, CustomTheme, EditableElement, ElementStyle, ElementStyles, CustomFont, ColorPreset } from '@/types/style';
 import { themePresets, themeElementStyles, defaultStyles } from '@/lib/themes/presets';
 import { deriveColorRolesFromStyles } from '@/lib/themes/colorRoles';
+import { migrateLegacyCodeStyles, ELEMENT_STYLES_VERSION } from '@/lib/themes/migrateElementStyles';
+
+/** Bring a custom theme saved before the code / inline code split up to date. */
+function upgradeCustomTheme(theme: CustomTheme): CustomTheme {
+  if ((theme.version ?? 1) >= ELEMENT_STYLES_VERSION) return theme;
+  return { ...theme, elementStyles: migrateLegacyCodeStyles(theme.elementStyles), version: ELEMENT_STYLES_VERSION };
+}
 
 const defaultGlobalStyles = defaultStyles;
 
@@ -59,6 +66,7 @@ export const useStyleStore = create<StyleStore>()(
             listStyles: { ...listStyles },
             headingStyles: { ...headingStyles },
             elementStyles: { ...elementStyles },
+            version: ELEMENT_STYLES_VERSION,
             createdAt: new Date().toISOString(),
           };
           set({ customThemes: [...customThemes, newTheme] });
@@ -66,7 +74,8 @@ export const useStyleStore = create<StyleStore>()(
 
         loadCustomTheme: (id: string) => {
           const { customThemes } = get();
-          const theme = customThemes.find((t) => t.id === id);
+          const found = customThemes.find((t) => t.id === id);
+          const theme = found && upgradeCustomTheme(found);
           if (theme) {
             set({
               globalStyles: { ...theme.globalStyles },
@@ -93,7 +102,7 @@ export const useStyleStore = create<StyleStore>()(
           set((state) => ({
             customThemes: [
               ...state.customThemes,
-              { ...theme, id: `custom-${Date.now()}` },
+              { ...upgradeCustomTheme(theme), id: `custom-${Date.now()}` },
             ],
           })),
 
@@ -158,6 +167,16 @@ export const useStyleStore = create<StyleStore>()(
     ),
     {
       name: 'printmd-styles',
+      // v2: the code element split into code (blocks) and inlineCode.
+      version: ELEMENT_STYLES_VERSION,
+      migrate: (persisted, version) => {
+        const state = (persisted ?? {}) as Partial<StyleStore>;
+        if (version < ELEMENT_STYLES_VERSION) {
+          state.elementStyles = migrateLegacyCodeStyles(state.elementStyles) ?? {};
+          state.customThemes = (state.customThemes ?? []).map(upgradeCustomTheme);
+        }
+        return state as StyleStore;
+      },
       partialize: (state) => ({
         currentTheme: state.currentTheme,
         globalStyles: state.globalStyles,

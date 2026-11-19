@@ -1,7 +1,10 @@
 import type { GlobalStyles, ElementStyles, ListStyles, HeadingStyles } from '@/types/style';
 import { defaultStyles } from '@/lib/themes/presets';
+import { migrateLegacyCodeStyles, ELEMENT_STYLES_VERSION } from '@/lib/themes/migrateElementStyles';
 
 interface SharedPreset {
+  /** Element-styles shape version; absent in links made before the inline code split. */
+  v?: number;
   g?: Partial<GlobalStyles>;
   e?: ElementStyles;
   l?: ListStyles;
@@ -56,7 +59,10 @@ export function encodePresetToUrl(
 
   const gDiff = diffFromDefaults(globalStyles, defaultStyles);
   if (gDiff) preset.g = gDiff;
-  if (!isEmptyObject(elementStyles)) preset.e = elementStyles;
+  if (!isEmptyObject(elementStyles)) {
+    preset.v = ELEMENT_STYLES_VERSION;
+    preset.e = elementStyles;
+  }
   if (!isEmptyObject(listStyles)) preset.l = listStyles;
   if (!isEmptyObject(headingStyles)) preset.h = headingStyles;
 
@@ -81,7 +87,9 @@ export function decodePresetFromUrl(encoded: string): {
 
     return {
       globalStyles: preset.g,
-      elementStyles: preset.e,
+      elementStyles: (preset.v ?? 1) < ELEMENT_STYLES_VERSION
+        ? migrateLegacyCodeStyles(preset.e)
+        : preset.e,
       listStyles: preset.l,
       headingStyles: preset.h,
     };

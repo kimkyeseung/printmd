@@ -1,7 +1,10 @@
+import { resolveCodePalette, type CodeThemeId } from './codeThemes';
+
 interface ContentStyleOptions {
   linkColor?: string;
   codeBackground?: string;
   textColor?: string;
+  codeTheme?: CodeThemeId;
 }
 
 /**
@@ -140,7 +143,7 @@ export function getContentStyles(options?: ContentStyleOptions): string {
       font-size: 0.85em;
       line-height: 1.5;
     }
-${getSyntaxHighlightStyles(codeBg)}
+${getSyntaxHighlightStyles(codeBg, options?.codeTheme ?? 'auto')}
     .preview-content hr {
       /* The UA gives hr its own grey; inherit so currentColor matches on both
          surfaces if an element style ever gives it a border. */
@@ -250,28 +253,24 @@ ${getSyntaxHighlightStyles(codeBg)}
 /**
  * Token colours for fenced code blocks with a language (```ts, ```py, ...).
  * The parser runs highlight.js and emits `hljs-*` spans; these rules colour
- * them. The palette follows the theme's code background: GitHub light on light
- * backgrounds, GitHub dark on dark ones, so tokens stay readable either way.
+ * them.
+ *
+ * `auto` (the default) follows the theme's code background: GitHub light on
+ * light backgrounds, GitHub dark on dark ones, keeping the theme's own block
+ * colours. A named theme also paints the block background and text so its
+ * tokens sit on the surface they were designed for. `none` adds no colours.
  */
-function getSyntaxHighlightStyles(codeBg: string): string {
-  const dark = isHex(codeBg) && !isLight(codeBg);
-  const c = dark
-    ? {
-        comment: '#8b949e', keyword: '#ff7b72', string: '#a5d6ff',
-        number: '#79c0ff', title: '#d2a8ff', type: '#ffa657',
-        tag: '#7ee787', attr: '#79c0ff', meta: '#8b949e',
-        addition: '#aff5b4', additionBg: 'rgba(46, 160, 67, 0.15)',
-        deletion: '#ffdcd7', deletionBg: 'rgba(248, 81, 73, 0.15)',
-      }
-    : {
-        comment: '#6a737d', keyword: '#d73a49', string: '#032f62',
-        number: '#005cc5', title: '#6f42c1', type: '#e36209',
-        tag: '#22863a', attr: '#005cc5', meta: '#6a737d',
-        addition: '#22863a', additionBg: '#f0fff4',
-        deletion: '#b31d28', deletionBg: '#ffeef0',
-      };
+function getSyntaxHighlightStyles(codeBg: string, codeTheme: CodeThemeId): string {
+  const resolved = resolveCodePalette(codeTheme, codeBg);
+  if (!resolved) return '';
+  const c = resolved.palette;
   const s = '.preview-content pre.hljs';
-  return `
+  const blockCss = resolved.named
+    ? `
+    ${s} { background-color: ${c.background}; color: ${c.foreground}; }
+    ${s} code { color: inherit; }`
+    : '';
+  return `${blockCss}
     ${s} .hljs-comment,
     ${s} .hljs-quote { color: ${c.comment}; font-style: italic; }
     ${s} .hljs-keyword,
@@ -311,10 +310,6 @@ function getSyntaxHighlightStyles(codeBg: string): string {
     ${s} .hljs-addition { color: ${c.addition}; background-color: ${c.additionBg}; }
     ${s} .hljs-deletion { color: ${c.deletion}; background-color: ${c.deletionBg}; }
   `;
-}
-
-function isHex(color: string): boolean {
-  return /^#?[0-9a-f]{3,8}$/i.test(color.trim());
 }
 
 /** Simple check: is the color perceived as "light"? */

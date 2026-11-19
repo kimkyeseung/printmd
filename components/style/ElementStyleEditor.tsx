@@ -10,11 +10,12 @@ import type { EditableElement, ElementStyle } from '@/types/style';
 import { SPACING_DEFAULTS } from '@/lib/styles/spacingDefaults';
 import { PREVIEW_WIDTH_MIN, PREVIEW_WIDTH_MAX } from '@/lib/styles/previewWidth';
 import { useClientDictionary } from '@/hooks/useClientLocale';
+import { CODE_THEMES, resolveCodePalette, type CodeThemeId } from '@/lib/markdown/codeThemes';
 
 const ELEMENT_KEYS: EditableElement[] = [
   'page', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
   'paragraph', 'bulletList', 'orderedList', 'todoList', 'todoChecked',
-  'blockquote', 'hr', 'image', 'code', 'table',
+  'blockquote', 'hr', 'image', 'code', 'inlineCode', 'table',
 ];
 
 function detectUsedElements(markdown: string): Set<EditableElement> {
@@ -33,9 +34,35 @@ function detectUsedElements(markdown: string): Set<EditableElement> {
   if (/^>/m.test(markdown)) used.add('blockquote');
   if (/^---/m.test(markdown) || /^\*\*\*/m.test(markdown)) used.add('hr');
   if (/!\[.*\]\(.*\)/m.test(markdown)) used.add('image');
-  if (/```/m.test(markdown) || /`[^`]+`/.test(markdown)) used.add('code');
+  if (/^\s*(```|~~~)/m.test(markdown)) used.add('code');
+  // Inline code: a backtick span outside fenced blocks.
+  const withoutFences = markdown.replace(/^\s*(```|~~~)[\s\S]*?^\s*\1/gm, '');
+  if (/`[^`\n]+`/.test(withoutFences)) used.add('inlineCode');
   if (/^\|.*\|/m.test(markdown)) used.add('table');
   return used;
+}
+
+/** Tiny sample line showing the selected code theme's colours. */
+function CodeThemeSwatch({ themeId, codeBackground }: { themeId: CodeThemeId; codeBackground: string }) {
+  const resolved = resolveCodePalette(themeId, codeBackground);
+  if (!resolved) return null;
+  const c = resolved.palette;
+  return (
+    <div
+      className="rounded px-2 py-1.5 font-mono text-xs"
+      style={{
+        backgroundColor: resolved.named ? c.background : codeBackground,
+        color: resolved.named ? c.foreground : undefined,
+      }}
+      aria-hidden="true"
+    >
+      <span style={{ color: c.keyword }}>const</span>{' '}
+      <span style={{ color: c.title }}>greet</span> = (
+      <span style={{ color: c.type }}>name</span>) =&gt;{' '}
+      <span style={{ color: c.string }}>{"'hi'"}</span>;{' '}
+      <span style={{ color: c.comment, fontStyle: 'italic' }}>{'// 42'}</span>
+    </div>
+  );
 }
 
 /** Collapsible section wrapper */
@@ -187,6 +214,7 @@ export function ElementStyleEditor() {
   const isTextElement = (['paragraph', 'bulletList', 'orderedList', 'todoList', 'todoChecked', 'blockquote'] as EditableElement[]).includes(selectedElement);
   const isHeadingElement = (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as EditableElement[]).includes(selectedElement);
   const isTableElement = selectedElement === 'table';
+  const isCodeElement = selectedElement === 'code' || selectedElement === 'inlineCode';
 
   const spacingLabels = { top: t.top, bottom: t.bottom, left: t.left, right: t.right };
 
@@ -376,7 +404,7 @@ export function ElementStyleEditor() {
               <Section title={t.background}>
                 <ColorPicker
                   label={selectedElement === 'hr' ? t.lineColor : t.background}
-                  value={currentStyle.backgroundColor || '#ffffff'}
+                  value={currentStyle.backgroundColor || (isCodeElement ? globalStyles.codeBackground : '#ffffff')}
                   onChange={(backgroundColor) => handleStyleChange({ backgroundColor })}
                 />
               </Section>
@@ -444,7 +472,8 @@ export function ElementStyleEditor() {
               </>
             )}
 
-            {/* Margin */}
+            {/* Margin (vertical margin does nothing on inline code) */}
+            {selectedElement !== 'inlineCode' && (
             <Section title={t.margin}>
               <SpacingGrid
                 values={{ top: currentStyle.marginTop, bottom: currentStyle.marginBottom }}
@@ -459,6 +488,7 @@ export function ElementStyleEditor() {
                 onFieldBlur={() => setSpacingHighlight(null)}
               />
             </Section>
+            )}
 
             {/* Table-specific controls */}
             {isTableElement && (() => {
@@ -614,6 +644,9 @@ export function ElementStyleEditor() {
                     handleStyleChange({ [map[field]]: value });
                   }}
                   labels={spacingLabels}
+                  fields={selectedElement === 'inlineCode'
+                    ? [{ key: 'left', label: t.left }, { key: 'right', label: t.right }]
+                    : undefined}
                   defaults={{
                     top: SPACING_DEFAULTS[selectedElement].paddingTop,
                     bottom: SPACING_DEFAULTS[selectedElement].paddingBottom,
@@ -644,9 +677,37 @@ export function ElementStyleEditor() {
               </Section>
             )}
 
-            {/* Code Block */}
-            {selectedElement === 'code' && (
+            {/* Code block / inline code */}
+            {isCodeElement && (
               <>
+                {selectedElement === 'code' && (
+                <>
+                <Section title={t.codeTheme}>
+                  <div className="flex flex-col gap-1">
+                    <select
+                      value={globalStyles.codeTheme ?? 'auto'}
+                      onChange={(e) => updateGlobalStyles({ codeTheme: e.target.value as CodeThemeId })}
+                      className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                      aria-label={t.codeTheme}
+                    >
+                      <option value="auto">{t.codeThemes.auto}</option>
+                      <option value="none">{t.codeThemes.none}</option>
+                      <optgroup label={t.codeThemes.light}>
+                        {CODE_THEMES.filter((ct) => !ct.dark).map((ct) => (
+                          <option key={ct.id} value={ct.id}>{ct.label}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label={t.codeThemes.dark}>
+                        {CODE_THEMES.filter((ct) => ct.dark).map((ct) => (
+                          <option key={ct.id} value={ct.id}>{ct.label}</option>
+                        ))}
+                      </optgroup>
+                    </select>
+                    <CodeThemeSwatch themeId={globalStyles.codeTheme ?? 'auto'} codeBackground={globalStyles.codeBackground} />
+                    <p className="text-xs text-[var(--ui-text-muted)]">{t.codeThemeHint}</p>
+                  </div>
+                </Section>
+
                 <Section title={t.codeStyle}>
                   <Slider
                     label={t.lineHeight}
@@ -657,6 +718,8 @@ export function ElementStyleEditor() {
                     step={0.1}
                   />
                 </Section>
+                </>
+                )}
 
                 <Section title={t.border} defaultOpen={false}>
                   <div className="flex flex-col gap-2">
@@ -691,7 +754,7 @@ export function ElementStyleEditor() {
 
                     <Slider
                       label={t.borderRadius}
-                      value={currentStyle.borderRadius ?? 6}
+                      value={currentStyle.borderRadius ?? (selectedElement === 'inlineCode' ? 3 : 6)}
                       onChange={(borderRadius) => handleStyleChange({ borderRadius })}
                       min={0}
                       max={24}

@@ -1,3 +1,5 @@
+import type { CodeThemeId } from '@/lib/markdown/codeThemes';
+
 export interface Padding {
   top: number;
   right: number;
@@ -32,7 +34,7 @@ export interface ElementStyle {
 export type EditableElement =
   | 'page' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
   | 'paragraph' | 'bulletList' | 'orderedList' | 'todoList' | 'todoChecked'
-  | 'blockquote' | 'hr' | 'image' | 'code' | 'table' | 'tableHeader' | 'tableCell' | 'tableEvenRow'
+  | 'blockquote' | 'hr' | 'image' | 'code' | 'inlineCode' | 'table' | 'tableHeader' | 'tableCell' | 'tableEvenRow'
   | 'strong';
 
 export type ElementStyles = Partial<Record<EditableElement, ElementStyle>>;
@@ -55,6 +57,8 @@ export interface GlobalStyles {
   lineHeight: number;
   linkColor: string;
   codeBackground: string;
+  /** Syntax-highlight palette for fenced code blocks; undefined means 'auto'. */
+  codeTheme?: CodeThemeId;
   maxWidth: number;
   padding: Padding;
 }
@@ -102,6 +106,8 @@ export interface CustomTheme {
   listStyles?: ListStyles;
   headingStyles?: HeadingStyles;
   elementStyles?: ElementStyles;
+  /** Element-styles shape version; missing means before the inline code split. */
+  version?: number;
   createdAt: string;
 }
 

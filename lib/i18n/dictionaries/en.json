@@ -730,7 +730,8 @@
       "blockquote": "Quote",
       "hr": "Divider",
       "image": "Image",
-      "code": "Code",
+      "code": "Code Block",
+      "inlineCode": "Inline Code",
       "table": "Table"
     },
     "table": {
@@ -741,6 +742,14 @@
       "evenRowColor": "Even Row Color"
     },
     "codeStyle": "Code Style",
+    "codeTheme": "Code Theme",
+    "codeThemeHint": "Colors code blocks with a language tag such as ```ts.",
+    "codeThemes": {
+      "auto": "Auto (match code background)",
+      "none": "No colors",
+      "light": "Light",
+      "dark": "Dark"
+    },
     "colorRoles": "Color Roles",
     "customColors": "Custom Colors",
     "colorName": "Color name",

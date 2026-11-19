@@ -27,6 +27,7 @@ vi.mock('@/stores', () => ({
 vi.mock('@/lib/themes', () => ({
   generateElementStylesCss: () => '',
   ELEMENT_SELECTORS: {},
+  ELEMENT_BOX_SELECTORS: {},
 }));
 
 const defaultStyles = {

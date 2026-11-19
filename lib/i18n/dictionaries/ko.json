@@ -730,7 +730,8 @@
       "blockquote": "인용문",
       "hr": "구분선",
       "image": "이미지",
-      "code": "코드",
+      "code": "코드블럭",
+      "inlineCode": "인라인 코드",
       "table": "테이블"
     },
     "table": {
@@ -741,6 +742,14 @@
       "evenRowColor": "짝수 행 색상"
     },
     "codeStyle": "코드 스타일",
+    "codeTheme": "코드 테마",
+    "codeThemeHint": "```ts 처럼 언어를 적은 코드블럭에 색상이 적용됩니다.",
+    "codeThemes": {
+      "auto": "자동 (코드 배경에 맞춤)",
+      "none": "색상 없음",
+      "light": "밝은 테마",
+      "dark": "어두운 테마"
+    },
     "colorRoles": "색상 역할",
     "customColors": "커스텀 색상",
     "colorName": "색상 이름",

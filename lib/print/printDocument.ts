@@ -178,6 +178,9 @@ export function buildPrintDocument(options: PrintDocumentOptions): string {
     linkColor: colors.link,
     codeBackground: colors.codeBackground,
     textColor: colors.text,
+    // Without backgrounds the page is plain black-on-white, so a dark code
+    // theme would print as light text on nothing; fall back to auto.
+    codeTheme: includeBackground ? styles.codeTheme : 'auto',
   });
 
   const elementCss = generateElementStylesCss(

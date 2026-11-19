@@ -179,6 +179,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: 'rgba(0,0,0,0.20)' },
     tableEvenRow: { backgroundColor: 'rgba(0,0,0,0.03)' },
     code: { borderRadius: 6 },
+    inlineCode: { borderRadius: 6 },
   },
   dark: {
     h1: { color: '#ffffff', borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.15)' },
@@ -189,6 +190,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
     tableEvenRow: { backgroundColor: 'rgba(255,255,255,0.03)' },
     code: { borderRadius: 6 },
+    inlineCode: { borderRadius: 6 },
   },
   document: {
     h1: { color: '#1a1a1a', borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#333333' },
@@ -199,6 +201,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: '#cccccc' },
     tableEvenRow: { backgroundColor: '#f8f8f8' },
     code: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#e0e0e0' },
+    inlineCode: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#e0e0e0' },
   },
   blog: {
     h1: { color: '#111111', borderBottomStyle: 'none' },
@@ -209,6 +212,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: '#e0e0e0' },
     tableEvenRow: { backgroundColor: '#f0f7ff' },
     code: { borderRadius: 8 },
+    inlineCode: { borderRadius: 8 },
   },
   minimal: {
     h1: { borderBottomStyle: 'none' },
@@ -218,6 +222,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: '#000000' },
     tableEvenRow: { backgroundColor: 'transparent' },
     code: { borderRadius: 0 },
+    inlineCode: { borderRadius: 0 },
   },
   sepia: {
     h1: { color: '#3e2c1a', borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#c4a882' },
@@ -228,6 +233,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: '#d4c4a8' },
     tableEvenRow: { backgroundColor: '#f0e8d8' },
     code: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#c4a882' },
+    inlineCode: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#c4a882' },
   },
   ocean: {
     h1: { color: '#90e0ef', borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#48cae4' },
@@ -238,6 +244,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: 'rgba(72,202,228,0.2)' },
     tableEvenRow: { backgroundColor: 'rgba(72,202,228,0.05)' },
     code: { borderRadius: 6, borderStyle: 'solid', borderWidth: 1, borderColor: '#1b3a4b' },
+    inlineCode: { borderRadius: 6, borderStyle: 'solid', borderWidth: 1, borderColor: '#1b3a4b' },
   },
   forest: {
     h1: { color: '#1b5e20', borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#2e7d32' },
@@ -248,6 +255,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: '#c8e6c9' },
     tableEvenRow: { backgroundColor: '#f1f8e9' },
     code: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#c8e6c9' },
+    inlineCode: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#c8e6c9' },
   },
   sunset: {
     h1: { color: '#ffcba4', borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#ff9a56' },
@@ -258,6 +266,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: 'rgba(255,154,86,0.2)' },
     tableEvenRow: { backgroundColor: 'rgba(255,154,86,0.05)' },
     code: { borderRadius: 6, borderStyle: 'solid', borderWidth: 1, borderColor: '#4a2850' },
+    inlineCode: { borderRadius: 6, borderStyle: 'solid', borderWidth: 1, borderColor: '#4a2850' },
   },
   newspaper: {
     h1: { color: '#000000', borderBottomStyle: 'double', borderBottomWidth: 3, borderBottomColor: '#1a1a1a' },
@@ -267,6 +276,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: '#999999' },
     tableEvenRow: { backgroundColor: '#ece9e1' },
     code: { borderRadius: 0, borderStyle: 'solid', borderWidth: 1, borderColor: '#cccccc' },
+    inlineCode: { borderRadius: 0, borderStyle: 'solid', borderWidth: 1, borderColor: '#cccccc' },
   },
   academic: {
     h1: { color: '#1a1a1a', borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#222222' },
@@ -277,6 +287,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: '#cccccc' },
     tableEvenRow: { backgroundColor: '#f8f8f8' },
     code: { borderRadius: 2, borderStyle: 'solid', borderWidth: 1, borderColor: '#d0d0d0' },
+    inlineCode: { borderRadius: 2, borderStyle: 'solid', borderWidth: 1, borderColor: '#d0d0d0' },
   },
   notebook: {
     h1: { color: '#4a7cbb', borderBottomStyle: 'dashed', borderBottomWidth: 1, borderBottomColor: '#b0b0a0' },
@@ -287,6 +298,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'dashed', borderWidth: 1, borderColor: '#c8c8b8' },
     tableEvenRow: { backgroundColor: '#fafaf2' },
     code: { borderRadius: 4 },
+    inlineCode: { borderRadius: 4 },
   },
   terminal: {
     h1: { color: '#39ff14', borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#00ff00' },
@@ -297,6 +309,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { color: '#00ff00', borderStyle: 'solid', borderWidth: 1, borderColor: '#005500' },
     tableEvenRow: { backgroundColor: '#0a1a0a' },
     code: { borderRadius: 0, borderStyle: 'solid', borderWidth: 1, borderColor: '#333333' },
+    inlineCode: { borderRadius: 0, borderStyle: 'solid', borderWidth: 1, borderColor: '#333333' },
   },
   elegant: {
     h1: { color: '#8b6914', borderBottomStyle: 'solid', borderBottomWidth: 1, borderBottomColor: '#8b6914' },
@@ -307,6 +320,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: '#e8e0d0' },
     tableEvenRow: { backgroundColor: '#faf8f5' },
     code: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#ddd5c4' },
+    inlineCode: { borderRadius: 4, borderStyle: 'solid', borderWidth: 1, borderColor: '#ddd5c4' },
   },
   pastel: {
     h1: { color: '#7c3aed', borderBottomStyle: 'solid', borderBottomWidth: 2, borderBottomColor: '#c084fc' },
@@ -317,6 +331,7 @@ export const themeElementStyles: Partial<Record<ThemePreset, ElementStyles>> = {
     tableCell: { borderStyle: 'solid', borderWidth: 1, borderColor: '#e8d5f5' },
     tableEvenRow: { backgroundColor: '#fdf2f8' },
     code: { borderRadius: 8 },
+    inlineCode: { borderRadius: 8 },
   },
 };
 

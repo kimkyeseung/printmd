@@ -3,7 +3,7 @@
 import { memo, useMemo, useDeferredValue, useRef, useEffect, useCallback, useState } from 'react';
 import { parseMarkdown } from '@/lib/markdown/parser';
 import { sanitizeHtml } from '@/lib/markdown/sanitizer';
-import { ELEMENT_SELECTORS } from '@/lib/themes';
+import { ELEMENT_SELECTORS, ELEMENT_BOX_SELECTORS } from '@/lib/themes';
 import { ContentStyles } from './ContentStyles';
 import { PreviewWidthRuler } from './PreviewWidthRuler';
 import { useStyleStore, useUIStore, useTabsStore } from '@/stores';
@@ -45,7 +45,9 @@ function generateSpacingHighlightCss(
   elementStyles: Record<string, any>,
   globalPadding: { top: number; right: number; bottom: number; left: number },
 ): string {
-  const selector = ELEMENT_SELECTORS[highlight.element as keyof typeof ELEMENT_SELECTORS];
+  const selector =
+    ELEMENT_BOX_SELECTORS[highlight.element as EditableElement]?.box ??
+    ELEMENT_SELECTORS[highlight.element as keyof typeof ELEMENT_SELECTORS];
   if (!selector) return '';
 
   const isMargin = highlight.type === 'margin';
