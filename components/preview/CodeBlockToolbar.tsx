@@ -15,8 +15,6 @@ interface CodeBlockToolbarProps {
   onLanguageChange: (lang: string) => void;
   onThemeChange: (theme: CodeThemeId) => void;
   onCopy: () => Promise<void>;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
   /** Keeps the toolbar up while one of its dropdowns is open. */
   onFocusChange: (focused: boolean) => void;
 }
@@ -37,8 +35,6 @@ export function CodeBlockToolbar({
   onLanguageChange,
   onThemeChange,
   onCopy,
-  onMouseEnter,
-  onMouseLeave,
   onFocusChange,
 }: CodeBlockToolbarProps) {
   const t = useClientDictionary();
@@ -69,8 +65,6 @@ export function CodeBlockToolbar({
     <div
       className="code-block-toolbar absolute z-10 flex items-center gap-0.5 rounded-md border border-[var(--ui-border)] bg-[var(--background)] p-0.5 shadow-sm"
       style={{ top, left: right, transform: 'translateX(-100%)' }}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
       // Only an open dropdown should pin the toolbar; its popup sits outside
       // the toolbar, so the pointer "leaves" while choosing.
       onFocus={(e) => onFocusChange(e.target.tagName === 'SELECT')}

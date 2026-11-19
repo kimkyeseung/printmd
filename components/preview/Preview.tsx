@@ -324,8 +324,6 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
   // --- Code block hover toolbar -------------------------------------------
   const [hoveredCode, setHoveredCode] = useState<HoveredCode | null>(null);
   const codeToolbarFocused = useRef(false);
-  /** Pointer is over a code block or the toolbar itself. */
-  const codePointerInside = useRef(false);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const cancelHideCodeToolbar = useCallback(() => {
@@ -334,32 +332,43 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
   }, []);
 
   const scheduleHideCodeToolbar = useCallback(() => {
-    cancelHideCodeToolbar();
+    if (hideTimer.current) return;
     hideTimer.current = setTimeout(() => {
-      if (!codeToolbarFocused.current && !codePointerInside.current) setHoveredCode(null);
+      hideTimer.current = null;
+      if (!codeToolbarFocused.current) setHoveredCode(null);
     }, CODE_TOOLBAR_HIDE_DELAY);
-  }, [cancelHideCodeToolbar]);
-
-  const handleCodePointerLeave = useCallback(() => {
-    codePointerInside.current = false;
-    scheduleHideCodeToolbar();
-  }, [scheduleHideCodeToolbar]);
-
-  const handleToolbarPointerEnter = useCallback(() => {
-    codePointerInside.current = true;
-    cancelHideCodeToolbar();
-  }, [cancelHideCodeToolbar]);
+  }, []);
 
   useEffect(() => cancelHideCodeToolbar, [cancelHideCodeToolbar]);
 
-  const handleCodeMouseOver = useCallback((e: MouseEvent) => {
-    const pre = (e.target as HTMLElement).closest('pre[data-line]') as HTMLElement | null;
+  // Hover is decided by pointer position, not enter/leave events. The toolbar
+  // sits on top of the block, so enter/leave saw "left the block" whenever
+  // the pointer reached the toolbar; if the toolbar then hid, the block was
+  // under the pointer again and it reappeared, over and over. Checking whether
+  // the pointer is inside the block's box (which contains the toolbar) has no
+  // such ordering to get wrong.
+  const handleCodePointerMove = useCallback((e: React.PointerEvent) => {
+    const article = articleRef.current;
     const container = containerRef.current;
-    if (!pre || !container) {
-      handleCodePointerLeave();
+    if (!article || !container) return;
+
+    const inside = (el: Element | null) => {
+      if (!el) return false;
+      const r = el.getBoundingClientRect();
+      return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    };
+
+    let pre: Element | null = null;
+    if (hoveredCode) {
+      const current = article.querySelector(`pre[data-line="${hoveredCode.line}"]`);
+      if (inside(current)) pre = current;
+    }
+    pre ??= (e.target as HTMLElement).closest?.('pre[data-line]') ?? null;
+    if (!pre || !article.contains(pre)) {
+      scheduleHideCodeToolbar();
       return;
     }
-    codePointerInside.current = true;
+
     cancelHideCodeToolbar();
     const line = parseInt(pre.getAttribute('data-line') ?? '', 10);
     if (isNaN(line)) return;
@@ -373,7 +382,7 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
     setHoveredCode((prev) =>
       prev && prev.line === next.line && prev.top === next.top && prev.right === next.right ? prev : next,
     );
-  }, [cancelHideCodeToolbar, handleCodePointerLeave]);
+  }, [hoveredCode, cancelHideCodeToolbar, scheduleHideCodeToolbar]);
 
   const hoveredLanguage = useMemo(() => {
     if (!hoveredCode) return null;
@@ -416,15 +425,11 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
     if (!article) return;
     article.addEventListener('click', handleCheckboxClick);
     article.addEventListener('dblclick', handleDblClick);
-    article.addEventListener('mouseover', handleCodeMouseOver);
-    article.addEventListener('mouseleave', handleCodePointerLeave);
     return () => {
       article.removeEventListener('click', handleCheckboxClick);
       article.removeEventListener('dblclick', handleDblClick);
-      article.removeEventListener('mouseover', handleCodeMouseOver);
-      article.removeEventListener('mouseleave', handleCodePointerLeave);
     };
-  }, [handleCheckboxClick, handleDblClick, handleCodeMouseOver, handleCodePointerLeave]);
+  }, [handleCheckboxClick, handleDblClick]);
 
   // The article's HTML was just rewritten (this runs after the innerHTML
   // effect above): re-anchor the toolbar to the block on the same source line,
@@ -464,6 +469,8 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
     <div
       ref={containerRef}
       className="preview-container h-full overflow-auto"
+      onPointerMove={handleCodePointerMove}
+      onPointerLeave={scheduleHideCodeToolbar}
       style={{
         position: 'relative',
         backgroundColor: styles.backgroundColor,
@@ -502,8 +509,6 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
           onLanguageChange={handleCodeLanguageChange}
           onThemeChange={handleCodeThemeChange}
           onCopy={handleCodeCopy}
-          onMouseEnter={handleToolbarPointerEnter}
-          onMouseLeave={handleCodePointerLeave}
           onFocusChange={handleCodeToolbarFocus}
         />
       )}
