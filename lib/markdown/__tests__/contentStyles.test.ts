@@ -90,3 +90,16 @@ describe('getContentStyles', () => {
     expect(themed).toContain('background-color: #ff0088');
   });
 });
+
+describe('syntax highlight styles', () => {
+  it('colours hljs tokens with a light palette on light code backgrounds', () => {
+    const css = getContentStyles({ codeBackground: '#f5f5f5' });
+    expect(css).toMatch(/pre\.hljs \.hljs-keyword[^{]*\{ color: #d73a49; \}/);
+  });
+
+  it('switches to a dark palette on dark code backgrounds', () => {
+    const css = getContentStyles({ codeBackground: '#1a1a1a' });
+    expect(css).toMatch(/pre\.hljs \.hljs-keyword[^{]*\{ color: #ff7b72; \}/);
+    expect(css).not.toContain('#d73a49');
+  });
+});

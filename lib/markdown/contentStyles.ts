@@ -140,6 +140,7 @@ export function getContentStyles(options?: ContentStyleOptions): string {
       font-size: 0.85em;
       line-height: 1.5;
     }
+${getSyntaxHighlightStyles(codeBg)}
     .preview-content hr {
       /* The UA gives hr its own grey; inherit so currentColor matches on both
          surfaces if an element style ever gives it a border. */
@@ -244,6 +245,76 @@ export function getContentStyles(options?: ContentStyleOptions): string {
       transform: rotate(45deg);
     }
   `;
+}
+
+/**
+ * Token colours for fenced code blocks with a language (```ts, ```py, ...).
+ * The parser runs highlight.js and emits `hljs-*` spans; these rules colour
+ * them. The palette follows the theme's code background: GitHub light on light
+ * backgrounds, GitHub dark on dark ones, so tokens stay readable either way.
+ */
+function getSyntaxHighlightStyles(codeBg: string): string {
+  const dark = isHex(codeBg) && !isLight(codeBg);
+  const c = dark
+    ? {
+        comment: '#8b949e', keyword: '#ff7b72', string: '#a5d6ff',
+        number: '#79c0ff', title: '#d2a8ff', type: '#ffa657',
+        tag: '#7ee787', attr: '#79c0ff', meta: '#8b949e',
+        addition: '#aff5b4', additionBg: 'rgba(46, 160, 67, 0.15)',
+        deletion: '#ffdcd7', deletionBg: 'rgba(248, 81, 73, 0.15)',
+      }
+    : {
+        comment: '#6a737d', keyword: '#d73a49', string: '#032f62',
+        number: '#005cc5', title: '#6f42c1', type: '#e36209',
+        tag: '#22863a', attr: '#005cc5', meta: '#6a737d',
+        addition: '#22863a', additionBg: '#f0fff4',
+        deletion: '#b31d28', deletionBg: '#ffeef0',
+      };
+  const s = '.preview-content pre.hljs';
+  return `
+    ${s} .hljs-comment,
+    ${s} .hljs-quote { color: ${c.comment}; font-style: italic; }
+    ${s} .hljs-keyword,
+    ${s} .hljs-selector-tag,
+    ${s} .hljs-doctag,
+    ${s} .hljs-template-tag,
+    ${s} .hljs-template-variable,
+    ${s} .hljs-variable.language_,
+    ${s} .hljs-type { color: ${c.keyword}; }
+    ${s} .hljs-string,
+    ${s} .hljs-regexp,
+    ${s} .hljs-meta .hljs-string { color: ${c.string}; }
+    ${s} .hljs-number,
+    ${s} .hljs-literal,
+    ${s} .hljs-attr,
+    ${s} .hljs-attribute,
+    ${s} .hljs-variable,
+    ${s} .hljs-operator,
+    ${s} .hljs-selector-attr,
+    ${s} .hljs-selector-class,
+    ${s} .hljs-selector-id { color: ${c.number}; }
+    ${s} .hljs-title,
+    ${s} .hljs-title.class_,
+    ${s} .hljs-title.function_,
+    ${s} .hljs-section { color: ${c.title}; }
+    ${s} .hljs-built_in,
+    ${s} .hljs-symbol,
+    ${s} .hljs-params,
+    ${s} .hljs-property { color: ${c.type}; }
+    ${s} .hljs-name,
+    ${s} .hljs-tag,
+    ${s} .hljs-selector-pseudo { color: ${c.tag}; }
+    ${s} .hljs-meta,
+    ${s} .hljs-bullet { color: ${c.meta}; }
+    ${s} .hljs-emphasis { font-style: italic; }
+    ${s} .hljs-strong { font-weight: bold; }
+    ${s} .hljs-addition { color: ${c.addition}; background-color: ${c.additionBg}; }
+    ${s} .hljs-deletion { color: ${c.deletion}; background-color: ${c.deletionBg}; }
+  `;
+}
+
+function isHex(color: string): boolean {
+  return /^#?[0-9a-f]{3,8}$/i.test(color.trim());
 }
 
 /** Simple check: is the color perceived as "light"? */
