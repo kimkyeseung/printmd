@@ -1,5 +1,6 @@
 import MarkdownIt from 'markdown-it';
 import { hljs } from './hljs';
+import { extractFrontmatter, blankFrontmatter, renderFrontmatterTable } from './frontmatter';
 
 const md = new MarkdownIt({
   html: true,
@@ -284,7 +285,9 @@ md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
 };
 
 export function parseMarkdown(content: string): string {
-  return md.render(content);
+  const fm = extractFrontmatter(content);
+  if (!fm) return md.render(content);
+  return renderFrontmatterTable(fm, md.utils.escapeHtml) + md.render(blankFrontmatter(content, fm));
 }
 
 export { md };

@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { stripFrontmatter } from '@/lib/markdown/frontmatter';
 
 export interface SlideMode {
   isSlideMode: boolean;
@@ -26,7 +27,8 @@ export function useSlideMode(content: string): SlideMode {
   const slides = useMemo(() => {
     // Split by horizontal rule patterns: a line that is just `---` (or more dashes)
     // We match lines that are exactly `---`, `----`, etc., possibly with surrounding whitespace
-    return content.split(/\n(?:---+)\n/).map((s) => s.trim()).filter((s) => s.length > 0);
+    // Frontmatter fences are not slide breaks, so drop that block first.
+    return stripFrontmatter(content).split(/\n(?:---+)\n/).map((s) => s.trim()).filter((s) => s.length > 0);
   }, [content]);
 
   const totalSlides = slides.length;

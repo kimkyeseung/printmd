@@ -723,6 +723,8 @@
     },
     "elements": {
       "page": "Page",
+      "frontmatter": "Front Matter",
+      "frontmatterKey": "Front Matter Keys",
       "h1": "H1",
       "h2": "H2",
       "h3": "H3",
@@ -775,7 +777,8 @@
       "alreadyRegistered": "\"{{name}}\" is already registered.",
       "added": "\"{{name}}\" font added.",
       "removed": "\"{{name}}\" font removed."
-    }
+    },
+    "frontmatterKeys": "Keys"
   },
   "footer": {
     "privacy": "Privacy Policy",

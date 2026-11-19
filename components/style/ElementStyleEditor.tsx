@@ -11,15 +11,17 @@ import { SPACING_DEFAULTS } from '@/lib/styles/spacingDefaults';
 import { PREVIEW_WIDTH_MIN, PREVIEW_WIDTH_MAX } from '@/lib/styles/previewWidth';
 import { useClientDictionary } from '@/hooks/useClientLocale';
 import { CODE_THEMES, resolveCodePalette, type CodeThemeId } from '@/lib/markdown/codeThemes';
+import { extractFrontmatter } from '@/lib/markdown/frontmatter';
 
 const ELEMENT_KEYS: EditableElement[] = [
-  'page', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+  'page', 'frontmatter', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
   'paragraph', 'bulletList', 'orderedList', 'todoList', 'todoChecked',
   'blockquote', 'hr', 'image', 'code', 'inlineCode', 'table',
 ];
 
 function detectUsedElements(markdown: string): Set<EditableElement> {
   const used = new Set<EditableElement>(['page']);
+  if (extractFrontmatter(markdown)) used.add('frontmatter');
   if (/^# /m.test(markdown)) used.add('h1');
   if (/^## /m.test(markdown)) used.add('h2');
   if (/^### /m.test(markdown)) used.add('h3');
@@ -215,6 +217,8 @@ export function ElementStyleEditor() {
   const isHeadingElement = (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as EditableElement[]).includes(selectedElement);
   const isTableElement = selectedElement === 'table';
   const isCodeElement = selectedElement === 'code' || selectedElement === 'inlineCode';
+  const isFrontmatter = selectedElement === 'frontmatter';
+  const frontmatterKeyStyle = elementStyles['frontmatterKey'] || {};
 
   const spacingLabels = { top: t.top, bottom: t.bottom, left: t.left, right: t.right };
 
@@ -629,8 +633,8 @@ export function ElementStyleEditor() {
               );
             })()}
 
-            {/* Padding */}
-            {!isNonTypographyElement && (
+            {/* Padding (frontmatter spacing lives in its cells, not the table box) */}
+            {!isNonTypographyElement && !isFrontmatter && (
               <Section title={t.padding}>
                 <SpacingGrid
                   values={{
@@ -677,9 +681,31 @@ export function ElementStyleEditor() {
               </Section>
             )}
 
-            {/* Code block / inline code */}
-            {isCodeElement && (
+            {/* Code block / inline code / frontmatter */}
+            {(isCodeElement || isFrontmatter) && (
               <>
+                {isFrontmatter && (
+                  <Section title={t.frontmatterKeys}>
+                    <ColorPicker
+                      label={t.color}
+                      value={frontmatterKeyStyle.color || ''}
+                      onChange={(color) => handleSubElementStyleChange('frontmatterKey', { color: color || undefined })}
+                    />
+                    <div className="flex flex-col gap-1">
+                      <label className="text-sm text-[var(--ui-text-muted)]">{t.fontWeight}</label>
+                      <select
+                        value={frontmatterKeyStyle.fontWeight || ''}
+                        onChange={(e) => handleSubElementStyleChange('frontmatterKey', { fontWeight: e.target.value || undefined })}
+                        className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+                      >
+                        {fontWeightOptions.map((fw) => (
+                          <option key={fw.value} value={fw.value}>{fw.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </Section>
+                )}
+
                 {selectedElement === 'code' && (
                 <>
                 <Section title={t.codeTheme}>
@@ -725,12 +751,14 @@ export function ElementStyleEditor() {
                   <div className="flex flex-col gap-2">
                     <div className="flex flex-col gap-1">
                       <label className="text-xs text-[var(--ui-text-muted)]">{t.borderStyle}</label>
+                      {/* Frontmatter has a border by default, so "none" must be
+                          stored explicitly rather than as "unset". */}
                       <select
-                        value={currentStyle.borderStyle || ''}
+                        value={currentStyle.borderStyle || (isFrontmatter ? 'solid' : '')}
                         onChange={(e) => handleStyleChange({ borderStyle: e.target.value || undefined })}
                         className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
                       >
-                        <option value="">{t.borderStyles.none}</option>
+                        <option value={isFrontmatter ? 'none' : ''}>{t.borderStyles.none}</option>
                         <option value="solid">{t.borderStyles.solid}</option>
                         <option value="dashed">{t.borderStyles.dashed}</option>
                         <option value="dotted">{t.borderStyles.dotted}</option>
@@ -754,7 +782,7 @@ export function ElementStyleEditor() {
 
                     <Slider
                       label={t.borderRadius}
-                      value={currentStyle.borderRadius ?? (selectedElement === 'inlineCode' ? 3 : 6)}
+                      value={currentStyle.borderRadius ?? (selectedElement === 'inlineCode' ? 3 : isFrontmatter ? 8 : 6)}
                       onChange={(borderRadius) => handleStyleChange({ borderRadius })}
                       min={0}
                       max={24}

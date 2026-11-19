@@ -113,6 +113,10 @@ export const ELEMENT_SELECTORS: Record<EditableElement, string> = {
   image: '.preview-content img',
   code: '.preview-content pre, .preview-content pre code',
   inlineCode: '.preview-content :not(pre) > code',
+  // Same specificity as the base frontmatter rules in contentStyles; element
+  // CSS is emitted after them, so these win.
+  frontmatter: '.preview-content table.frontmatter',
+  frontmatterKey: '.preview-content table.frontmatter th',
   table: '.preview-content table',
   tableHeader: '.preview-content table th',
   tableCell: '.preview-content table td',

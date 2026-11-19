@@ -172,6 +172,49 @@ ${getSyntaxHighlightStyles(codeBg, options?.codeTheme ?? 'auto')}
     .preview-content table tr:nth-child(even) {
       background-color: rgba(${overlayBase}, 0.03);
     }
+    /* Frontmatter: a quiet "document info" card rather than a data table.
+       Selectors are one class more specific than the generic table rules so
+       they win over both those and the table element styles; the frontmatter
+       element styles use these same selectors and come later, so they win. */
+    .preview-content table.frontmatter {
+      width: 100%;
+      margin: 0 0 2em;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid rgba(${overlayBase}, 0.12);
+      border-radius: 8px;
+      background-color: rgba(${overlayBase}, 0.025);
+      font-size: 0.85em;
+      line-height: 1.6;
+    }
+    .preview-content table.frontmatter tr,
+    .preview-content table.frontmatter tr:nth-child(even) {
+      background-color: transparent;
+    }
+    .preview-content table.frontmatter th,
+    .preview-content table.frontmatter td {
+      padding: 0.55em 1.1em;
+      border: 0;
+      border-bottom: 1px dashed rgba(${overlayBase}, 0.10);
+      background-color: transparent;
+      text-align: left;
+      vertical-align: top;
+    }
+    .preview-content table.frontmatter tr:last-child th,
+    .preview-content table.frontmatter tr:last-child td {
+      border-bottom: 0;
+    }
+    .preview-content table.frontmatter th {
+      width: 1%;
+      white-space: nowrap;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.95em;
+      font-weight: 600;
+      color: rgba(${overlayBase}, 0.55);
+    }
+    .preview-content table.frontmatter td {
+      overflow-wrap: anywhere;
+    }
     .preview-content img {
       max-width: 100%;
       height: auto;

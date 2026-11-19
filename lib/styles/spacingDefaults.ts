@@ -30,6 +30,8 @@ export const SPACING_DEFAULTS: Record<EditableElement, SpacingValues> = {
   code: { marginTop: 0, marginBottom: 16, paddingTop: 16, paddingBottom: 16, paddingLeft: 16, paddingRight: 16 },
   // Base CSS uses 0.2em 0.4em at 0.875em; these are the px equivalents at 16px.
   inlineCode: { marginTop: 0, marginBottom: 0, paddingTop: 3, paddingBottom: 3, paddingLeft: 6, paddingRight: 6 },
+  frontmatter: { marginTop: 0, marginBottom: 32, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
+  frontmatterKey: { marginTop: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
   table: { marginTop: 0, marginBottom: 16, paddingTop: 0, paddingBottom: 0, paddingLeft: 0, paddingRight: 0 },
   tableHeader: { marginTop: 0, marginBottom: 0, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },
   tableCell: { marginTop: 0, marginBottom: 0, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 },

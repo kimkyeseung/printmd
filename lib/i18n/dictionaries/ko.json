@@ -723,6 +723,8 @@
     },
     "elements": {
       "page": "페이지",
+      "frontmatter": "문서 정보",
+      "frontmatterKey": "문서 정보 키",
       "h1": "H1",
       "h2": "H2",
       "h3": "H3",
@@ -775,7 +777,8 @@
       "alreadyRegistered": "\"{{name}}\"은(는) 이미 등록되어 있습니다.",
       "added": "\"{{name}}\" 폰트가 추가되었습니다.",
       "removed": "\"{{name}}\" 폰트가 삭제되었습니다."
-    }
+    },
+    "frontmatterKeys": "키"
   },
   "footer": {
     "privacy": "개인정보처리방침",
