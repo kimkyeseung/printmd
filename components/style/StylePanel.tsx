@@ -110,7 +110,10 @@ export const StylePanel = memo(function StylePanel({ onClose }: StylePanelProps)
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4">
+      {/* Reserve the scrollbar's width even when it isn't shown, so switching
+          to a short element (e.g. hr) doesn't widen the content and re-wrap
+          the element chips. */}
+      <div className="flex-1 overflow-y-auto p-4 [scrollbar-gutter:stable]">
         {activeTab === 'preset' && (
           <ThemeSelector
             currentTheme={currentTheme}

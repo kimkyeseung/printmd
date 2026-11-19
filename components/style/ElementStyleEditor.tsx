@@ -245,10 +245,12 @@ export function ElementStyleEditor() {
             <button
               key={key}
               onClick={() => { setSelectedElement(key); setConfirmReset(false); }}
-              className={`rounded-md px-3 py-1.5 text-sm ${
+              // Both states keep a 1px border so selecting a chip doesn't change
+              // its width and shift the chips after it.
+              className={`rounded-md border px-3 py-1.5 text-sm ${
                 selectedElement === key
-                  ? 'bg-[var(--foreground)] text-[var(--background)]'
-                  : 'border border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)]'
+                  ? 'border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]'
+                  : 'border-[var(--ui-border)] hover:bg-[var(--ui-bg-hover)]'
               }`}
             >
               {label}
