@@ -84,15 +84,18 @@ function CodeThemeSwatch({ themeId, codeBackground }: { themeId: CodeThemeId; co
 /** Collapsible section wrapper */
 function Section({ title, defaultOpen = true, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen);
+  // A bordered card per group: the title bar and the fields under it share one
+  // outline, so it's obvious which fields belong to which group.
   return (
-    <div className="flex flex-col gap-2">
+    <div className="overflow-hidden rounded-lg border border-[var(--ui-border)]">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 text-xs font-medium text-[var(--ui-text-muted)] uppercase hover:text-[var(--foreground)]"
+        aria-expanded={open}
+        className="flex w-full items-center gap-1.5 bg-[var(--ui-bg-secondary)] px-3 py-2 text-xs font-semibold uppercase text-[var(--foreground)] hover:bg-[var(--ui-bg-hover)]"
       >
         <svg
-          className={`h-3 w-3 transition-transform ${open ? 'rotate-90' : ''}`}
+          className={`h-3 w-3 shrink-0 text-[var(--ui-text-muted)] transition-transform ${open ? 'rotate-90' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -102,7 +105,11 @@ function Section({ title, defaultOpen = true, children }: { title: string; defau
         </svg>
         {title}
       </button>
-      {open && children}
+      {open && (
+        <div className="flex flex-col gap-3 border-t border-[var(--ui-border)] px-3 py-3">
+          {children}
+        </div>
+      )}
     </div>
   );
 }
