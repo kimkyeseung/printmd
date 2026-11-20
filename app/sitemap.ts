@@ -25,6 +25,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/blog', lastModified: '2026-09-30', priority: 0.8, changeFrequency: 'weekly' as const },
     { path: '/guide', lastModified: '2026-09-30', priority: 0.8, changeFrequency: 'monthly' as const },
     { path: '/about', lastModified: '2026-09-30', priority: 0.7, changeFrequency: 'monthly' as const },
+    // Keep in step with the newest entry in lib/changelog.ts.
+    { path: '/changelog', lastModified: '2026-11-20', priority: 0.7, changeFrequency: 'weekly' as const },
     { path: '/github', lastModified: '2026-09-30', priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/presets', lastModified: '2026-09-30', priority: 0.7, changeFrequency: 'monthly' as const },
     { path: '/cheatsheet', lastModified: '2026-09-30', priority: 0.8, changeFrequency: 'monthly' as const },

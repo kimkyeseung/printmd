@@ -12,7 +12,7 @@
   "meta": {
     "title": "printmd - Markdown to PDF",
     "description": "마크다운을 PDF로 변환하는 무료 온라인 도구. 브라우저에서 편집하고 원하는 스타일대로 PDF를 저장하세요.",
-    "keywords": "마크다운 PDF 변환,마크다운 변환기,md 파일 PDF 변환,마크다운 PDF 저장,마크다운 PDF 변환 무료,마크다운 온라인 변환,마크다운 인쇄,마크다운 프린트,마크다운 편집기,온라인 마크다운 에디터,마크다운 미리보기,마크다운 위지윅,마크다운 인라인 편집,README PDF 변환,깃허브 README PDF,마크다운 테마,마크다운 PDF 템플릿,마크다운 커스텀 스타일"
+    "keywords": "마크다운 PDF 변환,마크다운 변환기,md 파일 PDF 변환,마크다운 PDF 저장,마크다운 PDF 변환 무료,마크다운 온라인 변환,마크다운 인쇄,마크다운 프린트,마크다운 편집기,온라인 마크다운 에디터,마크다운 미리보기,마크다운 위지윅,마크다운 인라인 편집,README PDF 변환,깃허브 README PDF,마크다운 테마,마크다운 PDF 템플릿,마크다운 커스텀 스타일,메타 프롬프트,메타 프롬프트 PDF,프롬프트 문서 PDF 변환,프롬프터,프롬프트 마크다운,SKILL.md 뷰어,YAML 프론트매터 미리보기,마크다운 코드블럭 문법 강조,마크다운 코드 테마"
   },
   "common": {
     "startFree": "무료로 시작하기",
@@ -786,6 +786,7 @@
     "privacy": "개인정보처리방침",
     "terms": "이용약관",
     "about": "소개",
+    "changelog": "업데이트 내역",
     "contact": "문의",
     "allRights": "All rights reserved.",
     "toolsHeading": "도구",

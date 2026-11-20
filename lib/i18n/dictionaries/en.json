@@ -12,7 +12,7 @@
   "meta": {
     "title": "printmd - Markdown to PDF",
     "description": "Edit, convert, and print Markdown in one place. Free online markdown editor with live preview, themes, and instant PDF export.",
-    "keywords": "markdown to pdf,md to pdf,markdown converter,markdown pdf converter,convert markdown to pdf,free markdown to pdf converter,online markdown to pdf converter,markdown to pdf no signup,print markdown,markdown print to pdf,markdown editor,online markdown editor,markdown preview,markdown WYSIWYG editor,markdown inline editing,readme to pdf,github readme to pdf,markdown pdf theme,markdown pdf template,custom markdown pdf style"
+    "keywords": "markdown to pdf,md to pdf,markdown converter,markdown pdf converter,convert markdown to pdf,free markdown to pdf converter,online markdown to pdf converter,markdown to pdf no signup,print markdown,markdown print to pdf,markdown editor,online markdown editor,markdown preview,markdown WYSIWYG editor,markdown inline editing,readme to pdf,github readme to pdf,markdown pdf theme,markdown pdf template,custom markdown pdf style,meta prompt,meta prompt to pdf,prompt markdown to pdf,prompter,SKILL.md viewer,yaml front matter preview,markdown syntax highlighting,markdown code theme"
   },
   "common": {
     "startFree": "Start for Free",
@@ -786,6 +786,7 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "about": "About",
+    "changelog": "Updates",
     "contact": "Contact",
     "allRights": "All rights reserved.",
     "toolsHeading": "Tools",

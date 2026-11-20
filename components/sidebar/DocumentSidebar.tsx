@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { FolderTree } from '@/components/save/FolderTree';
 import { FeedbackLink } from '@/components/layout/FeedbackLink';
+import { LATEST_CHANGELOG_DATE } from '@/lib/changelog';
 import { useDocumentsStore } from '@/stores/documentsStore';
 import { useTabsStore } from '@/stores/tabsStore';
 import { useUIStore } from '@/stores/uiStore';
@@ -35,6 +36,8 @@ const LINK_ICONS = {
   cheatsheet: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
   presets: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01',
   feedback: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+  // Sparkles: "what's new"
+  changelog: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
   blog: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z',
 } as const;
 
@@ -60,6 +63,10 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
     { key: 'chatgptToPdf', href: `/${locale}/chatgpt-to-pdf` },
     { key: 'github', href: `/${locale}/github` },
   ] as const;
+  const changelogHref = `/${locale}/changelog#${LATEST_CHANGELOG_DATE}`;
+  // "2026-11-20" → "2026.11.20": a plain, locale-neutral date, the same on the
+  // server and the client.
+  const latestUpdate = LATEST_CHANGELOG_DATE.replaceAll('-', '.');
   const main = [
     { key: 'guide', href: `/${locale}/guide` },
     { key: 'cheatsheet', href: `/${locale}/cheatsheet` },
@@ -91,6 +98,16 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
           {main.map(iconLink)}
         </nav>
         <span className="my-1 h-px w-5 bg-[var(--ui-border)]" aria-hidden="true" />
+        <Link
+          href={changelogHref}
+          title={`${t.changelog} · ${latestUpdate}`}
+          aria-label={t.changelog}
+          className="flex h-8 w-8 items-center justify-center rounded text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)] hover:text-[var(--foreground)]"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={LINK_ICONS.changelog} />
+          </svg>
+        </Link>
         <FeedbackLink
           title={strings.shell.feedback}
           aria-label={strings.shell.feedback}
@@ -132,7 +149,17 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
         <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ui-text-muted)]">{t.linksHeading}</h2>
         {linkList(main)}
       </nav>
-      <FeedbackLink title={strings.shell.feedbackHint} className="mt-3 flex items-center gap-2 rounded-md border border-[var(--ui-border)] px-2 py-1.5 text-[var(--ui-text-muted)] transition-colors hover:border-[var(--printmd-link-color,#2563eb)] hover:text-[var(--foreground)]">
+      <Link
+        href={changelogHref}
+        className="mt-3 flex items-center gap-2 rounded-md border border-[var(--ui-border)] px-2 py-1.5 text-[var(--ui-text-muted)] transition-colors hover:border-[var(--printmd-link-color,#2563eb)] hover:text-[var(--foreground)]"
+      >
+        <svg className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={LINK_ICONS.changelog} />
+        </svg>
+        <span className="whitespace-nowrap font-medium">{t.changelog}</span>
+        <time dateTime={LATEST_CHANGELOG_DATE} className="ml-auto text-[11px] tabular-nums">{latestUpdate}</time>
+      </Link>
+      <FeedbackLink title={strings.shell.feedbackHint} className="mt-1.5 flex items-center gap-2 rounded-md border border-[var(--ui-border)] px-2 py-1.5 text-[var(--ui-text-muted)] transition-colors hover:border-[var(--printmd-link-color,#2563eb)] hover:text-[var(--foreground)]">
         <svg className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={LINK_ICONS.feedback} />
         </svg>

@@ -5,6 +5,7 @@ export interface FooterDict {
   privacy: string;
   terms: string;
   about: string;
+  changelog: string;
   contact: string;
   allRights: string;
   toolsHeading: string;
@@ -65,6 +66,7 @@ export function SiteFooter({
       heading: dict.siteHeading,
       links: [
         { href: `/${locale}/about`, label: dict.about },
+        { href: `/${locale}/changelog`, label: dict.changelog },
         { href: `/${locale}/privacy`, label: dict.privacy },
         { href: `/${locale}/terms`, label: dict.terms },
       ],
