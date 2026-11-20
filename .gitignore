@@ -64,7 +64,9 @@ extension/*.zip
 tmp/
 
 # PDCA docs
-docs/
+docs/*
+# …except guides the repo itself relies on (AGENTS.md links here)
+!docs/changelog-guide.md
 
 # PDCA status (optional - uncomment if you want to track)
 # .pdca-status.json
