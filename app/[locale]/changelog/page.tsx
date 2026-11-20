@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { buildPageMetadata, localeUrl } from '@/lib/seo/metadata';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { SiteFooter } from '@/components/layout';
-import { CHANGELOG, CHANGELOG_PAGE, type ChangeKind } from '@/lib/changelog';
+import { CHANGELOG, CHANGELOG_PAGE, changelogImageSrc, type ChangeKind } from '@/lib/changelog';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -77,6 +78,7 @@ export default async function ChangelogPage({
         description: entry.summary[locale],
         datePublished: entry.date,
         url: `${pageUrl}#${entry.date}`,
+        image: entry.images?.map((image) => `https://printmd.app${changelogImageSrc(entry, image, locale)}`),
         author: { '@type': 'Organization', name: 'printmd' },
       })),
     },
@@ -121,6 +123,27 @@ export default async function ChangelogPage({
                   </a>
                 </h2>
                 <p className="mt-3 leading-relaxed text-gray-600">{entry.summary[locale]}</p>
+
+                {entry.images?.map((image, i) => (
+                  <figure key={image.name} className="mt-6">
+                    {/* Wide captures shrink a lot; clicking opens the full size. */}
+                    <a href={changelogImageSrc(entry, image, locale)} target="_blank" rel="noopener" className="block">
+                    <Image
+                      src={changelogImageSrc(entry, image, locale)}
+                      alt={image.alt[locale]}
+                      width={image.size[locale][0]}
+                      height={image.size[locale][1]}
+                      sizes="(max-width: 768px) 100vw, 768px"
+                      // Only the first shot is likely above the fold.
+                      priority={i === 0}
+                      className="h-auto w-full rounded-lg border border-gray-200 shadow-sm transition-shadow hover:shadow-md"
+                    />
+                    </a>
+                    <figcaption className="mt-2 text-center text-sm text-gray-500">
+                      {image.caption[locale]}
+                    </figcaption>
+                  </figure>
+                ))}
 
                 {KIND_ORDER.map((kind) => {
                   const items = entry.changes.filter((c) => c.kind === kind);

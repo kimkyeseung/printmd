@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "indexnow": "node scripts/indexnow.mjs"
+    "indexnow": "node scripts/indexnow.mjs",
+    "capture:changelog": "node scripts/capture-changelog.mjs"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.2",

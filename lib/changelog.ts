@@ -4,18 +4,34 @@ import type { Locale } from '@/lib/i18n/config';
  * Release notes shown on /[locale]/changelog and linked from the editor's
  * sidebar. Newest first. Add an entry per release and bump the changelog's
  * lastModified in app/sitemap.ts to the same date.
+ *
+ * What to record and how to write it: docs/changelog-guide.md.
  */
 
 export type ChangeKind = 'new' | 'improved' | 'fixed';
 
 type Localized = Record<Locale, string>;
 
+export interface ChangelogImage {
+  /** File is public/changelog/<date>/<locale>-<name>.png (scripts/capture-changelog.mjs). */
+  name: string;
+  /** Pixel size per locale; the captures differ where text wraps differently. */
+  size: Record<Locale, [width: number, height: number]>;
+  alt: Localized;
+  caption: Localized;
+}
+
 export interface ChangelogEntry {
   /** Release date, YYYY-MM-DD. Also the entry's anchor id. */
   date: string;
   title: Localized;
   summary: Localized;
+  images?: ChangelogImage[];
   changes: { kind: ChangeKind; text: Localized }[];
+}
+
+export function changelogImageSrc(entry: ChangelogEntry, image: ChangelogImage, locale: Locale): string {
+  return `/changelog/${entry.date}/${locale}-${image.name}.png`;
 }
 
 export const CHANGELOG: ChangelogEntry[] = [
@@ -29,6 +45,44 @@ export const CHANGELOG: ChangelogEntry[] = [
       ko: '코드와 프롬프트 문서를 더 보기 좋게 쓰고 출력할 수 있도록 코드블럭과 YAML 프론트매터 표시를 크게 개선했습니다. 메타 프롬프트나 스킬 파일(SKILL.md)처럼 맨 앞에 name, description 같은 메타데이터가 붙은 프롬프트 문서도 이제 깔끔한 문서 정보 카드로 보이고, 그대로 PDF로 저장할 수 있습니다. 프롬프트를 마크다운으로 관리하는 프롬프터라면 프롬프트 모음을 문서로 정리할 때 써 보세요.',
       en: 'Code blocks and YAML front matter got a big upgrade, so code and prompt documents read and print better. Prompt files that start with metadata such as name and description — meta prompts, skill files (SKILL.md) and the like — now show that metadata as a tidy document info card, and save to PDF just as they look. If you keep your prompts in Markdown, this makes a prompt library easy to turn into a readable document.',
     },
+    images: [
+      {
+        name: 'code-and-frontmatter',
+        size: { ko: [1536, 894], en: [1536, 936] },
+        alt: {
+          ko: '메타 프롬프트 문서의 프론트매터가 name, description, tags, version 카드로 표시되고, 아래 TypeScript 코드블럭에 문법 강조와 언어·테마·복사 툴바가 보이는 미리보기',
+          en: 'Preview of a meta prompt file: its front matter shown as a name, description, tags and version card, and a TypeScript code block with syntax highlighting and the language, theme and copy toolbar',
+        },
+        caption: {
+          ko: '프론트매터는 문서 정보 카드로, 코드블럭은 언어에 맞는 색으로 표시됩니다. 코드블럭에 마우스를 올리면 툴바가 나타납니다.',
+          en: 'Front matter becomes a document info card and code is coloured for its language. Hover a code block to bring up its toolbar.',
+        },
+      },
+      {
+        name: 'code-theme',
+        size: { ko: [1536, 414], en: [1536, 414] },
+        alt: {
+          ko: '코드블럭 툴바에서 Dracula 테마를 선택해 어두운 배경에 색이 입혀진 TypeScript 코드',
+          en: 'TypeScript code in the Dracula theme, chosen from the code block toolbar',
+        },
+        caption: {
+          ko: '툴바에서 테마를 고르면 바로 바뀝니다. (Dracula)',
+          en: 'Pick a theme from the toolbar and it applies at once. (Dracula)',
+        },
+      },
+      {
+        name: 'style-panel',
+        size: { ko: [2488, 2034], en: [2488, 2034] },
+        alt: {
+          ko: '스타일 설정 패널에서 문서 정보를 선택해 키와 값 묶음이 각각 색상·폰트·글자 크기·굵기 칸을 가진 카드로 나뉜 모습',
+          en: 'The style panel with Front Matter selected: Keys and Values are separate cards, each with colour, font, size and weight',
+        },
+        caption: {
+          ko: '스타일 패널에서 키와 값을 따로 꾸밀 수 있고, 설정 묶음이 카드로 구분됩니다.',
+          en: 'Style keys and values separately in the style panel, where each group of settings is its own card.',
+        },
+      },
+    ],
     changes: [
       {
         kind: 'new',
