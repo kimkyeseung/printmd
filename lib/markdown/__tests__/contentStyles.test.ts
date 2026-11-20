@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getContentStyles } from '../contentStyles';
+import { getContentStyles, getFrontmatterDefaultBackground, getFrontmatterDefaultKeyColor } from '../contentStyles';
 
 describe('getContentStyles', () => {
   const css = getContentStyles();
@@ -119,5 +119,36 @@ describe('code theme option', () => {
   it('adds no token colours for none', () => {
     const css = getContentStyles({ codeTheme: 'none' });
     expect(css).not.toContain('.hljs-keyword');
+  });
+});
+
+describe('getFrontmatterDefaultBackground', () => {
+  it('blends the dark text tint over a light page', () => {
+    expect(getFrontmatterDefaultBackground('#1a1a1a', '#ffffff')).toBe('#f9f9f9');
+  });
+
+  it('blends a light tint over a dark page', () => {
+    expect(getFrontmatterDefaultBackground('#e0e0e0', '#1a1a1a')).toBe('#202020');
+  });
+
+  it('falls back to the translucent tint for non-hex backgrounds', () => {
+    expect(getFrontmatterDefaultBackground('#1a1a1a', 'white')).toBe('rgba(0, 0, 0, 0.025)');
+  });
+});
+
+describe('getFrontmatterDefaultKeyColor', () => {
+  it('matches the 55% text tint over the page', () => {
+    expect(getFrontmatterDefaultKeyColor('#1a1a1a', '#ffffff')).toBe('#818181');
+  });
+
+  it('follows a coloured text colour', () => {
+    expect(getFrontmatterDefaultKeyColor('#cc0000', '#ffffff')).toBe('#e37373');
+  });
+});
+
+describe('frontmatter cells', () => {
+  it('give values their own colour so table cell styles cannot leak in', () => {
+    const css = getContentStyles({ textColor: '#333333' });
+    expect(css).toMatch(/table\.frontmatter td \{[^}]*color: #333333;/);
   });
 });

@@ -117,6 +117,7 @@ export const ELEMENT_SELECTORS: Record<EditableElement, string> = {
   // CSS is emitted after them, so these win.
   frontmatter: '.preview-content table.frontmatter',
   frontmatterKey: '.preview-content table.frontmatter th',
+  frontmatterValue: '.preview-content table.frontmatter td',
   table: '.preview-content table',
   tableHeader: '.preview-content table th',
   tableCell: '.preview-content table td',

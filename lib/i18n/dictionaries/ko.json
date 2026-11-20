@@ -725,6 +725,7 @@
       "page": "페이지",
       "frontmatter": "문서 정보",
       "frontmatterKey": "문서 정보 키",
+      "frontmatterValue": "문서 정보 값",
       "h1": "H1",
       "h2": "H2",
       "h3": "H3",
@@ -778,7 +779,8 @@
       "added": "\"{{name}}\" 폰트가 추가되었습니다.",
       "removed": "\"{{name}}\" 폰트가 삭제되었습니다."
     },
-    "frontmatterKeys": "키"
+    "frontmatterKeys": "키",
+    "frontmatterValues": "값"
   },
   "footer": {
     "privacy": "개인정보처리방침",

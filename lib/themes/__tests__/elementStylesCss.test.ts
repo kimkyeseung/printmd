@@ -73,3 +73,19 @@ describe('shared preset links', () => {
     expect(decodePresetFromUrl(encoded)?.elementStyles?.inlineCode).toBeUndefined();
   });
 });
+
+describe('frontmatter keys and values', () => {
+  it('styles keys and values independently', () => {
+    const css = generateElementStylesCss({
+      frontmatterKey: { color: '#ff0000', fontWeight: '700' },
+      frontmatterValue: { color: '#0055ff', fontSize: 15, fontFamily: 'Georgia, serif' },
+    });
+    expect(css).toContain('.preview-content table.frontmatter th { color: #ff0000; font-weight: 700 }');
+    expect(css).toContain('.preview-content table.frontmatter td { color: #0055ff; font-family: Georgia, serif; font-size: 15px }');
+  });
+
+  it('does not tie key colour to value colour', () => {
+    const css = generateElementStylesCss({ frontmatterValue: { color: '#0055ff' } });
+    expect(css).not.toContain('table.frontmatter th');
+  });
+});

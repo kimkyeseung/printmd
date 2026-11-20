@@ -1,4 +1,5 @@
 import { resolveCodePalette, type CodeThemeId } from './codeThemes';
+import { sanitizeCssColor } from '@/lib/sanitize/cssValue';
 
 interface ContentStyleOptions {
   linkColor?: string;
@@ -175,7 +176,8 @@ ${getSyntaxHighlightStyles(codeBg, options?.codeTheme ?? 'auto')}
     /* Frontmatter: a quiet "document info" card rather than a data table.
        Selectors are one class more specific than the generic table rules so
        they win over both those and the table element styles; the frontmatter
-       element styles use these same selectors and come later, so they win. */
+       element styles (card, keys = th, values = td) use these same selectors
+       and come later, so they win. */
     .preview-content table.frontmatter {
       width: 100%;
       margin: 0 0 2em;
@@ -183,7 +185,7 @@ ${getSyntaxHighlightStyles(codeBg, options?.codeTheme ?? 'auto')}
       border-spacing: 0;
       border: 1px solid rgba(${overlayBase}, 0.12);
       border-radius: 8px;
-      background-color: rgba(${overlayBase}, 0.025);
+      background-color: rgba(${overlayBase}, ${FRONTMATTER_BG_ALPHA});
       font-size: 0.85em;
       line-height: 1.6;
     }
@@ -210,10 +212,14 @@ ${getSyntaxHighlightStyles(codeBg, options?.codeTheme ?? 'auto')}
       font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
       font-size: 0.95em;
       font-weight: 600;
-      color: rgba(${overlayBase}, 0.55);
+      color: ${frontmatterKeyColor(textColor)};
     }
+    /* Values set their own text properties so table cell styles (some
+       presets colour every td) never leak into the card. */
     .preview-content table.frontmatter td {
       overflow-wrap: anywhere;
+      color: ${sanitizeCssColor(textColor) || 'inherit'};
+      font-weight: 400;
     }
     .preview-content img {
       max-width: 100%;
@@ -353,6 +359,59 @@ function getSyntaxHighlightStyles(codeBg: string, codeTheme: CodeThemeId): strin
     ${s} .hljs-addition { color: ${c.addition}; background-color: ${c.additionBg}; }
     ${s} .hljs-deletion { color: ${c.deletion}; background-color: ${c.deletionBg}; }
   `;
+}
+
+/** Strength of the text-colour tint behind the frontmatter card. */
+const FRONTMATTER_BG_ALPHA = 0.025;
+/** Strength of the text-colour tint used for frontmatter keys. */
+const FRONTMATTER_KEY_ALPHA = 0.55;
+
+function parseHex(color: string): [number, number, number] | null {
+  const hex = color.trim().replace('#', '');
+  if (!/^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(hex)) return null;
+  const full = hex.length === 3 ? hex.replace(/./g, '$&$&') : hex.slice(0, 6);
+  return [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16)) as [number, number, number];
+}
+
+/**
+ * The colour the frontmatter card's default background actually shows: the
+ * translucent tint from getContentStyles laid over the page background. The
+ * style panel shows this as the picker's value, so it matches what's on screen
+ * and choosing it explicitly changes nothing.
+ */
+export function getFrontmatterDefaultBackground(textColor: string, pageBackground: string): string {
+  return blendOverlay(textColor, pageBackground, FRONTMATTER_BG_ALPHA);
+}
+
+/**
+ * Frontmatter keys are the card's text colour, dimmed, so they follow the page
+ * text colour and the 문서 정보 colour instead of staying a fixed grey.
+ * Non-hex colours fall back to inheriting at full strength.
+ */
+export function frontmatterKeyColor(textColor: string): string {
+  const rgb = parseHex(textColor);
+  return rgb ? `rgba(${rgb.join(', ')}, ${FRONTMATTER_KEY_ALPHA})` : 'inherit';
+}
+
+/** The frontmatter keys' colour as it renders: `textColor` dimmed over the page, as hex. */
+export function getFrontmatterDefaultKeyColor(textColor: string, pageBackground: string): string {
+  const fg = parseHex(textColor);
+  return fg ? blend(fg, pageBackground, FRONTMATTER_KEY_ALPHA) : textColor;
+}
+
+/** `rgba(overlay, alpha)` (overlay = white or black, picked from the text colour) over the page, as hex. */
+function blendOverlay(textColor: string, pageBackground: string, alpha: number): string {
+  const v = isLight(textColor) ? 255 : 0;
+  return blend([v, v, v], pageBackground, alpha);
+}
+
+function blend(fg: [number, number, number], pageBackground: string, alpha: number): string {
+  const bg = parseHex(pageBackground);
+  if (!bg) return `rgba(${fg.join(', ')}, ${alpha})`;
+  return '#' + bg
+    .map((c, i) => Math.round(c * (1 - alpha) + fg[i] * alpha))
+    .map((c) => c.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 /** Simple check: is the color perceived as "light"? */

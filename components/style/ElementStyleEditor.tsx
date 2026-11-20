@@ -12,6 +12,20 @@ import { PREVIEW_WIDTH_MIN, PREVIEW_WIDTH_MAX } from '@/lib/styles/previewWidth'
 import { useClientDictionary } from '@/hooks/useClientLocale';
 import { CODE_THEMES, resolveCodePalette, type CodeThemeId } from '@/lib/markdown/codeThemes';
 import { extractFrontmatter } from '@/lib/markdown/frontmatter';
+import { getFrontmatterDefaultBackground, getFrontmatterDefaultKeyColor } from '@/lib/markdown/contentStyles';
+
+/** Parts edited from another element's panel, stored as their own entries. */
+const SUB_ELEMENTS: Partial<Record<EditableElement, EditableElement[]>> = {
+  frontmatter: ['frontmatterKey', 'frontmatterValue'],
+  table: ['tableHeader', 'tableCell', 'tableEvenRow'],
+};
+
+/**
+ * Default frontmatter key / value sizes relative to the page font size,
+ * matching the card (0.85em) and key (0.95em) rules in contentStyles.
+ */
+const FRONTMATTER_VALUE_SCALE = 0.85;
+const FRONTMATTER_KEY_SCALE = 0.85 * 0.95;
 
 const ELEMENT_KEYS: EditableElement[] = [
   'page', 'frontmatter', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
@@ -204,6 +218,8 @@ export function ElementStyleEditor() {
   const handleReset = () => {
     if (confirmReset) {
       resetElementStyle(selectedElement);
+      // The panel also edits these parts; resetting the element resets them too.
+      for (const part of SUB_ELEMENTS[selectedElement] ?? []) resetElementStyle(part);
       setConfirmReset(false);
       showToast(t.elementResetComplete.replace('{{label}}', selectedLabel), 'info');
     } else {
@@ -218,7 +234,55 @@ export function ElementStyleEditor() {
   const isTableElement = selectedElement === 'table';
   const isCodeElement = selectedElement === 'code' || selectedElement === 'inlineCode';
   const isFrontmatter = selectedElement === 'frontmatter';
-  const frontmatterKeyStyle = elementStyles['frontmatterKey'] || {};
+
+  /** Colour, font, size and weight for one part of a compound element (e.g. frontmatter keys or values). */
+  const renderCellTypography = (element: EditableElement, defaultColor: string, defaultSize: number) => {
+    const style = elementStyles[element] || {};
+    const change = (s: Partial<ElementStyle>) => handleSubElementStyleChange(element, s);
+    return (
+      <>
+        <ColorPicker
+          label={t.color}
+          value={style.color || defaultColor}
+          onChange={(color) => change({ color: color || undefined })}
+        />
+        <div className="flex flex-col gap-1">
+          <label className="text-sm text-[var(--ui-text-muted)]">{t.font}</label>
+          <select
+            value={style.fontFamily || ''}
+            onChange={(e) => change({ fontFamily: e.target.value || undefined })}
+            className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+          >
+            {fontOptions.map((font) => (
+              <option key={font.value} value={font.value}>{font.label}</option>
+            ))}
+          </select>
+        </div>
+        <Slider
+          label={t.fontSize}
+          value={style.fontSize || defaultSize}
+          onChange={(fontSize) => change({ fontSize })}
+          min={8}
+          max={32}
+          unit="px"
+        />
+        <div className="flex flex-col gap-1">
+          <label className="text-sm text-[var(--ui-text-muted)]">{t.fontWeight}</label>
+          <select
+            value={style.fontWeight || ''}
+            onChange={(e) => change({ fontWeight: e.target.value || undefined })}
+            className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
+          >
+            {fontWeightOptions.map((fw) => (
+              <option key={fw.value} value={fw.value}>{fw.label}</option>
+            ))}
+          </select>
+        </div>
+      </>
+    );
+  };
+  // What tinted defaults are blended over, to show them as they render.
+  const pageBackground = elementStyles.page?.backgroundColor || globalStyles.backgroundColor;
 
   const spacingLabels = { top: t.top, bottom: t.bottom, left: t.left, right: t.right };
 
@@ -355,12 +419,13 @@ export function ElementStyleEditor() {
           </>
         ) : (
           <>
-            {/* Typography */}
-            {!isNonTypographyElement && (
+            {/* Typography (frontmatter sets it per part: keys and values) */}
+            {!isNonTypographyElement && !isFrontmatter && (
               <Section title={t.typography}>
                 <ColorPicker
                   label={t.color}
-                  value={currentStyle.color || '#000000'}
+                  // Unset means the element inherits the page text colour.
+                  value={currentStyle.color || globalStyles.textColor}
                   onChange={(color) => handleStyleChange({ color })}
                 />
 
@@ -410,7 +475,11 @@ export function ElementStyleEditor() {
               <Section title={t.background}>
                 <ColorPicker
                   label={selectedElement === 'hr' ? t.lineColor : t.background}
-                  value={currentStyle.backgroundColor || (isCodeElement ? globalStyles.codeBackground : '#ffffff')}
+                  value={currentStyle.backgroundColor || (
+                    isCodeElement ? globalStyles.codeBackground
+                    : isFrontmatter ? getFrontmatterDefaultBackground(globalStyles.textColor, pageBackground)
+                    : '#ffffff'
+                  )}
                   onChange={(backgroundColor) => handleStyleChange({ backgroundColor })}
                 />
               </Section>
@@ -687,25 +756,22 @@ export function ElementStyleEditor() {
             {(isCodeElement || isFrontmatter) && (
               <>
                 {isFrontmatter && (
-                  <Section title={t.frontmatterKeys}>
-                    <ColorPicker
-                      label={t.color}
-                      value={frontmatterKeyStyle.color || ''}
-                      onChange={(color) => handleSubElementStyleChange('frontmatterKey', { color: color || undefined })}
-                    />
-                    <div className="flex flex-col gap-1">
-                      <label className="text-sm text-[var(--ui-text-muted)]">{t.fontWeight}</label>
-                      <select
-                        value={frontmatterKeyStyle.fontWeight || ''}
-                        onChange={(e) => handleSubElementStyleChange('frontmatterKey', { fontWeight: e.target.value || undefined })}
-                        className="rounded border border-[var(--ui-border)] bg-transparent px-2 py-1.5 text-sm"
-                      >
-                        {fontWeightOptions.map((fw) => (
-                          <option key={fw.value} value={fw.value}>{fw.label}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </Section>
+                  <>
+                    <Section title={t.frontmatterKeys}>
+                      {renderCellTypography(
+                        'frontmatterKey',
+                        getFrontmatterDefaultKeyColor(globalStyles.textColor, pageBackground),
+                        Math.round(globalStyles.fontSize * FRONTMATTER_KEY_SCALE),
+                      )}
+                    </Section>
+                    <Section title={t.frontmatterValues}>
+                      {renderCellTypography(
+                        'frontmatterValue',
+                        globalStyles.textColor,
+                        Math.round(globalStyles.fontSize * FRONTMATTER_VALUE_SCALE),
+                      )}
+                    </Section>
+                  </>
                 )}
 
                 {selectedElement === 'code' && (

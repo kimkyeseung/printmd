@@ -725,6 +725,7 @@
       "page": "Page",
       "frontmatter": "Front Matter",
       "frontmatterKey": "Front Matter Keys",
+      "frontmatterValue": "Front Matter Values",
       "h1": "H1",
       "h2": "H2",
       "h3": "H3",
@@ -778,7 +779,8 @@
       "added": "\"{{name}}\" font added.",
       "removed": "\"{{name}}\" font removed."
     },
-    "frontmatterKeys": "Keys"
+    "frontmatterKeys": "Keys",
+    "frontmatterValues": "Values"
   },
   "footer": {
     "privacy": "Privacy Policy",
