@@ -110,6 +110,22 @@ export default async function ChangelogPage({
       </header>
 
       <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+        {/* Jump list: one line per release, newest first. */}
+        <nav aria-label={t.title} className="mb-12 rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <ol className="flex flex-col gap-1.5 text-sm">
+            {CHANGELOG.map((entry) => (
+              <li key={entry.date} className="flex gap-3">
+                <time dateTime={entry.date} className="w-24 shrink-0 tabular-nums text-gray-500">
+                  {entry.date.replaceAll('-', '.')}
+                </time>
+                <a href={`#${entry.date}`} className="text-gray-800 hover:text-blue-700 hover:underline">
+                  {entry.title[locale]}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+
         <ol className="flex flex-col gap-14">
           {CHANGELOG.map((entry) => (
             <li key={entry.date}>
