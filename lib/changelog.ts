@@ -36,6 +36,59 @@ export function changelogImageSrc(entry: ChangelogEntry, image: ChangelogImage, 
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-23',
+    title: {
+      ko: '미리보기 목차, 블로그 글 따라오는 목차',
+      en: 'A preview outline, and a table of contents that follows you on the blog',
+    },
+    summary: {
+      ko: '긴 마크다운 문서를 미리보기에서 훑어볼 때 지금 어디를 읽고 있는지 바로 알 수 있도록 목차를 추가했습니다. 제목이 많은 보고서, 매뉴얼, README를 다듬을 때 목차에서 원하는 부분으로 바로 이동해 보세요. 블로그 글도 넓은 화면에서 오른쪽 목차가 스크롤을 따라옵니다.',
+      en: 'The preview now has an outline, so you always know where you are in a long Markdown document. When polishing a report, manual or README with many headings, jump straight to any section from the outline. Blog posts on wide screens also get a table of contents that stays beside you as you scroll.',
+    },
+    images: [
+      {
+        name: 'preview-outline',
+        size: { ko: [2968, 1076], en: [2968, 1076] },
+        alt: {
+          ko: '분기 운영 보고서 미리보기 오른쪽 위에 목차 카드가 떠 있고, 지금 보고 있는 "성능" 제목이 파란색으로 표시된 화면. 위쪽 도구 막대에 인쇄 폭과 목차 버튼이 보입니다.',
+          en: 'A quarterly operations report in the preview with the outline card floating at the top right, the current "Performance" heading highlighted in blue, and the Print width and Outline buttons in the toolbar above',
+        },
+        caption: {
+          ko: '목차 버튼을 누르면 미리보기 위에 목차 카드가 뜨고, 지금 보고 있는 제목이 표시됩니다. 카드는 드래그로 옮기거나 접어 둘 수 있습니다.',
+          en: 'Press Outline to float the outline over the preview, with the heading you\'re on marked. Drag the card anywhere, or fold it away.',
+        },
+      },
+      {
+        name: 'blog-toc',
+        size: { ko: [2256, 1280], en: [2256, 1280] },
+        alt: {
+          ko: '블로그 글 오른쪽에 목차가 고정되어 있고, 지금 읽고 있는 섹션이 파란 선과 진한 글씨로 표시된 화면',
+          en: 'A blog post with the table of contents fixed on the right, the section being read marked with a blue line and darker text',
+        },
+        caption: {
+          ko: '블로그 글에서는 오른쪽 목차가 스크롤을 따라옵니다.',
+          en: 'On the blog, the table of contents on the right follows you as you scroll.',
+        },
+      },
+    ],
+    changes: [
+      {
+        kind: 'new',
+        text: {
+          ko: '미리보기 목차: 인쇄 폭 옆의 목차 버튼으로 켜고 끕니다. 문서의 제목(#, ##, ###)을 보여주고, 지금 보고 있는 제목을 표시하며, 누르면 그 제목으로 이동합니다. 켜고 끈 상태는 다음에도 유지됩니다.',
+          en: 'Preview outline: turn it on or off with the Outline button next to Print width. It lists the document\'s headings (#, ##, ###), marks the one you\'re looking at, and jumps to a heading when you click it. Your on/off choice is remembered.',
+        },
+      },
+      {
+        kind: 'improved',
+        text: {
+          ko: '블로그 글을 넓은 화면에서 보면 오른쪽 목차가 스크롤을 따라오고, 지금 읽고 있는 부분이 표시됩니다.',
+          en: 'On wide screens, blog posts show a table of contents on the right that follows you down the page and marks the section you\'re reading.',
+        },
+      },
+    ],
+  },
+  {
     date: '2026-11-20',
     title: {
       ko: '코드블럭 문법 강조·코드 테마, 프롬프트 문서를 위한 문서 정보 카드',
