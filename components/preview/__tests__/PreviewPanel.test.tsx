@@ -3,11 +3,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { PreviewPanel } from '../PreviewPanel';
 
 const mockUpdateGlobalStyles = vi.fn();
+const mockToggleOutline = vi.fn();
 
 vi.mock('@/stores', () => ({
   usePrintStore: (selector: (s: Record<string, unknown>) => unknown) => selector({ settings: {} }),
   useStyleStore: (selector: (s: Record<string, unknown>) => unknown) =>
     selector({ updateGlobalStyles: mockUpdateGlobalStyles }),
+  useUIStore: (selector: (s: Record<string, unknown>) => unknown) =>
+    selector({ isOutlineOpen: false, toggleOutline: mockToggleOutline }),
 }));
 
 vi.mock('@/lib/print/printDocument', () => ({
@@ -45,5 +48,16 @@ describe('PreviewPanel - print width button', () => {
   it('shows as pressed once the width matches', () => {
     render(<PreviewPanel markdown="" styles={{ ...styles, maxWidth: 720 }} />);
     expect(screen.getByRole('button', { name: 'Print width' }).getAttribute('aria-pressed')).toBe('true');
+  });
+});
+
+describe('PreviewPanel - outline button', () => {
+  it('toggles the outline beside the preview', () => {
+    render(<PreviewPanel markdown="" styles={styles} />);
+    const button = screen.getByRole('button', { name: 'Outline' });
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+
+    fireEvent.click(button);
+    expect(mockToggleOutline).toHaveBeenCalledTimes(1);
   });
 });

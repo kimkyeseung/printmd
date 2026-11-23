@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { Preview } from './Preview';
 import type { GlobalStyles } from '@/types/style';
 import { useAppStrings } from '@/lib/i18n/appStrings';
-import { usePrintStore, useStyleStore } from '@/stores';
+import { usePrintStore, useStyleStore, useUIStore } from '@/stores';
 import { getPrintGeometry } from '@/lib/print/printDocument';
 import { printMatchedWidth } from '@/lib/styles/previewWidth';
 
@@ -18,6 +18,8 @@ export const PreviewPanel = memo(function PreviewPanel({ markdown, styles, sourc
   const t = useAppStrings().previewPanel;
   const printSettings = usePrintStore((state) => state.settings);
   const updateGlobalStyles = useStyleStore((state) => state.updateGlobalStyles);
+  const isOutlineOpen = useUIStore((state) => state.isOutlineOpen);
+  const toggleOutline = useUIStore((state) => state.toggleOutline);
 
   const printWidth = printMatchedWidth(getPrintGeometry(printSettings).contentWidthPx, styles.padding);
   const isPrintWidth = styles.maxWidth === printWidth;
@@ -49,6 +51,19 @@ export const PreviewPanel = memo(function PreviewPanel({ markdown, styles, sourc
             }`}
           >
             {t.printWidth}
+          </button>
+          <button
+            type="button"
+            aria-pressed={isOutlineOpen}
+            title={t.outlineHint}
+            onClick={toggleOutline}
+            className={`hidden rounded border px-2 py-0.5 text-xs md:block ${
+              isOutlineOpen
+                ? 'border-[var(--printmd-link-color)] text-[var(--printmd-link-color)]'
+                : 'border-[var(--ui-border)] text-[var(--ui-text-muted)] hover:bg-[var(--ui-bg-hover)]'
+            }`}
+          >
+            {t.outline}
           </button>
         </div>
       </div>
