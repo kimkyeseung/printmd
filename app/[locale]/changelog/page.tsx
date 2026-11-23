@@ -126,10 +126,11 @@ export default async function ChangelogPage({
           </ol>
         </nav>
 
-        <ol className="flex flex-col gap-14">
+        {/* A rule and generous space between releases, so each date reads as its own block. */}
+        <ol className="flex flex-col divide-y divide-gray-200">
           {CHANGELOG.map((entry) => (
-            <li key={entry.date}>
-              <article id={entry.date} className="scroll-mt-6">
+            <li key={entry.date} className="py-16 first:pt-0 last:pb-0">
+              <article id={entry.date} className="scroll-mt-12">
                 <time dateTime={entry.date} className="text-sm font-medium text-gray-500">
                   {formatDate(entry.date, locale)}
                 </time>

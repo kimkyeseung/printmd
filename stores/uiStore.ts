@@ -18,6 +18,11 @@ export interface UIState {
   editorWidth: number;
   stylePanelWidth: number;
   spacingHighlight: SpacingHighlight | null;
+  /** Heading outline beside the preview. */
+  isOutlineOpen: boolean;
+  isOutlineCollapsed: boolean;
+  /** Card offset from the preview's top-right corner, in px. */
+  outlinePosition: { top: number; right: number };
 }
 
 export interface UIActions {
@@ -32,6 +37,9 @@ export interface UIActions {
   setEditorWidth: (width: number) => void;
   setStylePanelWidth: (width: number) => void;
   setSpacingHighlight: (highlight: SpacingHighlight | null) => void;
+  toggleOutline: () => void;
+  toggleOutlineCollapsed: () => void;
+  setOutlinePosition: (position: { top: number; right: number }) => void;
 }
 
 export type UIStore = UIState & UIActions;
@@ -44,6 +52,9 @@ const initialState: UIState = {
   editorWidth: 50,
   stylePanelWidth: 360,
   spacingHighlight: null,
+  isOutlineOpen: false,
+  isOutlineCollapsed: false,
+  outlinePosition: { top: 16, right: 24 },
 };
 
 export const useUIStore = create<UIStore>()(
@@ -87,6 +98,12 @@ export const useUIStore = create<UIStore>()(
       },
 
       setSpacingHighlight: (spacingHighlight) => set({ spacingHighlight }),
+
+      toggleOutline: () => set((state) => ({ isOutlineOpen: !state.isOutlineOpen })),
+
+      toggleOutlineCollapsed: () => set((state) => ({ isOutlineCollapsed: !state.isOutlineCollapsed })),
+
+      setOutlinePosition: (outlinePosition) => set({ outlinePosition }),
     }),
     {
       name: 'printmd-ui',
@@ -95,6 +112,9 @@ export const useUIStore = create<UIStore>()(
         isSidebarOpen: state.isSidebarOpen,
         editorWidth: state.editorWidth,
         stylePanelWidth: state.stylePanelWidth,
+        isOutlineOpen: state.isOutlineOpen,
+        isOutlineCollapsed: state.isOutlineCollapsed,
+        outlinePosition: state.outlinePosition,
       }),
     }
   )

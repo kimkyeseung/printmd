@@ -1,24 +1,13 @@
 'use client';
 
-import { useAppStrings } from '@/lib/i18n/appStrings';
-import { currentEnvironment, feedbackMailto } from '@/lib/feedback/mailto';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { defaultLocale, locales, type Locale } from '@/lib/i18n/config';
 
-/**
- * A mail link to the feedback address. The page and browser details are only
- * known in the browser, so they are added to the link when it is clicked;
- * the rendered href carries just the subject and matches the server's.
- */
+/** A link to the feedback page in the current locale. */
 export function FeedbackLink(props: Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>) {
-  const t = useAppStrings().shell;
-  const strings = { subject: t.feedbackSubject, bodyIntro: t.feedbackBodyIntro, envHeading: t.feedbackEnvHeading };
-  return (
-    <a
-      {...props}
-      href={feedbackMailto(strings)}
-      onClick={(e) => {
-        e.currentTarget.href = feedbackMailto(strings, currentEnvironment());
-        props.onClick?.(e);
-      }}
-    />
-  );
+  const params = useParams();
+  const param = params?.locale as string | undefined;
+  const locale: Locale = locales.includes(param as Locale) ? (param as Locale) : defaultLocale;
+  return <Link {...props} href={`/${locale}/feedback`} />;
 }

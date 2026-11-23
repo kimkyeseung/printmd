@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { AdSidebar } from '@/components/adsense/AdSidebar';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { TableOfContents } from './TableOfContents';
-import { SiteFooter, type FooterDict } from '@/components/layout';
+import { OnThisPage, SiteFooter, type FooterDict } from '@/components/layout';
 
 interface Heading {
   id: string;
@@ -85,7 +85,10 @@ export function BlogLayout({
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex gap-8">
           <main className="min-w-0 flex-1 max-w-4xl">
-            <TableOfContents headings={headings} title={tocTitle} />
+            {/* Inline outline on narrow screens; wide screens get the sticky one in the aside. */}
+            <div className="lg:hidden">
+              <TableOfContents headings={headings} title={tocTitle} />
+            </div>
 
             <AdBanner
               className="h-[90px] w-full rounded-lg overflow-hidden mb-8"
@@ -130,8 +133,13 @@ export function BlogLayout({
             </div>
           </main>
 
-          <aside className="hidden lg:block w-[180px] shrink-0">
-            <div className="sticky top-8">
+          <aside className="hidden lg:block w-[220px] shrink-0">
+            <div className="sticky top-8 flex flex-col gap-6">
+              <OnThisPage
+                items={headings}
+                title={tocTitle ?? 'Table of Contents'}
+                listClassName="max-h-[40vh]"
+              />
               <AdSidebar
                 className="h-[600px] w-[160px] rounded-lg overflow-hidden"
                 slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR}

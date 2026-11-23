@@ -10,6 +10,8 @@ import { useStyleStore, useUIStore, useTabsStore } from '@/stores';
 import type { GlobalStyles, EditableElement } from '@/types/style';
 import { SPACING_DEFAULTS } from '@/lib/styles/spacingDefaults';
 import { CodeBlockToolbar } from './CodeBlockToolbar';
+import { PreviewOutline } from './PreviewOutline';
+import { useAppStrings } from '@/lib/i18n/appStrings';
 import { readFenceLanguage, setFenceLanguage } from '@/lib/markdown/codeLanguages';
 import type { CodeThemeId } from '@/lib/markdown/codeThemes';
 
@@ -178,6 +180,8 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
   const deferredMarkdown = useDeferredValue(markdown);
   const elementStyles = useStyleStore((state) => state.elementStyles);
   const spacingHighlight = useUIStore((state) => state.spacingHighlight);
+  const isOutlineOpen = useUIStore((state) => state.isOutlineOpen);
+  const t = useAppStrings().previewPanel;
   const updateTabContent = useTabsStore((state) => state.updateTabContent);
   const getActiveTab = useTabsStore((state) => state.getActiveTab);
   const articleRef = useRef<HTMLElement>(null);
@@ -466,9 +470,10 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
   } as React.CSSProperties), [styles.fontSize, styles.fontFamily, styles.textColor, styles.backgroundColor, styles.lineHeight, styles.linkColor, styles.codeBackground, styles.maxWidth, styles.padding.top, styles.padding.right, styles.padding.bottom, styles.padding.left]);
 
   return (
+    <div className="relative flex h-full">
     <div
       ref={containerRef}
-      className="preview-container h-full overflow-auto"
+      className="preview-container h-full min-w-0 flex-1 overflow-auto"
       onPointerMove={handleCodePointerMove}
       onPointerLeave={scheduleHideCodeToolbar}
       style={{
@@ -518,6 +523,11 @@ export const Preview = memo(function Preview({ markdown, styles }: PreviewProps)
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />
+      )}
+    </div>
+      {isOutlineOpen && (
+        // Floats over the preview; positioned against this wrapper.
+        <PreviewOutline html={html} t={t} containerRef={containerRef} articleRef={articleRef} />
       )}
     </div>
   );
