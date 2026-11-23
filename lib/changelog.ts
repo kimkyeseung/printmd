@@ -38,12 +38,12 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-23',
     title: {
-      ko: '미리보기 목차, 블로그 글 따라오는 목차',
-      en: 'A preview outline, and a table of contents that follows you on the blog',
+      ko: '미리보기 목차, 블로그 글 따라오는 목차, 의견 보내기 페이지',
+      en: 'A preview outline, a table of contents that follows you on the blog, and a feedback page',
     },
     summary: {
-      ko: '긴 마크다운 문서를 미리보기에서 훑어볼 때 지금 어디를 읽고 있는지 바로 알 수 있도록 목차를 추가했습니다. 제목이 많은 보고서, 매뉴얼, README를 다듬을 때 목차에서 원하는 부분으로 바로 이동해 보세요. 블로그 글도 넓은 화면에서 오른쪽 목차가 스크롤을 따라옵니다.',
-      en: 'The preview now has an outline, so you always know where you are in a long Markdown document. When polishing a report, manual or README with many headings, jump straight to any section from the outline. Blog posts on wide screens also get a table of contents that stays beside you as you scroll.',
+      ko: '긴 마크다운 문서를 미리보기에서 훑어볼 때 지금 어디를 읽고 있는지 바로 알 수 있도록 목차를 추가했습니다. 제목이 많은 보고서, 매뉴얼, README를 다듬을 때 목차에서 원하는 부분으로 바로 이동해 보세요. 블로그 글도 넓은 화면에서 오른쪽 목차가 스크롤을 따라옵니다. 의견은 이제 메일 앱 없이 의견 보내기 페이지에서 바로 보낼 수 있습니다.',
+      en: 'The preview now has an outline, so you always know where you are in a long Markdown document. When polishing a report, manual or README with many headings, jump straight to any section from the outline. Blog posts on wide screens also get a table of contents that stays beside you as you scroll. And you can now send feedback straight from the feedback page, no mail app needed.',
     },
     images: [
       {
@@ -77,6 +77,13 @@ export const CHANGELOG: ChangelogEntry[] = [
         text: {
           ko: '미리보기 목차: 인쇄 폭 옆의 목차 버튼으로 켜고 끕니다. 문서의 제목(#, ##, ###)을 보여주고, 지금 보고 있는 제목을 표시하며, 누르면 그 제목으로 이동합니다. 켜고 끈 상태는 다음에도 유지됩니다.',
           en: 'Preview outline: turn it on or off with the Outline button next to Print width. It lists the document\'s headings (#, ##, ###), marks the one you\'re looking at, and jumps to a heading when you click it. Your on/off choice is remembered.',
+        },
+      },
+      {
+        kind: 'new',
+        text: {
+          ko: '의견 보내기 페이지: 메일 앱을 열지 않아도 이름(선택)과 내용만 적어 바로 보낼 수 있습니다. 사이드바와 홈의 의견 보내기 버튼이 이 페이지로 연결됩니다.',
+          en: 'Feedback page: send feedback right from printmd — just your name (optional) and a message, no mail app needed. The Send feedback buttons in the sidebar and on the home page now open it.',
         },
       },
       {
