@@ -4,6 +4,8 @@
  * code so the form can use the same limits.
  */
 
+import { defaultLocale, isLocale } from '@/lib/i18n/config';
+
 export const FEEDBACK_LIMITS = {
   name: 50,
   message: 2000,
@@ -57,7 +59,7 @@ export function validateFeedback(body: unknown, now: number = Date.now()): Valid
     return { ok: false, error: 'tooLong' };
   }
 
-  const locale = b.locale === 'ko' ? 'ko' : 'en';
+  const locale = isLocale(b.locale) ? b.locale : defaultLocale;
   const page = clean(b.page).slice(0, FEEDBACK_LIMITS.page);
   return { ok: true, value: { name, message, locale, page } };
 }

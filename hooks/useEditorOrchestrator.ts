@@ -2,11 +2,12 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAppStrings } from '@/lib/i18n/appStrings';
+import { defaultLocale, isLocale, type Locale } from '@/lib/i18n/config';
 import { tabDisplayTitle } from '@/lib/editor/tabTitle';
 import { useEditorStore, useDocumentsStore, useTabsStore } from '@/stores';
 import { useFileOpener } from './useFileOpener';
 
-const DEFAULT_CONTENT: Record<string, string> = {
+const DEFAULT_CONTENT: Record<Locale, string> = {
   ko: `# printmd
 
 **마크다운을 가장 예쁜 PDF로 만드는 가장 쉬운 방법.**
@@ -265,11 +266,259 @@ Both Markdown syntax and HTML tags are supported:
 
 *Paste your Markdown or drag a file to get started.*
 `,
+  zh: `# printmd
+
+**把 Markdown 变成精美 PDF 的最简单方式。**
+
+免费、无需注册，直接在浏览器中使用。
+
+---
+
+## 主要功能
+
+- **实时预览** — 边写边看效果
+- **15 种可自定义预设** — 一键切换样式
+- **自定义样式** — 细调字体、颜色、间距等
+- **就地编辑** — 在预览中双击任意段落即可编辑
+- **导出 PDF** — 把排好版的文档保存为 PDF
+
+## 快速上手
+
+1. 直接写 Markdown，或拖入文件
+2. 在右侧查看实时预览
+3. 选一个主题来排版文档
+4. **保存为 PDF** 或直接**打印**
+
+## 文字格式
+
+Markdown 支持多种**文字格式**：
+
+- **粗体** — 强调重要内容
+- *斜体* — 轻微强调
+- ~~删除线~~ — 标记删除的内容
+- \`行内代码\` — 在文字中显示代码或命令
+- **粗体 + *斜体*** — 可以自由组合
+
+链接也很简单：[printmd 主页](https://printmd.app)
+
+## 待办清单
+
+- [x] 打开 Markdown 编辑器
+- [x] 选择主题
+- [ ] 应用自定义样式
+- [ ] 导出 PDF
+
+## 代码块
+
+\`\`\`javascript
+// 在 printmd 中试试代码块
+function greet(name) {
+  return \`你好，\${name}！欢迎使用 printmd。\`;
+}
+
+console.log(greet('世界'));
+\`\`\`
+
+\`\`\`python
+# 也支持 Python
+def fibonacci(n):
+    a, b = 0, 1
+    for _ in range(n):
+        yield a
+        a, b = b, a + b
+
+print(list(fibonacci(10)))
+\`\`\`
+
+## 表格
+
+| 功能 | 说明 | 快捷键 |
+|------|------|--------|
+| 编辑器 | CodeMirror 6 Markdown 编辑器 | — |
+| 预览 | 实时渲染 + 就地编辑 | 双击 |
+| 主题 | 15 种预设 + 自定义样式 | — |
+| 保存 | 保存文档 | \`Ctrl/⌘ + S\` |
+| 导出 | 保存 PDF 与打印 | \`Ctrl/⌘ + P\` |
+
+## 嵌套列表
+
+- Markdown 语法
+  - 块级元素
+    - 标题（h1–h6）
+    - 段落
+    - 引用
+    - 代码块
+  - 行内元素
+    - 粗体、斜体
+    - 链接、图片
+    - 行内代码
+
+### 有序嵌套列表
+
+1. 撰写文档
+   1. 用 Markdown 写内容
+   2. 查看实时预览
+2. 应用样式
+   1. 选择主题预设
+   2. 按需调整自定义样式
+3. 导出
+   1. 保存为 PDF
+   2. 或直接打印
+
+### 标题层级
+
+下面是 h3 到 h6 标题的示例：
+
+#### h4 四级标题
+
+##### h5 五级标题
+
+###### h6 六级标题
+
+## 引用
+
+> 你只管写 Markdown，排版交给 printmd。
+
+> **提示：** 在预览中双击任意段落，
+> 就能直接编辑它的 Markdown 源码。
+> 按 \`Ctrl/⌘ + Enter\` 确认，按 \`Escape\` 取消。
+
+## 图片
+
+![Markdown 标志](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)
+
+---
+
+*粘贴 Markdown 或拖入文件即可开始。*`,
+  ja: `# printmd
+
+**Markdown をきれいな PDF にするいちばん簡単な方法。**
+
+無料・登録不要・ブラウザだけで使えます。
+
+---
+
+## 主な機能
+
+- **リアルタイムプレビュー** — 入力しながら仕上がりを確認
+- **カスタマイズできる 15 のプリセット** — ワンクリックでスタイルを切り替え
+- **自由なスタイル調整** — フォント、色、余白などを細かく設定
+- **その場で編集** — プレビューのブロックをダブルクリックして編集
+- **PDF 出力** — 仕上げた文書を PDF として保存
+
+## はじめかた
+
+1. Markdown を直接書くか、ファイルをドラッグ＆ドロップ
+2. 右側のリアルタイムプレビューを確認
+3. テーマを選んで文書を整える
+4. **PDF として保存**するか、そのまま**印刷**
+
+## 文字の書式
+
+Markdown ではさまざまな**文字の書式**が使えます：
+
+- **太字** — 大事なところを強調
+- *斜体* — さりげない強調
+- ~~取り消し線~~ — 削除した内容を示す
+- \`インラインコード\` — 文中にコードやコマンドを表示
+- **太字 + *斜体*** — 自由に組み合わせ可能
+
+リンクも簡単です：[printmd ホームページ](https://printmd.app)
+
+## チェックリスト
+
+- [x] Markdown エディタを開く
+- [x] テーマを選ぶ
+- [ ] カスタムスタイルを適用する
+- [ ] PDF に書き出す
+
+## コードブロック
+
+\`\`\`javascript
+// printmd でコードブロックを試してみましょう
+function greet(name) {
+  return \`こんにちは、\${name}さん！printmd へようこそ。\`;
+}
+
+console.log(greet('世界'));
+\`\`\`
+
+\`\`\`python
+# Python にも対応しています
+def fibonacci(n):
+    a, b = 0, 1
+    for _ in range(n):
+        yield a
+        a, b = b, a + b
+
+print(list(fibonacci(10)))
+\`\`\`
+
+## 表
+
+| 機能 | 説明 | ショートカット |
+|------|------|----------------|
+| エディタ | CodeMirror 6 の Markdown エディタ | — |
+| プレビュー | リアルタイム表示 + その場で編集 | ダブルクリック |
+| テーマ | 15 のプリセット + カスタムスタイル | — |
+| 保存 | 文書を保存 | \`Ctrl/⌘ + S\` |
+| 出力 | PDF 保存と印刷 | \`Ctrl/⌘ + P\` |
+
+## 入れ子のリスト
+
+- Markdown の構文
+  - ブロック要素
+    - 見出し（h1–h6）
+    - 段落
+    - 引用
+    - コードブロック
+  - インライン要素
+    - 太字、斜体
+    - リンク、画像
+    - インラインコード
+
+### 番号付きの入れ子リスト
+
+1. 文書を書く
+   1. Markdown で内容を書く
+   2. リアルタイムプレビューを確認する
+2. スタイルを当てる
+   1. テーマプリセットを選ぶ
+   2. 必要ならカスタムスタイルを調整する
+3. 書き出す
+   1. PDF として保存する
+   2. またはそのまま印刷する
+
+### 見出しのレベル
+
+h3 から h6 までの見出しの例です：
+
+#### h4 第 4 レベルの見出し
+
+##### h5 第 5 レベルの見出し
+
+###### h6 第 6 レベルの見出し
+
+## 引用
+
+> Markdown を書くだけ。見た目は printmd におまかせ。
+
+> **ヒント：** プレビューのブロックをダブルクリックすると、
+> その Markdown ソースをその場で編集できます。
+> \`Ctrl/⌘ + Enter\` で確定、\`Escape\` でキャンセル。
+
+## 画像
+
+![Markdown ロゴ](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)
+
+---
+
+*Markdown を貼り付けるか、ファイルをドラッグして始めましょう。*`,
 };
 
 export function useEditorOrchestrator() {
   const params = useParams();
-  const locale = (params.locale as string) || 'en';
+  const locale: Locale = isLocale(params?.locale) ? params.locale : defaultLocale;
   const initRef = useRef(false);
   const text = useAppStrings();
   const { openFile } = useFileOpener();
@@ -303,7 +552,7 @@ export function useEditorOrchestrator() {
       const searchParams = new URLSearchParams(window.location.search);
       if (!searchParams.get('src')) {
         const saved = localStorage.getItem('printmd-content');
-        const defaultContent = saved || DEFAULT_CONTENT[locale] || DEFAULT_CONTENT['en'];
+        const defaultContent = saved || DEFAULT_CONTENT[locale];
         addTab({ content: defaultContent, title: 'Untitled' });
         // Clean up legacy storage
         localStorage.removeItem('printmd-content');

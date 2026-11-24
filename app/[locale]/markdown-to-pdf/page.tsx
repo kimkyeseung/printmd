@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
+import { CJK_KEYWORDS } from '@/lib/seo/cjkKeywords';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { SiteFooter } from '@/components/layout';
@@ -25,7 +26,7 @@ export async function generateMetadata({
     path: '/markdown-to-pdf',
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
-    keywords: locale === 'ko'
+    keywords: locale === 'zh' ? CJK_KEYWORDS.markdownToPdf.zh : locale === 'ja' ? CJK_KEYWORDS.markdownToPdf.ja : locale === 'ko'
       ? [
           // 핵심 키워드
           '마크다운 PDF 변환', '마크다운 to PDF', 'markdown to pdf', 'md to pdf',
@@ -154,7 +155,7 @@ export default async function MarkdownToPdfPage({
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
-    name: locale === 'ko' ? '마크다운을 PDF로 변환하는 방법' : 'How to Convert Markdown to PDF',
+    name: ({ ko: '마크다운을 PDF로 변환하는 방법', en: 'How to Convert Markdown to PDF', zh: '如何把 Markdown 转换成 PDF', ja: 'Markdown を PDF に変換する方法' } as Record<Locale, string>)[locale],
     description: t.hero.description,
     totalTime: 'PT1M',
     tool: {
@@ -199,7 +200,7 @@ export default async function MarkdownToPdfPage({
       {
         '@type': 'ListItem',
         position: 2,
-        name: locale === 'ko' ? '마크다운 PDF 변환' : 'Markdown to PDF',
+        name: ({ ko: '마크다운 PDF 변환', en: 'Markdown to PDF', zh: 'Markdown 转 PDF', ja: 'Markdown を PDF に変換' } as Record<Locale, string>)[locale],
         item: `https://printmd.app/${locale}/markdown-to-pdf`,
       },
     ],

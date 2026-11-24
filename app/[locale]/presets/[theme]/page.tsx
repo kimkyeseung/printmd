@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { themePresets, themeElementStyles, presetKeys } from '@/lib/themes/presets';
-import { THEME_NAMES, THEME_DESCRIPTIONS } from '@/types/theme';
+import { THEME_NAMES } from '@/types/theme';
 import type { ThemePreset } from '@/types/style';
 import { SiteFooter } from '@/components/layout';
 
@@ -94,6 +94,224 @@ const THEME_LONG_DESC_KO: Record<ThemePreset, string> = {
   pastel: '파스텔 라벤더와 핑크 톤의 부드러운 테마입니다. 창의적인 콘텐츠에 친근하고 따뜻한 인상을 줍니다.',
 };
 
+const THEME_KEYWORDS_ZH: Record<ThemePreset, string> = {
+  default: '默认markdown主题,简洁markdown样式,白色背景markdown,标准markdown pdf',
+  dark: '深色模式markdown,深色主题pdf,深色markdown编辑器,深色背景markdown',
+  document: '文档风格markdown,衬线字体markdown,正式文档pdf,专业markdown',
+  blog: '博客风格markdown,博客文章pdf,易读markdown主题,博客markdown格式',
+  minimal: '极简markdown主题,极简pdf样式,简洁打印markdown,简约markdown样式',
+  sepia: '复古markdown主题,复古风格pdf,暖色调markdown,怀旧文档样式',
+  ocean: '海洋主题markdown,蓝色深色主题pdf,海蓝色markdown,深蓝文档',
+  forest: '森林主题markdown,绿色自然pdf,自然色markdown,绿色文档样式',
+  sunset: '日落主题markdown,紫色暖调pdf,日落配色markdown,暮光文档样式',
+  newspaper: '报纸风格markdown,经典印刷pdf,衬线报纸markdown,传统文档样式',
+  academic: '学术论文markdown,研究论文pdf,学术markdown主题,论文样式文档',
+  notebook: '笔记本风格markdown,手写感pdf,笔记markdown,休闲文档样式',
+  terminal: '终端主题markdown,开发者控制台pdf,等宽字体markdown,极客风格文档',
+  elegant: '典雅markdown主题,高级感pdf,金色点缀markdown,精致文档样式',
+  pastel: '粉彩主题markdown,柔和配色pdf,薰衣草markdown样式,温柔文档主题',
+};
+
+const THEME_KEYWORDS_JA: Record<ThemePreset, string> = {
+  default: 'markdown デフォルトテーマ,シンプル markdown スタイル,白背景 markdown,標準 markdown pdf',
+  dark: 'ダークモード markdown,ダークテーマ pdf,ダーク markdown エディタ,黒背景 markdown',
+  document: 'ドキュメント風 markdown,明朝体 markdown,公式文書 pdf,ビジネス markdown',
+  blog: 'ブログ風 markdown,ブログ記事 pdf,読みやすい markdown テーマ,ブログ markdown 書式',
+  minimal: 'ミニマル markdown テーマ,ミニマリスト pdf,印刷向け markdown,シンプル markdown',
+  sepia: 'セピア markdown テーマ,ヴィンテージ pdf,暖色 markdown,レトロ文書スタイル',
+  ocean: 'オーシャン markdown テーマ,青いダークテーマ pdf,海の色 markdown,深い青の文書',
+  forest: 'フォレスト markdown テーマ,緑 自然 pdf,ナチュラルカラー markdown,緑の文書スタイル',
+  sunset: 'サンセット markdown テーマ,紫 暖色 pdf,夕焼けカラー markdown,黄昏の文書スタイル',
+  newspaper: '新聞風 markdown,クラシック印刷 pdf,明朝体 新聞 markdown,伝統的な文書',
+  academic: '学術論文 markdown,研究論文 pdf,アカデミック markdown テーマ,論文スタイル',
+  notebook: 'ノート風 markdown,手書き風 pdf,ノート markdown,カジュアル文書スタイル',
+  terminal: 'ターミナル markdown テーマ,開発者コンソール pdf,等幅フォント markdown,ハッカー風文書',
+  elegant: 'エレガント markdown テーマ,高級感 pdf,ゴールド markdown,プレミアム文書スタイル',
+  pastel: 'パステル markdown テーマ,やわらかい色 pdf,ラベンダー markdown,やさしい文書テーマ',
+};
+
+const THEME_LONG_DESC_ZH: Record<ThemePreset, string> = {
+  default: '白色背景配深色文字的简洁通用主题。适合一般文档、README 文件和日常 Markdown。',
+  dark: '深色背景配浅色文字的现代深色主题。适合开发者、夜间阅读和风格利落的演示。',
+  document: '使用衬线字体和宽松页边距的正式文档风格。适合正式报告、信函和专业文档。',
+  blog: '用较大字号和宽松行距优化可读性的主题。适合博客文章、专栏和长篇内容。',
+  minimal: '装饰极少、为打印优化的样式。带来干净、不受干扰的阅读体验。',
+  sepia: '暖色调的复古主题，重现旧纸张和经典书籍的质感。',
+  ocean: '灵感来自深海的蓝色主题。清爽的青色点缀带来平静、沉浸的阅读体验。',
+  forest: '看着舒服的自然绿色主题。柔和的绿色调带来清新的感觉。',
+  sunset: '灵感来自暮色天空的紫色主题。深紫底色上的橙色点缀营造出戏剧化的氛围。',
+  newspaper: '衬线字体和传统版式的经典报纸风格。双线边框更添正宗的印刷质感。',
+  academic: '为学术论文和研究文档设计的主题。干净的衬线排版和规整的版式。',
+  notebook: '虚线边框、间距宽松的休闲笔记本风格，就像写在横格本上的笔记。',
+  terminal: '等宽字体、黑底绿字终端风格的开发者主题，以代码为中心的设计。',
+  elegant: '金色点缀和衬线排版的高级主题。适合特别的文档和邀请函。',
+  pastel: '粉彩薰衣草和粉色调的柔和主题。为创意内容带来亲切温暖的印象。',
+};
+
+const THEME_LONG_DESC_JA: Record<ThemePreset, string> = {
+  default: '白い背景に濃い文字の、すっきりした汎用テーマです。一般的な文書、README ファイル、普段の Markdown に向いています。',
+  dark: '暗い背景に明るい文字のモダンなダークテーマです。開発者、夜の読書、洗練されたプレゼンテーションにぴったりです。',
+  document: '明朝系フォントとゆったりした余白を使った、フォーマルな文書スタイルです。公式な報告書、書簡、ビジネス文書に向いています。',
+  blog: '大きめの文字と広い行間で読みやすさを高めたテーマです。ブログ記事、コラム、長文のコンテンツに向いています。',
+  minimal: '装飾を最小限に抑えた、印刷向けのスタイルです。気が散らない、すっきりとした読み心地です。',
+  sepia: '暖かみのあるヴィンテージ調のテーマです。古い紙や古典的な本の雰囲気を再現します。',
+  ocean: '深い海から着想を得たブルーのテーマです。涼しげなシアンのアクセントで、落ち着いて読めます。',
+  forest: '目にやさしい自然なグリーンのテーマです。やわらかな緑のトーンで、さわやかな印象になります。',
+  sunset: '夕暮れの空から着想を得た紫のテーマです。深い紫にオレンジのアクセントが映え、ドラマチックな雰囲気を演出します。',
+  newspaper: '明朝系の書体と伝統的なレイアウトによる、クラシックな新聞スタイルです。二重線の罫線が本格的な印刷物らしさを添えます。',
+  academic: '学術論文や研究文書のためのテーマです。すっきりした明朝系の文字組みと、整ったレイアウトが特長です。',
+  notebook: '点線の枠とゆとりのある間隔の、カジュアルなノート風スタイルです。罫線ノートに手書きしたような雰囲気です。',
+  terminal: '等幅フォントと黒地に緑のターミナル風デザインの、開発者向けテーマです。コード中心のデザインです。',
+  elegant: 'ゴールドのアクセントと明朝系の文字組みによる上品なテーマです。特別な文書や招待状にふさわしい高級感があります。',
+  pastel: 'パステルのラベンダーとピンクを使った、やわらかなテーマです。クリエイティブなコンテンツに親しみやすい印象を与えます。',
+};
+
+const THEME_KEYWORDS: Record<Locale, Record<ThemePreset, string>> = {
+  en: THEME_KEYWORDS_EN,
+  ko: THEME_KEYWORDS_KO,
+  zh: THEME_KEYWORDS_ZH,
+  ja: THEME_KEYWORDS_JA,
+};
+
+const THEME_LONG_DESC: Record<Locale, Record<ThemePreset, string>> = {
+  en: THEME_LONG_DESC_EN,
+  ko: THEME_LONG_DESC_KO,
+  zh: THEME_LONG_DESC_ZH,
+  ja: THEME_LONG_DESC_JA,
+};
+
+const PAGE_TEXT: Record<Locale, {
+  metaTitle: (name: string) => string;
+  metaDescription: (name: string, desc: string) => string;
+  background: string;
+  textColor: string;
+  linkColor: string;
+  codeBackground: string;
+  h1Color: string;
+  h1Border: string;
+  strongColor: string;
+  hrColor: string;
+  colorPalette: string;
+  elementColors: string;
+  font: string;
+  fontSize: string;
+  lineHeight: string;
+  maxWidth: string;
+  padding: string;
+  themeDetails: string;
+  preview: string;
+  ctaTitle: (name: string) => string;
+  ctaSubtitle: string;
+  previous: string;
+  next: string;
+  allThemes: string;
+}> = {
+  en: {
+    metaTitle: (name) => `${name} Theme - Markdown PDF Theme`,
+    metaDescription: (name, desc) => `Convert Markdown to PDF with the printmd ${name} theme. ${desc}`,
+    background: 'Background',
+    textColor: 'Text Color',
+    linkColor: 'Link Color',
+    codeBackground: 'Code Background',
+    h1Color: 'H1 Color',
+    h1Border: 'H1 Border',
+    strongColor: 'Strong Color',
+    hrColor: 'HR Color',
+    colorPalette: 'Color Palette',
+    elementColors: 'Element Colors',
+    font: 'Font',
+    fontSize: 'Font Size',
+    lineHeight: 'Line Height',
+    maxWidth: 'Max Width',
+    padding: 'Padding',
+    themeDetails: 'Theme Details',
+    preview: 'Preview',
+    ctaTitle: (name) => `Try the ${name} theme on your Markdown`,
+    ctaSubtitle: 'Free to use. No signup required.',
+    previous: '← Previous',
+    next: 'Next →',
+    allThemes: '← View all themes',
+  },
+  ko: {
+    metaTitle: (name) => `${name} 테마 - 마크다운 PDF 테마`,
+    metaDescription: (name, desc) => `printmd ${name} 테마로 마크다운을 PDF로 변환하세요. ${desc}`,
+    background: '배경색',
+    textColor: '텍스트 색상',
+    linkColor: '링크 색상',
+    codeBackground: '코드 배경',
+    h1Color: 'H1 색상',
+    h1Border: 'H1 하단 테두리',
+    strongColor: '강조 색상',
+    hrColor: '구분선 색상',
+    colorPalette: '색상 팔레트',
+    elementColors: '요소별 색상',
+    font: '폰트',
+    fontSize: '글자 크기',
+    lineHeight: '행간',
+    maxWidth: '최대 너비',
+    padding: '여백',
+    themeDetails: '테마 상세',
+    preview: '미리보기',
+    ctaTitle: (name) => `${name} 테마로 마크다운을 변환해보세요`,
+    ctaSubtitle: '무료로 사용할 수 있습니다. 가입이 필요 없습니다.',
+    previous: '← 이전',
+    next: '다음 →',
+    allThemes: '← 모든 테마 보기',
+  },
+  zh: {
+    metaTitle: (name) => `${name} 主题 - Markdown PDF 主题`,
+    metaDescription: (name, desc) => `用 printmd 的 ${name} 主题把 Markdown 转换成 PDF。${desc}`,
+    background: '背景色',
+    textColor: '文字颜色',
+    linkColor: '链接颜色',
+    codeBackground: '代码背景',
+    h1Color: 'H1 颜色',
+    h1Border: 'H1 下边框',
+    strongColor: '强调颜色',
+    hrColor: '分隔线颜色',
+    colorPalette: '配色',
+    elementColors: '各元素颜色',
+    font: '字体',
+    fontSize: '字号',
+    lineHeight: '行高',
+    maxWidth: '最大宽度',
+    padding: '内边距',
+    themeDetails: '主题详情',
+    preview: '预览',
+    ctaTitle: (name) => `用 ${name} 主题转换你的 Markdown`,
+    ctaSubtitle: '免费使用，无需注册。',
+    previous: '← 上一个',
+    next: '下一个 →',
+    allThemes: '← 查看全部主题',
+  },
+  ja: {
+    metaTitle: (name) => `${name} テーマ - Markdown PDF テーマ`,
+    metaDescription: (name, desc) => `printmd の ${name} テーマで Markdown を PDF に変換しましょう。${desc}`,
+    background: '背景色',
+    textColor: '文字色',
+    linkColor: 'リンクの色',
+    codeBackground: 'コード背景',
+    h1Color: 'H1 の色',
+    h1Border: 'H1 の下線',
+    strongColor: '強調の色',
+    hrColor: '区切り線の色',
+    colorPalette: 'カラーパレット',
+    elementColors: '要素ごとの色',
+    font: 'フォント',
+    fontSize: '文字サイズ',
+    lineHeight: '行間',
+    maxWidth: '最大幅',
+    padding: '余白',
+    themeDetails: 'テーマの詳細',
+    preview: 'プレビュー',
+    ctaTitle: (name) => `${name} テーマで Markdown を変換してみましょう`,
+    ctaSubtitle: '無料で使えます。登録は不要です。',
+    previous: '← 前へ',
+    next: '次へ →',
+    allThemes: '← すべてのテーマを見る',
+  },
+};
+
 export async function generateMetadata({
   params,
 }: {
@@ -104,16 +322,13 @@ export async function generateMetadata({
 
   const dict = await getDictionary(locale);
   const themeName = THEME_NAMES[theme];
-  const themeDesc = locale === 'ko' ? THEME_LONG_DESC_KO[theme] : THEME_LONG_DESC_EN[theme];
-  const keywords = locale === 'ko' ? THEME_KEYWORDS_KO[theme] : THEME_KEYWORDS_EN[theme];
+  const themeDesc = THEME_LONG_DESC[locale][theme];
+  const keywords = THEME_KEYWORDS[locale][theme];
+  const tx = PAGE_TEXT[locale];
 
-  const title = locale === 'ko'
-    ? `${themeName} 테마 - 마크다운 PDF 테마`
-    : `${themeName} Theme - Markdown PDF Theme`;
+  const title = tx.metaTitle(themeName);
 
-  const description = locale === 'ko'
-    ? `printmd ${themeName} 테마로 마크다운을 PDF로 변환하세요. ${themeDesc}`
-    : `Convert Markdown to PDF with the printmd ${themeName} theme. ${themeDesc}`;
+  const description = tx.metaDescription(themeName, themeDesc);
 
   return buildPageMetadata({
     locale,
@@ -239,34 +454,34 @@ function ColorPalette({ theme, locale }: { theme: ThemePreset; locale: Locale })
   const styles = themePresets[theme];
   const elementStyles = themeElementStyles[theme];
 
-  const isKo = locale === 'ko';
+  const tx = PAGE_TEXT[locale];
 
   const globalColors: { color: string; label: string }[] = [
-    { color: styles.backgroundColor, label: isKo ? '배경색' : 'Background' },
-    { color: styles.textColor, label: isKo ? '텍스트 색상' : 'Text Color' },
-    { color: styles.linkColor, label: isKo ? '링크 색상' : 'Link Color' },
-    { color: styles.codeBackground, label: isKo ? '코드 배경' : 'Code Background' },
+    { color: styles.backgroundColor, label: tx.background },
+    { color: styles.textColor, label: tx.textColor },
+    { color: styles.linkColor, label: tx.linkColor },
+    { color: styles.codeBackground, label: tx.codeBackground },
   ];
 
   const elementColors: { color: string; label: string }[] = [];
 
   if (elementStyles?.h1?.color) {
-    elementColors.push({ color: elementStyles.h1.color, label: isKo ? 'H1 색상' : 'H1 Color' });
+    elementColors.push({ color: elementStyles.h1.color, label: tx.h1Color });
   }
   if (elementStyles?.h1?.borderBottomColor && elementStyles.h1.borderBottomStyle !== 'none') {
-    elementColors.push({ color: elementStyles.h1.borderBottomColor, label: isKo ? 'H1 하단 테두리' : 'H1 Border' });
+    elementColors.push({ color: elementStyles.h1.borderBottomColor, label: tx.h1Border });
   }
   if (elementStyles?.strong?.color) {
-    elementColors.push({ color: elementStyles.strong.color, label: isKo ? '강조 색상' : 'Strong Color' });
+    elementColors.push({ color: elementStyles.strong.color, label: tx.strongColor });
   }
   if (elementStyles?.hr?.backgroundColor) {
-    elementColors.push({ color: elementStyles.hr.backgroundColor, label: isKo ? '구분선 색상' : 'HR Color' });
+    elementColors.push({ color: elementStyles.hr.backgroundColor, label: tx.hrColor });
   }
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm">
       <h3 className="text-lg font-semibold text-gray-900 mb-6">
-        {isKo ? '색상 팔레트' : 'Color Palette'}
+        {tx.colorPalette}
       </h3>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {globalColors.map(({ color, label }) => (
@@ -276,7 +491,7 @@ function ColorPalette({ theme, locale }: { theme: ThemePreset; locale: Locale })
       {elementColors.length > 0 && (
         <>
           <h4 className="text-sm font-medium text-gray-500 mb-4 mt-6">
-            {isKo ? '요소별 색상' : 'Element Colors'}
+            {tx.elementColors}
           </h4>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {elementColors.map(({ color, label }) => (
@@ -291,20 +506,20 @@ function ColorPalette({ theme, locale }: { theme: ThemePreset; locale: Locale })
 
 function ThemeDetails({ theme, locale }: { theme: ThemePreset; locale: Locale }) {
   const styles = themePresets[theme];
-  const isKo = locale === 'ko';
+  const tx = PAGE_TEXT[locale];
 
   const details = [
-    { label: isKo ? '폰트' : 'Font', value: styles.fontFamily.split(',')[0].replace(/"/g, '') },
-    { label: isKo ? '글자 크기' : 'Font Size', value: `${styles.fontSize}px` },
-    { label: isKo ? '행간' : 'Line Height', value: `${styles.lineHeight}` },
-    { label: isKo ? '최대 너비' : 'Max Width', value: `${styles.maxWidth}px` },
-    { label: isKo ? '여백' : 'Padding', value: `${styles.padding.top}px` },
+    { label: tx.font, value: styles.fontFamily.split(',')[0].replace(/"/g, '') },
+    { label: tx.fontSize, value: `${styles.fontSize}px` },
+    { label: tx.lineHeight, value: `${styles.lineHeight}` },
+    { label: tx.maxWidth, value: `${styles.maxWidth}px` },
+    { label: tx.padding, value: `${styles.padding.top}px` },
   ];
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        {isKo ? '테마 상세' : 'Theme Details'}
+        {tx.themeDetails}
       </h3>
       <dl className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {details.map(({ label, value }) => (
@@ -329,10 +544,10 @@ export default async function ThemePage({
   const dict = await getDictionary(locale);
   const t = dict.presets;
 
-  const isKo = locale === 'ko';
+  const tx = PAGE_TEXT[locale];
   const themeName = THEME_NAMES[theme];
-  const themeDesc = THEME_DESCRIPTIONS[theme];
-  const longDesc = isKo ? THEME_LONG_DESC_KO[theme] : THEME_LONG_DESC_EN[theme];
+  const themeDesc = dict.stylePanel.themeDescriptions[theme];
+  const longDesc = THEME_LONG_DESC[locale][theme];
 
   const themeIndex = presetKeys.indexOf(theme);
   const prevTheme = themeIndex > 0 ? presetKeys[themeIndex - 1] : null;
@@ -420,7 +635,7 @@ export default async function ThemePage({
         {/* Theme Preview */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">
-            {isKo ? '미리보기' : 'Preview'}
+            {tx.preview}
           </h2>
           <ThemePreview theme={theme} />
         </section>
@@ -438,14 +653,10 @@ export default async function ThemePage({
         {/* CTA */}
         <section className="mb-12 rounded-xl bg-gray-50 border border-gray-200 p-8 text-center">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            {isKo
-              ? `${themeName} 테마로 마크다운을 변환해보세요`
-              : `Try the ${themeName} theme on your Markdown`}
+            {tx.ctaTitle(themeName)}
           </h2>
           <p className="text-gray-600 mb-6">
-            {isKo
-              ? '무료로 사용할 수 있습니다. 가입이 필요 없습니다.'
-              : 'Free to use. No signup required.'}
+            {tx.ctaSubtitle}
           </p>
           <Link
             href={`/${locale}`}
@@ -462,7 +673,7 @@ export default async function ThemePage({
               href={`/${locale}/presets/${prevTheme}`}
               className="text-sm text-blue-600 hover:text-blue-700"
             >
-              {isKo ? '← 이전' : '← Previous'}: {THEME_NAMES[prevTheme]}
+              {tx.previous}: {THEME_NAMES[prevTheme]}
             </Link>
           ) : (
             <span />
@@ -472,7 +683,7 @@ export default async function ThemePage({
               href={`/${locale}/presets/${nextTheme}`}
               className="text-sm text-blue-600 hover:text-blue-700"
             >
-              {THEME_NAMES[nextTheme]} :{isKo ? ' 다음 →' : ' Next →'}
+              {THEME_NAMES[nextTheme]} : {tx.next}
             </Link>
           ) : (
             <span />
@@ -485,7 +696,7 @@ export default async function ThemePage({
             href={`/${locale}/presets`}
             className="text-sm text-gray-500 hover:text-gray-700"
           >
-            {isKo ? '← 모든 테마 보기' : '← View all themes'}
+            {tx.allThemes}
           </Link>
         </div>
       </main>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
-import { locales, type Locale } from '@/lib/i18n/config';
+import { locales, localeTags, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { buildPageMetadata, SITE_NAME } from '@/lib/seo/metadata';
 import { Providers } from '@/components/Providers';
@@ -83,7 +83,7 @@ export default async function LocaleLayout({
   }
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={localeTags[locale]} suppressHydrationWarning>
       <head suppressHydrationWarning>
         <script
           type="application/ld+json"

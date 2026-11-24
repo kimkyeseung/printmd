@@ -15,6 +15,14 @@ const TEXT = {
     message: 'Get the Chrome extension to import GitHub Markdown instantly!',
     install: 'Install',
   },
+  zh: {
+    message: '安装 Chrome 扩展，即可一键导入 GitHub 上的 Markdown！',
+    install: '安装',
+  },
+  ja: {
+    message: 'Chrome 拡張機能を入れると、GitHub の Markdown をすぐに取り込めます！',
+    install: 'インストール',
+  },
 } as const;
 
 function isChromium(): boolean {

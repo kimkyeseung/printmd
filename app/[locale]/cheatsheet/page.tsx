@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
-import { locales, type Locale } from '@/lib/i18n/config';
+import { locales, localeTags, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { CheatsheetClient } from '@/components/cheatsheet/CheatsheetClient';
 import { AdBanner } from '@/components/adsense/AdBanner';
@@ -61,7 +61,7 @@ export default async function CheatsheetPage({
       '@id': `https://printmd.app/${locale}/cheatsheet`,
     },
     articleSection: 'Reference',
-    inLanguage: locale === 'ko' ? 'ko-KR' : 'en-US',
+    inLanguage: localeTags[locale],
     datePublished: '2026-03-26',
     dateModified: '2026-03-26',
   };
@@ -86,15 +86,15 @@ export default async function CheatsheetPage({
   };
 
   const tocItems = [
-    { id: 'headings', label: locale === 'ko' ? '제목' : 'Headings' },
-    { id: 'text-formatting', label: locale === 'ko' ? '텍스트 서식' : 'Text Formatting' },
-    { id: 'links-images', label: locale === 'ko' ? '링크 & 이미지' : 'Links & Images' },
-    { id: 'lists', label: locale === 'ko' ? '목록' : 'Lists' },
-    { id: 'blockquotes', label: locale === 'ko' ? '인용문' : 'Blockquotes' },
-    { id: 'code', label: locale === 'ko' ? '코드' : 'Code' },
-    { id: 'tables', label: locale === 'ko' ? '테이블' : 'Tables' },
-    { id: 'horizontal-rules', label: locale === 'ko' ? '수평선' : 'Horizontal Rules' },
-    { id: 'other', label: locale === 'ko' ? '기타' : 'Other' },
+    { id: 'headings', label: ({ ko: '제목', en: 'Headings', zh: '标题', ja: '見出し' } as Record<Locale, string>)[locale] },
+    { id: 'text-formatting', label: ({ ko: '텍스트 서식', en: 'Text Formatting', zh: '文字格式', ja: '文字の書式' } as Record<Locale, string>)[locale] },
+    { id: 'links-images', label: ({ ko: '링크 & 이미지', en: 'Links & Images', zh: '链接与图片', ja: 'リンクと画像' } as Record<Locale, string>)[locale] },
+    { id: 'lists', label: ({ ko: '목록', en: 'Lists', zh: '列表', ja: 'リスト' } as Record<Locale, string>)[locale] },
+    { id: 'blockquotes', label: ({ ko: '인용문', en: 'Blockquotes', zh: '引用', ja: '引用' } as Record<Locale, string>)[locale] },
+    { id: 'code', label: ({ ko: '코드', en: 'Code', zh: '代码', ja: 'コード' } as Record<Locale, string>)[locale] },
+    { id: 'tables', label: ({ ko: '테이블', en: 'Tables', zh: '表格', ja: '表' } as Record<Locale, string>)[locale] },
+    { id: 'horizontal-rules', label: ({ ko: '수평선', en: 'Horizontal Rules', zh: '分隔线', ja: '区切り線' } as Record<Locale, string>)[locale] },
+    { id: 'other', label: ({ ko: '기타', en: 'Other', zh: '其他', ja: 'その他' } as Record<Locale, string>)[locale] },
   ];
 
   return (

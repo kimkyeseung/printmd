@@ -52,8 +52,12 @@ function formatDate(date: unknown): string {
 }
 
 function calculateReadingTime(content: string): number {
-  const words = content.trim().split(/\s+/).length;
-  return Math.max(1, Math.ceil(words / 200));
+  // Chinese and Japanese put no spaces between words, so their characters are
+  // counted on their own (about 500 a minute) and everything else by words.
+  const cjk = /[぀-ヿ㐀-鿿]/g;
+  const cjkChars = (content.match(cjk) ?? []).length;
+  const words = content.replace(cjk, ' ').trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200 + cjkChars / 500));
 }
 
 export function getPostSlugs(locale: string): string[] {

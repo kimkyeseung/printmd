@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
-import { locales, type Locale } from '@/lib/i18n/config';
+import { Fragment } from 'react';
+import { locales, localeTags, type Locale } from '@/lib/i18n/config';
+import { GUIDE_SECTIONS } from '@/lib/guide/sections';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { AdSidebar } from '@/components/adsense/AdSidebar';
@@ -39,6 +41,7 @@ export default async function GuidePage({
   const locale = isValidLocale(localeParam) ? localeParam : 'en';
   const dict = await getDictionary(locale);
   const t = dict.guide;
+  const sections = GUIDE_SECTIONS[locale];
 
   const articleJsonLd = {
     '@context': 'https://schema.org',
@@ -60,7 +63,7 @@ export default async function GuidePage({
       '@id': `https://printmd.app/${locale}/guide`,
     },
     articleSection: 'Tutorial',
-    inLanguage: locale === 'ko' ? 'ko-KR' : 'en-US',
+    inLanguage: localeTags[locale],
     datePublished: '2025-03-01',
     dateModified: '2026-03-13',
   };
@@ -130,149 +133,34 @@ export default async function GuidePage({
             <nav className="mb-12 rounded-xl bg-gray-50 p-6">
           <h2 className="font-semibold text-gray-900">{t.toc}</h2>
           <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            <TocItem href="#headings">제목</TocItem>
-            <TocItem href="#emphasis">강조</TocItem>
-            <TocItem href="#lists">목록</TocItem>
-            <TocItem href="#links">링크</TocItem>
-            <TocItem href="#images">이미지</TocItem>
-            <TocItem href="#code">코드</TocItem>
-            <TocItem href="#blockquotes">인용문</TocItem>
-            <TocItem href="#tables">테이블</TocItem>
-            <TocItem href="#horizontal-rules">수평선</TocItem>
+            {sections.map((section) => (
+              <TocItem key={section.id} href={`#${section.id}`}>{section.toc}</TocItem>
+            ))}
           </ul>
         </nav>
 
         {/* Sections */}
         <div className="space-y-16">
-          <SyntaxSection
-            id="headings"
-            syntaxLabel={t.syntaxLabel}
-            title="제목 (Headings)"
-            description="# 기호로 제목을 만들 수 있습니다. 1~6단계까지 지원합니다."
-            syntax={`# 제목 1
-## 제목 2
-### 제목 3
-#### 제목 4
-##### 제목 5
-###### 제목 6`}
-          />
-
-          <SyntaxSection
-            syntaxLabel={t.syntaxLabel}
-            id="emphasis"
-            title="강조 (Emphasis)"
-            description="텍스트를 굵게, 기울임, 취소선으로 표시할 수 있습니다."
-            syntax={`**굵은 텍스트** 또는 __굵은 텍스트__
-*기울임 텍스트* 또는 _기울임 텍스트_
-~~취소선 텍스트~~
-***굵은 기울임***`}
-          />
-
-          <SyntaxSection
-            syntaxLabel={t.syntaxLabel}
-            id="lists"
-            title="목록 (Lists)"
-            description="순서 없는 목록과 순서 있는 목록을 만들 수 있습니다."
-            syntax={`순서 없는 목록:
-- 항목 1
-- 항목 2
-  - 중첩 항목
-  - 중첩 항목
-- 항목 3
-
-순서 있는 목록:
-1. 첫 번째
-2. 두 번째
-3. 세 번째`}
-          />
-
-          <SyntaxSection
-            syntaxLabel={t.syntaxLabel}
-            id="links"
-            title="링크 (Links)"
-            description="텍스트에 링크를 추가할 수 있습니다."
-            syntax={`[링크 텍스트](https://example.com)
-[제목 있는 링크](https://example.com "링크 제목")
-
-URL 자동 링크:
-https://example.com`}
-          />
-
-          {/* In-article Ad */}
-          <div className="lg:hidden">
-            <AdBanner
-              className="h-[90px] w-full rounded-lg overflow-hidden"
-              slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE}
-            />
-          </div>
-
-          <SyntaxSection
-            syntaxLabel={t.syntaxLabel}
-            id="images"
-            title="이미지 (Images)"
-            description="이미지를 삽입할 수 있습니다."
-            syntax={`![대체 텍스트](이미지URL)
-![대체 텍스트](이미지URL "이미지 제목")`}
-          />
-
-          <SyntaxSection
-            syntaxLabel={t.syntaxLabel}
-            id="code"
-            title="코드 (Code)"
-            description="인라인 코드와 코드 블록을 작성할 수 있습니다."
-            syntax={`인라인 코드: \`const x = 1;\`
-
-코드 블록:
-\`\`\`javascript
-function hello() {
-  console.log("Hello, World!");
-}
-\`\`\`
-
-\`\`\`python
-def hello():
-    print("Hello, World!")
-\`\`\``}
-          />
-
-          <SyntaxSection
-            syntaxLabel={t.syntaxLabel}
-            id="blockquotes"
-            title="인용문 (Blockquotes)"
-            description="> 기호로 인용문을 만들 수 있습니다."
-            syntax={`> 이것은 인용문입니다.
->
-> 여러 줄도 가능합니다.
-
-> 중첩 인용문
->> 더 깊은 인용문`}
-          />
-
-          <SyntaxSection
-            syntaxLabel={t.syntaxLabel}
-            id="tables"
-            title="테이블 (Tables)"
-            description="파이프(|)와 하이픈(-)으로 테이블을 만들 수 있습니다."
-            syntax={`| 제목 1 | 제목 2 | 제목 3 |
-|--------|--------|--------|
-| 셀 1   | 셀 2   | 셀 3   |
-| 셀 4   | 셀 5   | 셀 6   |
-
-정렬:
-| 왼쪽 | 가운데 | 오른쪽 |
-|:-----|:------:|-------:|
-| L    |   C    |      R |`}
-          />
-
-          <SyntaxSection
-            syntaxLabel={t.syntaxLabel}
-            id="horizontal-rules"
-            title="수평선 (Horizontal Rules)"
-            description="세 개 이상의 하이픈, 별표, 밑줄로 수평선을 만들 수 있습니다."
-            syntax={`---
-***
-___`}
-          />
+          {sections.map((section, i) => (
+            <Fragment key={section.id}>
+              <SyntaxSection
+                id={section.id}
+                syntaxLabel={t.syntaxLabel}
+                title={section.title}
+                description={section.description}
+                syntax={section.syntax}
+              />
+              {/* In-article Ad, after the links section */}
+              {section.id === 'links' && i < sections.length - 1 && (
+                <div className="lg:hidden">
+                  <AdBanner
+                    className="h-[90px] w-full rounded-lg overflow-hidden"
+                    slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE}
+                  />
+                </div>
+              )}
+            </Fragment>
+          ))}
         </div>
 
             {/* CTA */}

@@ -519,7 +519,7 @@
     "featurePrivacy": "Privacy First",
     "featurePrivacyDesc": "All processing happens in your browser. No data is sent to any server.",
     "featureI18n": "Multilingual",
-    "featureI18nDesc": "Available in English and Korean with full localization.",
+    "featureI18nDesc": "Available in English, Korean, Simplified Chinese and Japanese.",
     "featureExtension": "Chrome Extension",
     "featureExtensionDesc": "Convert GitHub README files to PDF directly from GitHub pages.",
     "whoTitle": "Who We Are",

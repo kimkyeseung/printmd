@@ -7,6 +7,8 @@ export const SITE_NAME = 'printmd';
 const OG_LOCALE: Record<Locale, string> = {
   en: 'en_US',
   ko: 'ko_KR',
+  zh: 'zh_CN',
+  ja: 'ja_JP',
 };
 
 export interface SocialImage {

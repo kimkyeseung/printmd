@@ -1,17 +1,19 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import type { Locale } from '@/lib/i18n/config';
+import { defaultLocale, isLocale, type Locale } from '@/lib/i18n/config';
 
 import en from '@/lib/i18n/dictionaries/en.json';
 import ko from '@/lib/i18n/dictionaries/ko.json';
+import zh from '@/lib/i18n/dictionaries/zh.json';
+import ja from '@/lib/i18n/dictionaries/ja.json';
 
-const dictionaries: Record<Locale, typeof en> = { en, ko };
+const dictionaries: Record<Locale, typeof en> = { en, ko, zh, ja };
 
 export function useClientLocale() {
   const params = useParams();
-  const locale = ((params.locale as string) || 'en') as Locale;
-  return locale;
+  const param = params?.locale;
+  return isLocale(param) ? param : defaultLocale;
 }
 
 export function useClientDictionary() {

@@ -1,6 +1,6 @@
 # 업데이트 내역 작성 가이드
 
-printmd의 업데이트 내역(`/ko/changelog`, `/en/changelog`)을 쓰는 방법과 규칙입니다.
+printmd의 업데이트 내역(`/ko/changelog`, `/en/changelog`, `/zh/changelog`, `/ja/changelog`)을 쓰는 방법과 규칙입니다.
 사람과 AI 에이전트 모두 이 문서를 따릅니다. 에이전트가 언제 사용자에게 물어봐야 하는지는 [AGENTS.md](../AGENTS.md)에 있습니다.
 
 ## 어디에 무엇이 있나
@@ -42,12 +42,13 @@ printmd의 업데이트 내역(`/ko/changelog`, `/en/changelog`)을 쓰는 방�
 
 ### 공통 규칙
 
-1. **한국어(`ko`)와 영어(`en`)를 모두** 씁니다. 뜻은 같게, 문장은 각 언어로 자연스럽게 씁니다(직역 금지).
+1. **한국어(`ko`), 영어(`en`), 중국어 간체(`zh`), 일본어(`ja`)를 모두** 씁니다. 뜻은 같게, 문장은 각 언어로 자연스럽게 씁니다(직역 금지). 버튼 이름은 `lib/i18n/appStrings.ts`의 해당 언어 라벨과 똑같이 씁니다(예: 목차 → zh "目录", ja "目次").
 2. **사용자의 말**로 씁니다. 컴포넌트·함수·파일 이름, CSS 용어 대신 화면에 보이는 이름을 씁니다.
    - 앱 라벨과 똑같이: "스타일 패널", "문서 정보", "코드블럭", "인라인 코드", "미리보기", "프리셋"
    - ✗ `frontmatterValue` 요소의 `td` 셀렉터 분리 → ✓ 문서 정보의 값 색상을 따로 바꿀 수 있습니다
 3. **사실만** 씁니다. 실제로 동작을 확인한 것만 적고, "획기적인", "완벽한" 같은 과장은 쓰지 않습니다.
-4. 한국어는 "~합니다 / ~있습니다" 존댓말, 영어는 짧고 평이한 문장으로 씁니다.
+4. 한국어는 "~합니다 / ~있습니다" 존댓말, 영어는 짧고 평이한 문장, 중국어는 간결한 서술체, 일본어는 "です・ます"체로 씁니다.
+5. 캡처 이미지는 `ko`·`en` 두 벌만 만듭니다. `zh`·`ja` 페이지는 영어 캡처를 씁니다(`captureLocale`). `alt`·`caption`은 네 언어 모두 씁니다.
 
 ### 제목 (`title`)
 
@@ -99,32 +100,36 @@ printmd의 업데이트 내역(`/ko/changelog`, `/en/changelog`)을 쓰는 방�
   title: {
     ko: '…',
     en: '…',
+    zh: '…',
+    ja: '…',
   },
   summary: {
     ko: '…',
     en: '…',
+    zh: '…',
+    ja: '…',
   },
   images: [
     {
       name: 'feature-name',                       // public/changelog/2026-12-01/ko-feature-name.png
       size: { ko: [1536, 900], en: [1536, 940] },
-      alt: { ko: '…', en: '…' },
-      caption: { ko: '…', en: '…' },
+      alt: { ko: '…', en: '…', zh: '…', ja: '…' },
+      caption: { ko: '…', en: '…', zh: '…', ja: '…' },
     },
   ],
   changes: [
-    { kind: 'new', text: { ko: '기능 이름: …', en: 'Feature name: …' } },
-    { kind: 'improved', text: { ko: '…', en: '…' } },
-    { kind: 'fixed', text: { ko: '…하던 문제를 고쳤습니다.', en: 'Fixed …' } },
+    { kind: 'new', text: { ko: '기능 이름: …', en: 'Feature name: …', zh: '功能名称：…', ja: '機能名：…' } },
+    { kind: 'improved', text: { ko: '…', en: '…', zh: '…', ja: '…' } },
+    { kind: 'fixed', text: { ko: '…하던 문제를 고쳤습니다.', en: 'Fixed …', zh: '修复了…的问题。', ja: '…問題を修正しました。' } },
   ],
 },
 ```
 
 ## 마무리 체크리스트
 
-- [ ] `CHANGELOG` 맨 위에 항목 추가(또는 같은 날짜 항목에 추가), ko/en 모두 작성
+- [ ] `CHANGELOG` 맨 위에 항목 추가(또는 같은 날짜 항목에 추가), ko/en/zh/ja 모두 작성
 - [ ] `app/sitemap.ts`의 `/changelog` `lastModified`를 항목 날짜로 변경
 - [ ] (이미지가 있으면) 파일 존재, `size` 값 일치
 - [ ] `npx tsc --noEmit`, `npm test`, `npm run build` 통과
-- [ ] 앱에서 `/ko/changelog`, `/en/changelog` 확인, 사이드바 날짜 확인
+- [ ] 앱에서 `/ko/changelog`, `/en/changelog`, `/zh/changelog`, `/ja/changelog` 확인, 사이드바 날짜 확인
 - [ ] 기능 커밋과 별도로 커밋: `docs: 2026-12-01 업데이트 내역 추가`

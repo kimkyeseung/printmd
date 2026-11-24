@@ -3,6 +3,14 @@ import { AdSidebar } from '@/components/adsense/AdSidebar';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { TableOfContents } from './TableOfContents';
 import { OnThisPage, SiteFooter, type FooterDict } from '@/components/layout';
+import type { Locale } from '@/lib/i18n/config';
+
+const TEXT: Record<Locale, { text: string; button: string; readingTime: (minutes: number) => string }> = {
+  en: { text: 'Convert your Markdown to PDF with printmd', button: 'Try printmd', readingTime: (m) => `${m} min read` },
+  ko: { text: 'printmd로 마크다운을 PDF로 변환해보세요', button: 'printmd 시작하기', readingTime: (m) => `${m}분 분량` },
+  zh: { text: '用 printmd 把你的 Markdown 转换成 PDF', button: '试用 printmd', readingTime: (m) => `阅读约 ${m} 分钟` },
+  ja: { text: 'printmd で Markdown を PDF に変換してみましょう', button: 'printmd を試す', readingTime: (m) => `約 ${m} 分で読めます` },
+};
 
 interface Heading {
   id: string;
@@ -11,7 +19,7 @@ interface Heading {
 }
 
 interface BlogLayoutProps {
-  locale: string;
+  locale: Locale;
   title: string;
   date: string;
   readingTime: number;
@@ -67,7 +75,7 @@ export function BlogLayout({
           <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-500">
             <time dateTime={date}>{date}</time>
             <span>·</span>
-            <span>{readingTime} min read</span>
+            <span>{TEXT[locale].readingTime(readingTime)}</span>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {tags.map((tag) => (
@@ -120,15 +128,13 @@ export function BlogLayout({
 
             <div className="mt-12 pt-8 border-t border-gray-200 text-center">
               <p className="text-gray-600 mb-4">
-                {locale === 'ko'
-                  ? 'printmd로 마크다운을 PDF로 변환해보세요'
-                  : 'Convert your Markdown to PDF with printmd'}
+                {TEXT[locale].text}
               </p>
               <Link
                 href={`/${locale}`}
                 className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
-                {locale === 'ko' ? 'printmd 시작하기' : 'Try printmd'}
+                {TEXT[locale].button}
               </Link>
             </div>
           </main>
@@ -149,7 +155,7 @@ export function BlogLayout({
         </div>
       </div>
 
-      <SiteFooter locale={locale as 'en' | 'ko'} dict={footerDict} />
+      <SiteFooter locale={locale} dict={footerDict} />
     </div>
   );
 }

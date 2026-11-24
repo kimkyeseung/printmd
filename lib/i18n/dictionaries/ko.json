@@ -519,7 +519,7 @@
     "featurePrivacy": "개인정보 보호",
     "featurePrivacyDesc": "모든 처리는 브라우저에서 이루어집니다. 서버로 데이터가 전송되지 않습니다.",
     "featureI18n": "다국어 지원",
-    "featureI18nDesc": "한국어와 영어를 완벽하게 지원합니다.",
+    "featureI18nDesc": "한국어, 영어, 중국어(간체), 일본어로 쓸 수 있습니다.",
     "featureExtension": "Chrome 확장프로그램",
     "featureExtensionDesc": "GitHub 페이지에서 직접 README 파일을 PDF로 변환할 수 있습니다.",
     "whoTitle": "만든 사람들",

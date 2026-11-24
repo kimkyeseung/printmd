@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
+import { CJK_KEYWORDS } from '@/lib/seo/cjkKeywords';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { SiteFooter } from '@/components/layout';
@@ -25,7 +26,7 @@ export async function generateMetadata({
     path: '/chatgpt-to-pdf',
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
-    keywords: locale === 'ko'
+    keywords: locale === 'zh' ? CJK_KEYWORDS.chatgptToPdf.zh : locale === 'ja' ? CJK_KEYWORDS.chatgptToPdf.ja : locale === 'ko'
       ? [
           // ChatGPT
           'chatgpt pdf 저장', 'chatgpt 대화 pdf', 'chatgpt 답변 pdf', 'chatgpt pdf 변환',
@@ -94,7 +95,7 @@ export default async function ChatgptToPdfPage({
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
-    name: locale === 'ko' ? 'ChatGPT 답변을 PDF로 저장하는 방법' : 'How to Save a ChatGPT Answer as PDF',
+    name: ({ ko: 'ChatGPT 답변을 PDF로 저장하는 방법', en: 'How to Save a ChatGPT Answer as PDF', zh: '如何把 ChatGPT 的回答保存为 PDF', ja: 'ChatGPT の回答を PDF に保存する方法' } as Record<Locale, string>)[locale],
     description: t.hero.description,
     totalTime: 'PT1M',
     tool: {

@@ -155,8 +155,8 @@ export default async function BlogPostPage({
         tags={post.tags}
         content={contentWithIds}
         headings={headings}
-        tocTitle={locale === 'ko' ? '목차' : 'Table of Contents'}
-        backLabel={locale === 'ko' ? '← 블로그' : '← Blog'}
+        tocTitle={({ ko: '목차', en: 'Table of Contents', zh: '目录', ja: '目次' } as Record<Locale, string>)[locale]}
+        backLabel={({ ko: '← 블로그', en: '← Blog', zh: '← 博客', ja: '← ブログ' } as Record<Locale, string>)[locale]}
         footerDict={dict.footer}
       />
     </>

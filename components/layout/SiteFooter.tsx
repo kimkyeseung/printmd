@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Locale } from '@/lib/i18n/config';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 export interface FooterDict {
   privacy: string;
@@ -100,7 +101,8 @@ export function SiteFooter({
 
         <div className="mt-10 flex flex-col items-center gap-3 border-t border-gray-200 dark:border-gray-800 pt-6 text-xs text-gray-500 sm:flex-row sm:justify-between">
           <p>&copy; {new Date().getFullYear()} printmd. {dict.allRights}</p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <LanguageSwitcher className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200" />
             <a
               href="mailto:kimkyeseung@gmail.com"
               className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
+import { CJK_KEYWORDS } from '@/lib/seo/cjkKeywords';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { SiteFooter } from '@/components/layout';
@@ -25,7 +26,7 @@ export async function generateMetadata({
     path: '/markdown-print',
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
-    keywords: locale === 'ko'
+    keywords: locale === 'zh' ? CJK_KEYWORDS.markdownPrint.zh : locale === 'ja' ? CJK_KEYWORDS.markdownPrint.ja : locale === 'ko'
       ? ['마크다운 프린트', '마크다운 인쇄', 'markdown print', 'md 인쇄', '마크다운 출력', '마크다운 프린터', '마크다운 인쇄 도구', 'README 인쇄', '마크다운 문서 인쇄', '마크다운 깔끔하게 인쇄', 'md 파일 인쇄', '무료 마크다운 인쇄']
       : ['print markdown', 'markdown print', 'print md file', 'markdown printer', 'print markdown online', 'markdown print tool', 'print md document', 'print readme', 'markdown to printer', 'print markdown free', 'markdown print format', 'print markdown beautifully'],
   });
