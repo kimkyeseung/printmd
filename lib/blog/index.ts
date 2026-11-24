@@ -108,6 +108,18 @@ export function getAllPosts(locale: string): BlogPostMeta[] {
   return posts;
 }
 
+/**
+ * Anchor id for a heading. Keeps letters and numbers in any script, so Chinese
+ * and Japanese headings get ids too (Korean and English ids are unchanged).
+ */
+export function headingSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
 export function extractHeadings(html: string): { id: string; text: string; level: number }[] {
   const headings: { id: string; text: string; level: number }[] = [];
   const idCount = new Map<string, number>();
@@ -115,11 +127,7 @@ export function extractHeadings(html: string): { id: string; text: string; level
   let match;
   while ((match = regex.exec(html)) !== null) {
     const text = match[2].replace(/<[^>]*>/g, '');
-    let id = text
-      .toLowerCase()
-      .replace(/[^a-z0-9가-힣\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
+    let id = headingSlug(text);
     const count = idCount.get(id) || 0;
     idCount.set(id, count + 1);
     if (count > 0) id = `${id}-${count}`;

@@ -3,7 +3,7 @@ import { buildPageMetadata } from '@/lib/seo/metadata';
 import { notFound } from 'next/navigation';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
-import { getPostBySlug, getPostSlugs, extractHeadings } from '@/lib/blog';
+import { getPostBySlug, getPostSlugs, extractHeadings, headingSlug } from '@/lib/blog';
 import { BlogLayout } from '@/components/blog/BlogLayout';
 
 function isValidLocale(locale: string): locale is Locale {
@@ -70,11 +70,7 @@ export default async function BlogPostPage({
     /<h([2-3])([^>]*)>(.*?)<\/h\1>/gi,
     (_match, level, attrs, text) => {
       const plainText = text.replace(/<[^>]*>/g, '');
-      let id = plainText
-        .toLowerCase()
-        .replace(/[^a-z0-9가-힣\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
+      let id = headingSlug(plainText);
       const count = idCount.get(id) || 0;
       idCount.set(id, count + 1);
       if (count > 0) id = `${id}-${count}`;

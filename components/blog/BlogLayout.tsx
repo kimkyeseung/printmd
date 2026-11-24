@@ -4,12 +4,13 @@ import { AdBanner } from '@/components/adsense/AdBanner';
 import { TableOfContents } from './TableOfContents';
 import { OnThisPage, SiteFooter, type FooterDict } from '@/components/layout';
 import type { Locale } from '@/lib/i18n/config';
+import { formatReadingTime } from '@/lib/blog/readingTime';
 
-const TEXT: Record<Locale, { text: string; button: string; readingTime: (minutes: number) => string }> = {
-  en: { text: 'Convert your Markdown to PDF with printmd', button: 'Try printmd', readingTime: (m) => `${m} min read` },
-  ko: { text: 'printmd로 마크다운을 PDF로 변환해보세요', button: 'printmd 시작하기', readingTime: (m) => `${m}분 분량` },
-  zh: { text: '用 printmd 把你的 Markdown 转换成 PDF', button: '试用 printmd', readingTime: (m) => `阅读约 ${m} 分钟` },
-  ja: { text: 'printmd で Markdown を PDF に変換してみましょう', button: 'printmd を試す', readingTime: (m) => `約 ${m} 分で読めます` },
+const TEXT: Record<Locale, { text: string; button: string }> = {
+  en: { text: 'Convert your Markdown to PDF with printmd', button: 'Try printmd' },
+  ko: { text: 'printmd로 마크다운을 PDF로 변환해보세요', button: 'printmd 시작하기' },
+  zh: { text: '用 printmd 把你的 Markdown 转换成 PDF', button: '试用 printmd' },
+  ja: { text: 'printmd で Markdown を PDF に変換してみましょう', button: 'printmd を試す' },
 };
 
 interface Heading {
@@ -75,7 +76,7 @@ export function BlogLayout({
           <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-500">
             <time dateTime={date}>{date}</time>
             <span>·</span>
-            <span>{TEXT[locale].readingTime(readingTime)}</span>
+            <span>{formatReadingTime(readingTime, locale)}</span>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {tags.map((tag) => (
