@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { notFound } from 'next/navigation';
-import { locales, type Locale } from '@/lib/i18n/config';
+import { localeTags, locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { getPostBySlug, getPostSlugs, extractHeadings, headingSlug } from '@/lib/blog';
 import { BlogLayout } from '@/components/blog/BlogLayout';
@@ -86,6 +86,7 @@ export default async function BlogPostPage({
       description: post.description,
       datePublished: post.date,
       dateModified: post.date,
+      inLanguage: localeTags[locale],
       keywords: post.tags,
       image: `https://printmd.app/${locale}/blog/${slug}/opengraph-image`,
       author: {

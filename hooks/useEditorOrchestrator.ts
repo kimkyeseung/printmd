@@ -129,9 +129,9 @@ print(list(fibonacci(10)))
 
 마크다운 문법과 HTML 태그 모두 지원합니다:
 
-![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)
+![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg)
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png" width="100" alt="크기 조절 예시">
+<img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="100" alt="크기 조절 예시">
 
 ---
 
@@ -258,9 +258,9 @@ Below are examples of h3 through h6 headings:
 
 Both Markdown syntax and HTML tags are supported:
 
-![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)
+![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg)
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png" width="100" alt="Resized example">
+<img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg" width="100" alt="Resized example">
 
 ---
 
@@ -385,7 +385,7 @@ print(list(fibonacci(10)))
 
 ## 图片
 
-![Markdown 标志](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)
+![Markdown 标志](https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg)
 
 ---
 
@@ -509,7 +509,7 @@ h3 から h6 までの見出しの例です：
 
 ## 画像
 
-![Markdown ロゴ](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)
+![Markdown ロゴ](https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg)
 
 ---
 
