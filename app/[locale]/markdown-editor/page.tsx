@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
+import { CJK_KEYWORDS } from '@/lib/seo/cjkKeywords';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { SiteFooter } from '@/components/layout';
@@ -25,7 +26,7 @@ export async function generateMetadata({
     path: '/markdown-editor',
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
-    keywords: locale === 'ko'
+    keywords: locale === 'zh' ? CJK_KEYWORDS.markdownEditor.zh : locale === 'ja' ? CJK_KEYWORDS.markdownEditor.ja : locale === 'ko'
       ? ['마크다운 편집기', '마크다운 에디터', 'markdown editor', '온라인 마크다운 편집기', '무료 마크다운 편집기', '웹 마크다운 편집기', '마크다운 편집', '마크다운 작성', '마크다운 편집 도구', '마크다운 뷰어', '마크다운 미리보기', '마크다운 실시간 편집', '마크다운 라이브 프리뷰', 'md 편집기', 'md 에디터']
       : ['markdown editor', 'online markdown editor', 'md editor', 'free markdown editor', 'markdown editing', 'edit markdown online', 'web markdown editor', 'markdown editor online free', 'markdown live preview', 'markdown writing tool', 'markdown viewer', 'markdown preview editor', 'best free markdown editor', 'browser markdown editor', 'markdown editor no signup'],
   });
@@ -210,7 +211,7 @@ export default async function MarkdownEditorPage({
                       printmd
                     </th>
                     <th className="px-4 py-3 text-center font-semibold text-gray-500">
-                      {locale === 'ko' ? '기타' : 'Others'}
+                      {({ ko: '기타', en: 'Others', zh: '其他工具', ja: 'ほかのツール' } as Record<Locale, string>)[locale]}
                     </th>
                   </tr>
                 </thead>

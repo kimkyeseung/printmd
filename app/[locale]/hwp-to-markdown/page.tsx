@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
+import { CJK_KEYWORDS } from '@/lib/seo/cjkKeywords';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { SiteFooter } from '@/components/layout';
@@ -25,7 +26,7 @@ export async function generateMetadata({
     path: '/hwp-to-markdown',
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
-    keywords: locale === 'ko'
+    keywords: locale === 'zh' ? CJK_KEYWORDS.hwpToMarkdown.zh : locale === 'ja' ? CJK_KEYWORDS.hwpToMarkdown.ja : locale === 'ko'
       ? [
           // 핵심 키워드
           'hwp 마크다운 변환', 'hwpx 마크다운 변환', 'hwp to markdown', 'hwpx to markdown',
@@ -100,7 +101,7 @@ export default async function HwpToMarkdownPage({
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
-    name: locale === 'ko' ? '한글(HWP·HWPX) 문서를 마크다운으로 변환하는 방법' : 'How to Convert an HWP or HWPX Document to Markdown',
+    name: ({ ko: '한글(HWP·HWPX) 문서를 마크다운으로 변환하는 방법', en: 'How to Convert an HWP or HWPX Document to Markdown', zh: '如何把韩文（HWP/HWPX）文档转换成 Markdown', ja: 'ハングル（HWP/HWPX）文書を Markdown に変換する方法' } as Record<Locale, string>)[locale],
     description: t.hero.description,
     totalTime: 'PT1M',
     tool: {

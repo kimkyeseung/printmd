@@ -3,7 +3,7 @@ import { buildPageMetadata } from '@/lib/seo/metadata';
 import { notFound } from 'next/navigation';
 import { locales, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
-import { getPostBySlug, getPostSlugs, extractHeadings } from '@/lib/blog';
+import { getPostBySlug, getPostSlugs, extractHeadings, headingSlug } from '@/lib/blog';
 import { BlogLayout } from '@/components/blog/BlogLayout';
 
 function isValidLocale(locale: string): locale is Locale {
@@ -70,11 +70,7 @@ export default async function BlogPostPage({
     /<h([2-3])([^>]*)>(.*?)<\/h\1>/gi,
     (_match, level, attrs, text) => {
       const plainText = text.replace(/<[^>]*>/g, '');
-      let id = plainText
-        .toLowerCase()
-        .replace(/[^a-z0-9가-힣\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
+      let id = headingSlug(plainText);
       const count = idCount.get(id) || 0;
       idCount.set(id, count + 1);
       if (count > 0) id = `${id}-${count}`;
@@ -155,8 +151,8 @@ export default async function BlogPostPage({
         tags={post.tags}
         content={contentWithIds}
         headings={headings}
-        tocTitle={locale === 'ko' ? '목차' : 'Table of Contents'}
-        backLabel={locale === 'ko' ? '← 블로그' : '← Blog'}
+        tocTitle={({ ko: '목차', en: 'Table of Contents', zh: '目录', ja: '目次' } as Record<Locale, string>)[locale]}
+        backLabel={({ ko: '← 블로그', en: '← Blog', zh: '← 博客', ja: '← ブログ' } as Record<Locale, string>)[locale]}
         footerDict={dict.footer}
       />
     </>

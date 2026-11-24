@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
+import { CJK_KEYWORDS } from '@/lib/seo/cjkKeywords';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { themePresets, presetKeys } from '@/lib/themes/presets';
 import { THEME_NAMES, THEME_DESCRIPTIONS } from '@/types/theme';
@@ -25,7 +26,7 @@ export async function generateMetadata({
   const dict = await getDictionary(locale);
   const t = dict.presets;
 
-  const keywords = locale === 'ko'
+  const keywords = locale === 'zh' ? CJK_KEYWORDS.presets.zh : locale === 'ja' ? CJK_KEYWORDS.presets.ja : locale === 'ko'
     ? ['마크다운 테마', '마크다운 프리셋', 'PDF 스타일', '마크다운 PDF 테마', 'printmd 프리셋', '커스텀 PDF 스타일', '마크다운 커스터마이즈', 'markdown theme preset']
     : ['markdown theme', 'markdown preset', 'PDF style', 'markdown PDF theme', 'printmd presets', 'custom PDF style', 'markdown customize', 'markdown to pdf themes', 'pdf styling presets'];
 

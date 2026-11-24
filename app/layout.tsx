@@ -45,7 +45,7 @@ export const metadata: Metadata = {
       "Free online Markdown to PDF converter. Edit, style, and convert Markdown to PDF instantly in your browser. Live preview, 15 themes, and no signup required.",
     type: "website",
     locale: "en_US",
-    alternateLocale: "ko_KR",
+    alternateLocale: ["ko_KR", "zh_CN", "ja_JP"],
     siteName: "printmd",
     url: "https://printmd.app/en",
   },
@@ -77,6 +77,8 @@ export const metadata: Metadata = {
     languages: {
       "en-US": "https://printmd.app/en",
       "ko-KR": "https://printmd.app/ko",
+      "zh-CN": "https://printmd.app/zh",
+      "ja-JP": "https://printmd.app/ja",
       "x-default": "https://printmd.app/en",
     },
   },

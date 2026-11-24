@@ -117,40 +117,150 @@ const t = {
     ctaText: '나만의 색상 팔레트를 만들어 보시겠어요?',
     ctaButton: '에디터 열기',
   },
+  zh: {
+    title: 'Markdown 颜色自定义指南',
+    subtitle:
+      '了解 printmd 如何用 7 种颜色角色为 Markdown PDF 配色。选一个预设，调整每个角色，导出符合你品牌风格的文档。',
+    metaDescription:
+      '用 printmd 自定义 Markdown PDF 的颜色。了解背景、文字、标题、粗体、链接、代码背景、分隔线这 7 种颜色角色，轻松做出带品牌色的 PDF。',
+    breadcrumbHome: 'printmd',
+    breadcrumbThemes: '主题',
+    breadcrumbColors: '颜色自定义',
+    rolesHeading: '7 种颜色角色',
+    rolesIntro:
+      '每个 printmd 主题都建立在 7 种颜色角色之上。理解它们，就能轻松做出统一而专业的文档。',
+    presetsHeading: '不同预设中的颜色角色',
+    presetsIntro:
+      '看看同样的 7 种角色，在不同预设主题下会呈现多么不同的效果。',
+    howItWorksHeading: '使用方法',
+    steps: [
+      {
+        name: '选择预设主题',
+        text: '打开 printmd 编辑器，从内置的预设主题中选一个作为起点。',
+      },
+      {
+        name: '自定义每种颜色角色',
+        text: '在样式面板中调整背景、文字、标题、粗体、链接、代码背景和分隔线的颜色，使其符合你的品牌。',
+      },
+      {
+        name: '导出 PDF',
+        text: '满意之后，把 Markdown 导出为应用了自定义配色的精确 PDF。',
+      },
+    ],
+    faqHeading: '常见问题',
+    faqs: [
+      {
+        q: 'printmd 可以自定义颜色吗？',
+        a: '可以。在 printmd 的样式面板中，可以调整背景、文字、标题、粗体、链接、代码背景和分隔线全部 7 种颜色角色。修改会实时显示，并在导出 PDF 时生效。',
+      },
+      {
+        q: '什么是颜色角色？',
+        a: '颜色角色是定义 printmd 主题的 7 个语义化颜色位置：背景、文字、标题、粗体、链接、代码背景和分隔线。每个角色负责文档的特定部分，因此很容易做出统一的样式。',
+      },
+      {
+        q: '可以保存自定义配色吗？',
+        a: '目前 printmd 会把你的自定义设置保存在浏览器中。从任意预设主题开始调整颜色后，下次打开时修改依然保留。可分享的配色导出功能已列入计划。',
+      },
+    ],
+    ctaText: '准备好打造你自己的配色了吗？',
+    ctaButton: '打开编辑器',
+  },
+  ja: {
+    title: 'Markdown のカラーカスタマイズガイド',
+    subtitle:
+      'printmd が 7 つの「色の役割」で Markdown PDF を彩る仕組みを紹介します。プリセットを選び、役割ごとに色を調整して、ブランドに合った文書を書き出しましょう。',
+    metaDescription:
+      'printmd で Markdown PDF の色をカスタマイズ。背景、文字、見出し、太字、リンク、コード背景、区切り線の 7 つの色の役割を理解して、ブランドカラーの PDF を手軽に作れます。',
+    breadcrumbHome: 'printmd',
+    breadcrumbThemes: 'テーマ',
+    breadcrumbColors: 'カラーのカスタマイズ',
+    rolesHeading: '7 つの色の役割',
+    rolesIntro:
+      'printmd のテーマはすべて、7 つの色の役割で成り立っています。仕組みを知れば、少ない手間で統一感のあるプロらしい文書を作れます。',
+    presetsHeading: 'プリセットごとの色の役割',
+    presetsIntro:
+      '同じ 7 つの役割でも、プリセットテーマによって仕上がりががらりと変わる様子をご覧ください。',
+    howItWorksHeading: '使い方',
+    steps: [
+      {
+        name: 'プリセットテーマを選ぶ',
+        text: 'printmd のエディタを開き、組み込みのプリセットテーマから出発点を 1 つ選びます。',
+      },
+      {
+        name: '色の役割ごとにカスタマイズ',
+        text: 'スタイルパネルで、背景、文字、見出し、太字、リンク、コード背景、区切り線の色をブランドに合わせて調整します。',
+      },
+      {
+        name: 'PDF に書き出す',
+        text: '納得のいく仕上がりになったら、カスタムカラーを適用した Markdown を正確な PDF として書き出します。',
+      },
+    ],
+    faqHeading: 'よくある質問',
+    faqs: [
+      {
+        q: 'printmd で色をカスタマイズできますか？',
+        a: 'はい。printmd のスタイルパネルで、背景、文字、見出し、太字、リンク、コード背景、区切り線の 7 つの色の役割をすべて調整できます。変更はリアルタイムに反映され、PDF の書き出し時にも適用されます。',
+      },
+      {
+        q: '色の役割とは何ですか？',
+        a: '色の役割は、printmd のテーマを構成する 7 つの意味づけされた色の枠です：背景、文字、見出し、太字、リンク、コード背景、区切り線。役割ごとに文書の特定の部分を受け持つので、統一感のあるスタイルを簡単に作れます。',
+      },
+      {
+        q: 'カスタムカラーのパレットは保存できますか？',
+        a: '現在、printmd はカスタマイズした内容をブラウザに保存します。好きなプリセットテーマから色を調整すれば、次に開いたときも変更が残ります。パレットを共有して書き出す機能も予定しています。',
+      },
+    ],
+    ctaText: '自分だけのカラーパレットを作ってみませんか？',
+    ctaButton: 'エディタを開く',
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */
 /*  Role descriptions (en / ko)                                        */
 /* ------------------------------------------------------------------ */
 
-const ROLE_DESCRIPTIONS: Record<string, { en: string; ko: string }> = {
+const ROLE_DESCRIPTIONS: Record<string, Record<Locale, string>> = {
   Background: {
     en: 'The base canvas color for your entire document. Sets the overall tone - light for readability, dark for a modern feel.',
     ko: '문서 전체의 기본 캔버스 색상입니다. 전체적인 톤을 설정합니다 - 밝은 색은 가독성을, 어두운 색은 모던한 느낌을 줍니다.',
+    zh: '整个文档的底色，决定整体基调——浅色更易读，深色更有现代感。',
+    ja: '文書全体の土台となる色です。全体のトーンを決めます。明るい色は読みやすく、暗い色はモダンな印象になります。',
   },
   Text: {
     en: 'The primary body text color. Ensure sufficient contrast against the background for comfortable reading.',
     ko: '기본 본문 텍스트 색상입니다. 편안한 읽기를 위해 배경과 충분한 대비를 확보하세요.',
+    zh: '正文文字的主色。请与背景保持足够的对比度，读起来才舒服。',
+    ja: '本文の基本の文字色です。快適に読めるよう、背景との十分なコントラストを確保しましょう。',
   },
   Heading: {
     en: 'Color for H1 through H6 headings. A distinct heading color helps readers scan your document structure.',
     ko: 'H1부터 H6까지의 제목 색상입니다. 독특한 제목 색상은 독자가 문서 구조를 쉽게 파악하게 돕습니다.',
+    zh: 'H1 到 H6 标题的颜色。醒目的标题颜色能帮助读者快速把握文档结构。',
+    ja: 'H1 から H6 までの見出しの色です。見出しに目立つ色を使うと、読み手が文書の構成をつかみやすくなります。',
   },
   Bold: {
     en: 'Color for bold / strong text. An accent color here draws attention to important terms and phrases.',
     ko: '볼드 / 강조 텍스트의 색상입니다. 여기에 강조 색상을 사용하면 중요한 용어와 구문에 주의를 끌 수 있습니다.',
+    zh: '粗体/强调文字的颜色。在这里使用强调色，可以突出重要的术语和语句。',
+    ja: '太字・強調テキストの色です。ここにアクセントカラーを使うと、重要な用語やフレーズが目を引きます。',
   },
   Link: {
     en: 'Color for hyperlinks and accents. A vibrant link color signals clickable elements clearly.',
     ko: '하이퍼링크 및 강조 색상입니다. 선명한 링크 색상은 클릭 가능한 요소를 명확히 나타냅니다.',
+    zh: '超链接和点缀的颜色。鲜明的链接颜色能清楚地提示哪些内容可以点击。',
+    ja: 'リンクとアクセントの色です。鮮やかなリンク色にすると、クリックできる要素がはっきりわかります。',
   },
   'Code BG': {
     en: 'Background color for inline code and code blocks. A subtle tint distinguishes code from surrounding text.',
     ko: '인라인 코드 및 코드 블록의 배경 색상입니다. 은은한 색조가 코드를 주변 텍스트와 구별해 줍니다.',
+    zh: '行内代码和代码块的背景色。淡淡的底色能把代码和周围的文字区分开。',
+    ja: 'インラインコードとコードブロックの背景色です。ほのかな色味で、コードを周りの文章と区別できます。',
   },
   Divider: {
     en: 'Color for horizontal rules (---). Dividers separate sections and provide visual breathing room.',
     ko: '수평선(---)의 색상입니다. 구분선은 섹션을 나누고 시각적 여백을 제공합니다.',
+    zh: '分隔线（---）的颜色。分隔线用来划分章节，让版面有呼吸感。',
+    ja: '区切り線（---）の色です。区切り線はセクションを分け、視覚的なゆとりを生みます。',
   },
 };
 

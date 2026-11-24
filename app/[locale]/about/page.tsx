@@ -146,12 +146,15 @@ export default async function AboutPage({
           {/* Support */}
           <section className="mb-12 text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {locale === 'ko' ? '응원하기' : 'Support'}
+              {({ ko: '응원하기', en: 'Support', zh: '支持我们', ja: '応援する' } as Record<Locale, string>)[locale]}
             </h2>
             <p className="text-gray-600 mb-6">
-              {locale === 'ko'
-                ? 'printmd가 도움이 되셨다면, 커피 한 잔으로 응원해 주세요.'
-                : 'If printmd has been helpful, consider buying me a coffee.'}
+              {({
+                ko: 'printmd가 도움이 되셨다면, 커피 한 잔으로 응원해 주세요.',
+                en: 'If printmd has been helpful, consider buying me a coffee.',
+                zh: '如果 printmd 对你有帮助，欢迎请我喝杯咖啡。',
+                ja: 'printmd がお役に立ったら、コーヒー 1 杯で応援していただけるとうれしいです。',
+              } as Record<Locale, string>)[locale]}
             </p>
             <a
               href="https://buymeacoffee.com/kimkyeseung"

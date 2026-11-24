@@ -54,9 +54,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: page.priority,
         alternates: {
           languages: {
-            ko: `${baseUrl}/ko${page.path}`,
-            en: `${baseUrl}/en${page.path}`,
-            'x-default': `${baseUrl}/en${page.path}`,
+            ...Object.fromEntries(locales.map((l) => [l, `${baseUrl}/${l}${page.path}`])),
+            'x-default': `${baseUrl}/${defaultLocale}${page.path}`,
           },
         },
       });

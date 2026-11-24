@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { FolderTree } from '@/components/save/FolderTree';
 import { FeedbackLink } from '@/components/layout/FeedbackLink';
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher';
 import { LATEST_CHANGELOG_DATE } from '@/lib/changelog';
 import { useDocumentsStore } from '@/stores/documentsStore';
 import { useTabsStore } from '@/stores/tabsStore';
@@ -175,6 +176,7 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
           </span>
         ))}
       </p>
+      <LanguageSwitcher className="mt-1 text-[11px] text-[var(--ui-text-muted)] hover:text-[var(--foreground)]" />
     </div>
   );
 }

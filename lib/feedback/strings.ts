@@ -57,6 +57,62 @@ const ko: typeof en = {
   },
 };
 
+const zh: typeof en = {
+  title: '发送反馈',
+  description: '使用 printmd 时遇到的问题、想法，什么都可以告诉我们。消息会直接发给开发者。',
+  back: '← 返回 printmd',
+  heading: '发送反馈',
+  intro: '问题、想法，什么都可以，写几行就够了。消息会直接发给开发者。',
+  nameLabel: '你的名字',
+  nameOptional: '（可选）',
+  namePlaceholder: '留空即匿名发送',
+  messageLabel: '内容',
+  messagePlaceholder: '遇到了什么情况，或者希望有什么功能？',
+  submit: '发送',
+  sending: '正在发送…',
+  success: '谢谢！你的消息已发送。',
+  sendAnother: '再发一条',
+  privacyNote: '随消息一起发送的只有你来自的页面、浏览器名称和语言，不会收集其他任何信息。',
+  mailFallback: '更习惯用邮件？',
+  mailLink: '改用邮件发送',
+  errors: {
+    invalid: '表单出了点问题。请刷新页面后再试。',
+    empty: '请写下内容。',
+    tooLong: '内容太长了。',
+    tooFast: '发得太快了！请稍等片刻再发送。',
+    rateLimited: '短时间内发送次数过多。请过几分钟再试。',
+    server: '消息未能发送。请稍后再试，或改用邮件联系我们。',
+  },
+};
+
+const ja: typeof en = {
+  title: 'フィードバックを送る',
+  description: 'printmd を使っていて気づいた不具合やアイデアなど、なんでもお寄せください。開発者に直接届きます。',
+  back: '← printmd に戻る',
+  heading: 'フィードバックを送る',
+  intro: '不具合、アイデア、なんでも。数行で十分です。送った内容は開発者に直接届きます。',
+  nameLabel: 'お名前',
+  nameOptional: '（任意）',
+  namePlaceholder: '空欄なら匿名で送信されます',
+  messageLabel: '内容',
+  messagePlaceholder: '何が起きたか、どんな機能がほしいかを書いてください',
+  submit: '送信',
+  sending: '送信中…',
+  success: 'ありがとうございます！メッセージを送信しました。',
+  sendAnother: '別のメッセージを送る',
+  privacyNote: 'メッセージと一緒に、アクセス元のページ、ブラウザの種類と言語を送信します。それ以外の情報は収集しません。',
+  mailFallback: 'メールのほうが便利ですか？',
+  mailLink: 'メールで送る',
+  errors: {
+    invalid: 'フォームに問題が発生しました。ページを再読み込みしてからもう一度お試しください。',
+    empty: '内容を入力してください。',
+    tooLong: '内容が長すぎます。',
+    tooFast: '送信が早すぎます。少し待ってからもう一度送ってください。',
+    rateLimited: '短時間に送信しすぎています。数分後にもう一度お試しください。',
+    server: '送信できませんでした。しばらくしてからもう一度お試しいただくか、メールでご連絡ください。',
+  },
+};
+
 export type FeedbackStrings = typeof en;
 
-export const FEEDBACK_STRINGS: Record<Locale, FeedbackStrings> = { en, ko };
+export const FEEDBACK_STRINGS: Record<Locale, FeedbackStrings> = { en, ko, zh, ja };

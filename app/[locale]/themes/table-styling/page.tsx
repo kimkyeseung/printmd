@@ -70,6 +70,60 @@ const t = {
       { name: '미리보기 및 내보내기', text: '스타일이 적용된 테이블을 실시간으로 미리보고 PDF로 내보내거나 인쇄합니다.' },
     ],
   },
+  zh: {
+    title: 'Markdown 表格样式',
+    subtitle:
+      '对比 15 种预设主题下表格的样子。在 printmd 中挑选风格，自由调整颜色、边框和斑马纹行。',
+    description:
+      '探索 Markdown 表格的样式与自定义选项。在 printmd 的 15 种主题中预览表头、单元格和斑马纹行的颜色。',
+    headerLabel: '表头',
+    sampleHeaders: ['功能', '状态', '备注'],
+    sampleRows: [
+      ['深色模式', '已完成', 'v1.2'],
+      ['导出 PDF', '已完成', 'v1.0'],
+      ['表格样式', '新增', 'v1.5'],
+    ],
+    ctaText: '准备好给你的 Markdown 表格换个样式了吗？',
+    ctaButton: '打开编辑器',
+    howToName: '如何在 printmd 中自定义 Markdown 表格样式',
+    howToDesc:
+      '分步讲解如何在 printmd 中自定义表头颜色、单元格边框和斑马纹行背景。',
+    steps: [
+      { name: '打开 printmd 编辑器', text: '访问 printmd.app，打开 Markdown 编辑器。' },
+      { name: '写一个 Markdown 表格', text: '用标准的 Markdown 竖线语法创建表格。' },
+      { name: '打开样式面板', text: '点击样式面板，进入主题和元素设置。' },
+      { name: '选择预设主题', text: '从 15 种内置主题中选一个，表格外观立即改变。' },
+      { name: '自定义表格样式', text: '调整 tableHeader 背景、tableCell 边框和 tableEvenRow 斑马纹。' },
+      { name: '预览并导出', text: '实时预览排好样式的表格，再导出为 PDF 或打印。' },
+    ],
+  },
+  ja: {
+    title: 'Markdown の表スタイル',
+    subtitle:
+      '15 のプリセットテーマで表がどう見えるかを比べてみましょう。printmd では色、罫線、縞模様の行を自由にカスタマイズできます。',
+    description:
+      'Markdown の表スタイルとカスタマイズ方法を紹介します。printmd の 15 のテーマで、見出しセル、セル、縞模様の行の色をプレビューできます。',
+    headerLabel: '見出し',
+    sampleHeaders: ['機能', '状態', '備考'],
+    sampleRows: [
+      ['ダークモード', '完了', 'v1.2'],
+      ['PDF 出力', '完了', 'v1.0'],
+      ['表のスタイル', '新規', 'v1.5'],
+    ],
+    ctaText: 'Markdown の表をおしゃれにしてみませんか？',
+    ctaButton: 'エディタを開く',
+    howToName: 'printmd で Markdown の表スタイルをカスタマイズする方法',
+    howToDesc:
+      'printmd で見出しセルの色、セルの罫線、縞模様の行の背景をカスタマイズする手順を紹介します。',
+    steps: [
+      { name: 'printmd のエディタを開く', text: 'printmd.app にアクセスし、Markdown エディタを開きます。' },
+      { name: 'Markdown で表を書く', text: '標準的な Markdown のパイプ記法で表を作ります。' },
+      { name: 'スタイルパネルを開く', text: 'スタイルパネルを開き、テーマと要素の設定にアクセスします。' },
+      { name: 'プリセットテーマを選ぶ', text: '15 の組み込みテーマから 1 つ選ぶと、表の見た目がすぐに変わります。' },
+      { name: '表のスタイルをカスタマイズ', text: 'tableHeader の背景、tableCell の罫線、tableEvenRow の縞模様を調整します。' },
+      { name: 'プレビューして書き出す', text: 'スタイルを当てた表をリアルタイムで確認し、PDF に書き出すか印刷します。' },
+    ],
+  },
 } as const;
 
 export async function generateMetadata({

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { BlogPostMeta } from '@/lib/blog';
+import { formatReadingTime } from '@/lib/blog/readingTime';
 
 interface BlogPostCardProps {
   post: BlogPostMeta;
@@ -29,7 +30,7 @@ export function BlogPostCard({ post, locale }: BlogPostCardProps) {
         <div className="flex items-center gap-3 text-xs text-gray-400">
           <time dateTime={post.date}>{post.date}</time>
           <span>·</span>
-          <span>{post.readingTime} min read</span>
+          <span>{formatReadingTime(post.readingTime, locale)}</span>
         </div>
       </Link>
     </article>

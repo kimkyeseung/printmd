@@ -52,8 +52,12 @@ function formatDate(date: unknown): string {
 }
 
 function calculateReadingTime(content: string): number {
-  const words = content.trim().split(/\s+/).length;
-  return Math.max(1, Math.ceil(words / 200));
+  // Chinese and Japanese put no spaces between words, so their characters are
+  // counted on their own (about 500 a minute) and everything else by words.
+  const cjk = /[぀-ヿ㐀-鿿]/g;
+  const cjkChars = (content.match(cjk) ?? []).length;
+  const words = content.replace(cjk, ' ').trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200 + cjkChars / 500));
 }
 
 export function getPostSlugs(locale: string): string[] {
@@ -104,6 +108,18 @@ export function getAllPosts(locale: string): BlogPostMeta[] {
   return posts;
 }
 
+/**
+ * Anchor id for a heading. Keeps letters and numbers in any script, so Chinese
+ * and Japanese headings get ids too (Korean and English ids are unchanged).
+ */
+export function headingSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
 export function extractHeadings(html: string): { id: string; text: string; level: number }[] {
   const headings: { id: string; text: string; level: number }[] = [];
   const idCount = new Map<string, number>();
@@ -111,11 +127,7 @@ export function extractHeadings(html: string): { id: string; text: string; level
   let match;
   while ((match = regex.exec(html)) !== null) {
     const text = match[2].replace(/<[^>]*>/g, '');
-    let id = text
-      .toLowerCase()
-      .replace(/[^a-z0-9가-힣\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
+    let id = headingSlug(text);
     const count = idCount.get(id) || 0;
     idCount.set(id, count + 1);
     if (count > 0) id = `${id}-${count}`;

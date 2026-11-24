@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { buildPageMetadata, localeUrl } from '@/lib/seo/metadata';
-import { locales, type Locale } from '@/lib/i18n/config';
+import { locales, localeTags, type Locale } from '@/lib/i18n/config';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { SiteFooter } from '@/components/layout';
-import { CHANGELOG, CHANGELOG_PAGE, changelogImageSrc, type ChangeKind } from '@/lib/changelog';
+import { CHANGELOG, CHANGELOG_PAGE, captureLocale, changelogImageSrc, type ChangeKind } from '@/lib/changelog';
 
 function isValidLocale(locale: string): locale is Locale {
   return locales.includes(locale as Locale);
@@ -44,7 +44,7 @@ const KIND_ORDER: ChangeKind[] = ['new', 'improved', 'fixed'];
 function formatDate(date: string, locale: Locale): string {
   const [y, m, d] = date.split('-').map(Number);
   // Dates are calendar days, so format them in UTC to avoid shifting a day.
-  return new Intl.DateTimeFormat(locale === 'ko' ? 'ko-KR' : 'en-US', {
+  return new Intl.DateTimeFormat(localeTags[locale], {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -70,7 +70,7 @@ export default async function ChangelogPage({
       name: t.heading,
       description: t.description,
       url: pageUrl,
-      inLanguage: locale,
+      inLanguage: localeTags[locale],
       keywords: t.keywords.join(', '),
       hasPart: CHANGELOG.map((entry) => ({
         '@type': 'BlogPosting',
@@ -148,8 +148,8 @@ export default async function ChangelogPage({
                     <Image
                       src={changelogImageSrc(entry, image, locale)}
                       alt={image.alt[locale]}
-                      width={image.size[locale][0]}
-                      height={image.size[locale][1]}
+                      width={image.size[captureLocale(locale)][0]}
+                      height={image.size[captureLocale(locale)][1]}
                       sizes="(max-width: 768px) 100vw, 768px"
                       // Only the first shot is likely above the fold.
                       priority={i === 0}

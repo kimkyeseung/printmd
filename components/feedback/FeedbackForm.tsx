@@ -5,6 +5,7 @@ import type { Locale } from '@/lib/i18n/config';
 import { FEEDBACK_LIMITS, type FeedbackError } from '@/lib/feedback/submit';
 import { FEEDBACK_STRINGS } from '@/lib/feedback/strings';
 import { feedbackMailto } from '@/lib/feedback/mailto';
+import { getAppStrings } from '@/lib/i18n/appStrings';
 
 type Status = { kind: 'idle' } | { kind: 'sending' } | { kind: 'sent' } | { kind: 'error'; error: FeedbackError };
 
@@ -64,7 +65,7 @@ export function FeedbackForm({ locale }: { locale: Locale }) {
     }
   }
 
-  const mailHref = feedbackMailto({ subject: locale === 'ko' ? '[printmd] 의견' : '[printmd] Feedback', bodyIntro: '', envHeading: '' });
+  const mailHref = feedbackMailto({ subject: getAppStrings(locale).shell.feedbackSubject, bodyIntro: '', envHeading: '' });
 
   if (status.kind === 'sent') {
     return (

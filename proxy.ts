@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { locales, defaultLocale, type Locale } from './lib/i18n/config';
+import { locales, defaultLocale, isLocale, LOCALE_COOKIE, type Locale } from './lib/i18n/config';
 
 // Paths that must never be locale-prefixed.
 const reservedPaths = new Set([
@@ -11,12 +11,17 @@ const reservedPaths = new Set([
 ]);
 
 function getLocale(request: NextRequest): Locale {
-  // Check Accept-Language header
+  // A language the reader picked in the switcher wins over the browser's.
+  const chosen = request.cookies.get(LOCALE_COOKIE)?.value;
+  if (isLocale(chosen)) return chosen;
+
+  // Check Accept-Language header. Only the primary subtag counts, so zh-TW
+  // and zh-HK readers land on Simplified Chinese rather than English.
   const acceptLanguage = request.headers.get('accept-language');
   if (acceptLanguage) {
     const preferredLocale = acceptLanguage
       .split(',')
-      .map((lang) => lang.split(';')[0].trim().substring(0, 2))
+      .map((lang) => lang.split(';')[0].trim().split('-')[0].toLowerCase())
       .find((lang) => locales.includes(lang as Locale));
 
     if (preferredLocale) {

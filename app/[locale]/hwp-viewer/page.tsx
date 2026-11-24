@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
 import { locales, type Locale } from '@/lib/i18n/config';
+import { CJK_KEYWORDS } from '@/lib/seo/cjkKeywords';
 import { getDictionary } from '@/lib/i18n/dictionaries';
 import { AdBanner } from '@/components/adsense/AdBanner';
 import { SiteFooter } from '@/components/layout';
@@ -26,7 +27,7 @@ export async function generateMetadata({
     path: '/hwp-viewer',
     title: `${t.title} - ${t.subtitle}`,
     description: t.hero.description,
-    keywords: locale === 'ko'
+    keywords: locale === 'zh' ? CJK_KEYWORDS.hwpViewer.zh : locale === 'ja' ? CJK_KEYWORDS.hwpViewer.ja : locale === 'ko'
       ? [
           // 뷰어
           'hwp 뷰어', '한글 뷰어', 'hwp 파일 열기', '한글 파일 열기', 'hwp 온라인 뷰어',
@@ -97,7 +98,7 @@ export default async function HwpViewerPage({
   const howToJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
-    name: locale === 'ko' ? 'HWP 파일을 PDF로 변환하는 방법' : 'How to Convert an HWP File to PDF',
+    name: ({ ko: 'HWP 파일을 PDF로 변환하는 방법', en: 'How to Convert an HWP File to PDF', zh: '如何把 HWP 文件转换成 PDF', ja: 'HWP ファイルを PDF に変換する方法' } as Record<Locale, string>)[locale],
     description: t.hero.description,
     totalTime: 'PT1M',
     tool: {
