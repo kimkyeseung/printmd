@@ -46,6 +46,44 @@ export function changelogImageSrc(entry: ChangelogEntry, image: ChangelogImage, 
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-24',
+    title: {
+      ko: '중국어·일본어 버전, 언어 선택',
+      en: 'Chinese and Japanese versions, and a language picker',
+      zh: '中文版与日文版上线，新增语言切换',
+      ja: '中国語版・日本語版、言語の切り替え',
+    },
+    summary: {
+      ko: 'printmd를 이제 중국어(간체)와 일본어로도 쓸 수 있습니다. 에디터와 가이드, 업데이트 내역, 의견 보내기 페이지까지 고른 언어로 보입니다. 사이트 아래쪽이나 에디터 사이드바에서 언어를 바꾸면 다음에 들어올 때도 그 언어로 열립니다.',
+      en: 'printmd now comes in Simplified Chinese and Japanese. The editor, the guides, the updates page and the feedback page all appear in the language you pick. Change the language at the bottom of the site or in the editor sidebar, and printmd opens in that language next time too.',
+      zh: 'printmd 现已支持简体中文和日文。编辑器、指南、更新日志和反馈页面都会以你选择的语言显示。在网站底部或编辑器侧边栏切换语言后，下次打开时也会使用该语言。',
+      ja: 'printmd が簡体字中国語と日本語でも使えるようになりました。エディター、ガイド、アップデート履歴、フィードバックページまで、選んだ言語で表示されます。サイトの下部やエディターのサイドバーで言語を切り替えると、次に開いたときもその言語で表示されます。',
+    },
+    changes: [
+      c(
+        'new',
+        '중국어(간체)·일본어 버전: 에디터, 마크다운 가이드, 테마 안내, 업데이트 내역, 의견 보내기 페이지가 각 언어로 보입니다. 중국어 번체를 쓰는 브라우저도 중국어 버전으로 열립니다.',
+        'Chinese (Simplified) and Japanese versions: the editor, the Markdown guide, the theme pages, the updates page and the feedback page all appear in each language. Browsers set to Traditional Chinese open the Chinese version.',
+        '简体中文与日文版：编辑器、Markdown 指南、主题介绍、更新日志和反馈页面都以对应语言显示。浏览器语言为繁体中文时也会打开中文版。',
+        '中国語（簡体字）版・日本語版：エディター、Markdown ガイド、テーマの案内、アップデート履歴、フィードバックページがそれぞれの言語で表示されます。ブラウザーが繁体字中国語の場合も中国語版が開きます。',
+      ),
+      c(
+        'new',
+        '언어 선택: 사이트 아래쪽과 에디터 사이드바에서 언어를 바꿀 수 있습니다. 보던 페이지 그대로 언어만 바뀌고, 고른 언어는 다음 방문 때도 유지됩니다.',
+        'Language picker: switch languages at the bottom of the site or in the editor sidebar. You stay on the same page, and your choice is remembered for your next visit.',
+        '语言切换：可以在网站底部和编辑器侧边栏切换语言。切换后仍停留在当前页面，所选语言下次访问时也会保留。',
+        '言語の切り替え：サイトの下部とエディターのサイドバーで言語を切り替えられます。見ていたページのまま言語だけが変わり、選んだ言語は次に訪れたときも保持されます。',
+      ),
+      c(
+        'fixed',
+        '영어 사이트에서 마크다운 가이드와 GitHub README 페이지가 한국어로 보이던 문제를 고쳤습니다.',
+        'Fixed the Markdown guide and the GitHub README page showing Korean on the English site.',
+        '修复了英文网站上 Markdown 指南和 GitHub README 页面显示为韩文的问题。',
+        '英語サイトで Markdown ガイドと GitHub README のページが韓国語で表示されていた問題を修正しました。',
+      ),
+    ],
+  },
+  {
     date: '2026-11-23',
     title: {
       ko: '미리보기 목차, 블로그 글 따라오는 목차, 의견 보내기 페이지',
