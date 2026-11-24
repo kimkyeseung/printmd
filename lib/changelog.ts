@@ -81,6 +81,13 @@ export const CHANGELOG: ChangelogEntry[] = [
         '修复了英文网站上 Markdown 指南和 GitHub README 页面显示为韩文的问题。',
         '英語サイトで Markdown ガイドと GitHub README のページが韓国語で表示されていた問題を修正しました。',
       ),
+      c(
+        'fixed',
+        '블로그 글 목록의 읽기 시간이 모든 언어에서 영어로 보이던 문제를 고쳤습니다.',
+        'Fixed the reading time on the blog post list showing in English in every language.',
+        '修复了博客文章列表中的阅读时间在所有语言下都显示为英文的问题。',
+        'ブログ記事一覧の読了時間が、どの言語でも英語で表示されていた問題を修正しました。',
+      ),
     ],
   },
   {
