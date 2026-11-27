@@ -42,6 +42,52 @@ const LINK_ICONS = {
   blog: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z',
 } as const;
 
+/** A headed link list in the expanded sidebar that folds from its heading. */
+function FoldableLinks({
+  id,
+  heading,
+  open,
+  onToggle,
+  className,
+  children,
+}: {
+  id: string;
+  heading: string;
+  open: boolean;
+  onToggle: () => void;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <nav aria-label={heading} className={className}>
+      <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ui-text-muted)]">
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-controls={id}
+          className="-mx-1 flex w-[calc(100%+0.5rem)] items-center gap-1 rounded px-1 py-0.5 text-left uppercase tracking-wide hover:bg-[var(--ui-bg-hover)] hover:text-[var(--foreground)]"
+        >
+          <svg
+            className={`h-3 w-3 shrink-0 transition-transform ${open ? 'rotate-90' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+          {heading}
+        </button>
+      </h2>
+      {/* Hidden rather than removed, so the links stay in the page for crawlers. */}
+      <div id={id} hidden={!open}>
+        {children}
+      </div>
+    </nav>
+  );
+}
+
 /**
  * Links to the rest of the site. The home page is the editor alone, so this
  * is where it links out to the tool landing pages, guides and presets — for
@@ -57,6 +103,8 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
   const t = strings.sidebar;
   const toolsOpen = useUIStore((s) => s.isSidebarToolsOpen);
   const toggleTools = useUIStore((s) => s.toggleSidebarTools);
+  const linksOpen = useUIStore((s) => s.isSidebarLinksOpen);
+  const toggleLinks = useUIStore((s) => s.toggleSidebarLinks);
   const tools = [
     { key: 'markdownToPdf', href: `/${locale}/markdown-to-pdf` },
     { key: 'markdownPrint', href: `/${locale}/markdown-print` },
@@ -144,36 +192,12 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
 
   return (
     <div className="border-t border-[var(--ui-border)] px-3 py-3 text-xs">
-      <nav aria-label={t.toolsHeading}>
-        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ui-text-muted)]">
-          <button
-            type="button"
-            onClick={toggleTools}
-            aria-expanded={toolsOpen}
-            aria-controls="sidebar-tools-list"
-            className="-mx-1 flex w-[calc(100%+0.5rem)] items-center gap-1 rounded px-1 py-0.5 text-left uppercase tracking-wide hover:bg-[var(--ui-bg-hover)] hover:text-[var(--foreground)]"
-          >
-            <svg
-              className={`h-3 w-3 shrink-0 transition-transform ${toolsOpen ? 'rotate-90' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-            {t.toolsHeading}
-          </button>
-        </h2>
-        {/* Hidden rather than removed, so the links stay in the page for crawlers. */}
-        <div id="sidebar-tools-list" hidden={!toolsOpen}>
-          {linkList(tools)}
-        </div>
-      </nav>
-      <nav aria-label={t.linksHeading} className="mt-3">
-        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ui-text-muted)]">{t.linksHeading}</h2>
+      <FoldableLinks id="sidebar-tools-list" heading={t.toolsHeading} open={toolsOpen} onToggle={toggleTools}>
+        {linkList(tools)}
+      </FoldableLinks>
+      <FoldableLinks id="sidebar-learn-list" heading={t.linksHeading} open={linksOpen} onToggle={toggleLinks} className="mt-3">
         {linkList(main)}
-      </nav>
+      </FoldableLinks>
       <Link
         href={changelogHref}
         className="mt-3 flex items-center gap-2 rounded-md border border-[var(--ui-border)] px-2 py-1.5 text-[var(--ui-text-muted)] transition-colors hover:border-[var(--printmd-link-color,#2563eb)] hover:text-[var(--foreground)]"

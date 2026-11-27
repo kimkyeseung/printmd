@@ -25,6 +25,8 @@ export interface UIState {
   outlinePosition: { top: number; right: number };
   /** The "Tools" link list in the expanded document sidebar. */
   isSidebarToolsOpen: boolean;
+  /** The "Learn more" link list in the expanded document sidebar. */
+  isSidebarLinksOpen: boolean;
 }
 
 export interface UIActions {
@@ -43,6 +45,7 @@ export interface UIActions {
   toggleOutlineCollapsed: () => void;
   setOutlinePosition: (position: { top: number; right: number }) => void;
   toggleSidebarTools: () => void;
+  toggleSidebarLinks: () => void;
 }
 
 export type UIStore = UIState & UIActions;
@@ -59,6 +62,7 @@ const initialState: UIState = {
   isOutlineCollapsed: false,
   outlinePosition: { top: 16, right: 24 },
   isSidebarToolsOpen: true,
+  isSidebarLinksOpen: true,
 };
 
 export const useUIStore = create<UIStore>()(
@@ -110,6 +114,8 @@ export const useUIStore = create<UIStore>()(
       setOutlinePosition: (outlinePosition) => set({ outlinePosition }),
 
       toggleSidebarTools: () => set((state) => ({ isSidebarToolsOpen: !state.isSidebarToolsOpen })),
+
+      toggleSidebarLinks: () => set((state) => ({ isSidebarLinksOpen: !state.isSidebarLinksOpen })),
     }),
     {
       name: 'printmd-ui',
@@ -122,6 +128,7 @@ export const useUIStore = create<UIStore>()(
         isOutlineCollapsed: state.isOutlineCollapsed,
         outlinePosition: state.outlinePosition,
         isSidebarToolsOpen: state.isSidebarToolsOpen,
+        isSidebarLinksOpen: state.isSidebarLinksOpen,
       }),
     }
   )
