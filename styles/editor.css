@@ -17,6 +17,11 @@
   --cm-link: #1d4ed8;
   --cm-code: #9a3412;
   --cm-label: #6d28d9;
+  /*
+   * Active-line tint. Translucent so the selection layer, which CodeMirror
+   * draws behind the lines, stays visible. Matches --ui-bg-hover on --background.
+   */
+  --cm-active-line: rgba(0, 0, 0, 0.06);
 }
 
 .dark {
@@ -24,6 +29,7 @@
   --cm-link: #93c5fd;
   --cm-code: #fdba74;
   --cm-label: #c4b5fd;
+  --cm-active-line: rgba(255, 255, 255, 0.11);
 }
 
 /* Selection */

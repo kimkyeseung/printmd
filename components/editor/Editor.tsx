@@ -142,7 +142,7 @@ export const Editor = memo(forwardRef<EditorRef, EditorProps>(function Editor({ 
             backgroundColor: 'transparent',
           },
           '.cm-activeLine': {
-            backgroundColor: 'var(--ui-bg-hover)',
+            backgroundColor: 'var(--cm-active-line)',
           },
           '.cm-placeholder': {
             color: 'var(--ui-text-muted)',
