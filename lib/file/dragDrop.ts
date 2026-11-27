@@ -1,9 +1,12 @@
 import { readFile, isSupportedFile, UnsupportedFileError, type FileInfo } from './fileHandler';
+import { readDroppedFolders, type DroppedTree } from './folderImport';
 
 export interface DragDropOptions {
   onDragEnter?: () => void;
   onDragLeave?: () => void;
   onDrop?: (file: FileInfo) => void;
+  /** A drop with folders in it; without this, folders are opened like files. */
+  onFolderDrop?: (tree: Promise<DroppedTree>) => void;
   onError?: (error: Error) => void;
   /** Override the no-activity timeout (ms). Defaults to 300ms. */
   idleTimeoutMs?: number;
@@ -18,7 +21,7 @@ export interface DragDropOptions {
 const DEFAULT_IDLE_TIMEOUT_MS = 300;
 
 export function createDragDropHandler(options: DragDropOptions) {
-  const { onDragEnter, onDragLeave, onDrop, onError } = options;
+  const { onDragEnter, onDragLeave, onDrop, onFolderDrop, onError } = options;
   const idleTimeoutMs = options.idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS;
 
   let dragCounter = 0;
@@ -95,6 +98,13 @@ export function createDragDropHandler(options: DragDropOptions) {
     e.preventDefault();
     e.stopPropagation();
     resetState();
+
+    // Taken before any await: the browser empties dataTransfer after the event.
+    const folders = onFolderDrop ? readDroppedFolders(e.dataTransfer) : null;
+    if (folders) {
+      onFolderDrop?.(folders);
+      return;
+    }
 
     const files = e.dataTransfer?.files;
     if (!files || files.length === 0) {

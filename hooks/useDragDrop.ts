@@ -4,14 +4,15 @@ import { useFileOpener } from './useFileOpener';
 
 export function useDragDrop() {
   const [isDragging, setIsDragging] = useState(false);
-  const { openFileInfo, reportFileError } = useFileOpener();
+  const { openFileInfo, reportFileError, importFolders } = useFileOpener();
 
   const dragDropHandlers = useMemo(() => createDragDropHandler({
     onDragEnter: () => setIsDragging(true),
     onDragLeave: () => setIsDragging(false),
     onDrop: openFileInfo,
+    onFolderDrop: (tree) => void importFolders(tree),
     onError: reportFileError,
-  }), [openFileInfo, reportFileError]);
+  }), [openFileInfo, reportFileError, importFolders]);
 
   useEffect(() => {
     const handleDragEnter = (e: DragEvent) => dragDropHandlers.handleDragEnter(e);

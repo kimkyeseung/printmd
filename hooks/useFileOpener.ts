@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import { format, useAppStrings, type AppStrings } from '@/lib/i18n/appStrings';
-import { fileTitle, readFile, UnsupportedFileError, type FileInfo } from '@/lib/file';
+import { fileTitle, importDroppedTree, readFile, UnsupportedFileError, type DroppedTree, type FileInfo } from '@/lib/file';
 import type { HwpErrorCode } from '@/lib/import';
-import { useTabsStore } from '@/stores';
+import { useDocumentsStore, useTabsStore, useUIStore } from '@/stores';
 
 /** What to tell the user when a file can't be opened. */
 function errorMessage(error: Error, text: AppStrings): string {
@@ -56,5 +56,36 @@ export function useFileOpener() {
     }
   }, [openFileInfo, reportFileError]);
 
-  return { openFile, openFileInfo, reportFileError };
+  /**
+   * Add dropped folders to the document sidebar with their structure, then
+   * open the sidebar so the new folders can be seen.
+   */
+  const importFolders = useCallback(async (tree: Promise<DroppedTree>) => {
+    try {
+      const { createFolder, saveDocument } = useDocumentsStore.getState();
+      const result = await importDroppedTree(await tree, { createFolder, saveDocument }, readFile);
+      if (result.documents === 0) {
+        if (result.failed > 0) {
+          toast.error(format(text.toast.folderImportFailedFiles, { count: String(result.failed) }));
+        } else {
+          toast.error(text.toast.folderNoDocuments);
+        }
+        return;
+      }
+      let message = format(text.toast.folderImported, {
+        folders: String(result.folders),
+        documents: String(result.documents),
+      });
+      if (result.failed > 0) {
+        message += ' ' + format(text.toast.folderImportFailedFiles, { count: String(result.failed) });
+      }
+      toast.success(message);
+      useUIStore.getState().openSidebar();
+    } catch (error) {
+      console.error('Folder import error:', error);
+      toast.error(text.toast.folderReadFailed);
+    }
+  }, [text]);
+
+  return { openFile, openFileInfo, reportFileError, importFolders };
 }
