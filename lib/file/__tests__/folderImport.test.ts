@@ -35,7 +35,7 @@ describe('importDroppedTree', () => {
       folders: [{ name: 'guide', files: [file('setup.txt')], folders: [] }],
     };
     const target = fakeTarget();
-    const result = await importDroppedTree({ folders: [docs], files: [] }, target, read);
+    const result = await importDroppedTree({ folders: [docs], files: [], unreadable: 0 }, target, read);
 
     expect(target.folders).toEqual([
       { id: 'f0', name: 'docs', parentId: null },
@@ -58,6 +58,7 @@ describe('importDroppedTree', () => {
         },
       ],
       files: [],
+      unreadable: 0,
     };
     const target = fakeTarget();
     const result = await importDroppedTree(tree, target, read);
@@ -70,6 +71,7 @@ describe('importDroppedTree', () => {
     const tree = {
       folders: [{ name: 'notes', files: [file('broken.md')], folders: [] }],
       files: [file('readme.md')],
+      unreadable: 0,
     };
     const target = fakeTarget();
     const result = await importDroppedTree(tree, target, read);
@@ -127,5 +129,37 @@ describe('readDroppedFolders', () => {
     expect(docs.files.map((f) => f.name)).toEqual(['a.md', 'b.md']);
     expect(docs.folders.map((f) => f.name)).toEqual(['sub']);
     expect(docs.folders[0].files.map((f) => f.name)).toEqual(['c.md']);
+    expect(tree!.unreadable).toBe(0);
+  });
+
+  it('skips files and folders that cannot be read instead of failing the whole drop', async () => {
+    // e.g. a OneDrive file that is only in the cloud, or a locked system folder on Windows.
+    const cloudOnly: Entry = {
+      name: 'cloud.md',
+      isFile: true,
+      isDirectory: false,
+      file: (_ok: FileCallback, fail?: ErrorCallback) => fail?.(new DOMException('gone', 'NotFoundError')),
+    };
+    const locked: Entry = {
+      name: 'locked',
+      isFile: false,
+      isDirectory: true,
+      createReader: () => ({
+        readEntries: (_ok: FileSystemEntriesCallback, fail?: ErrorCallback) =>
+          fail?.(new DOMException('denied', 'NotReadableError')),
+      }),
+    };
+    const tree = await readDroppedFolders(
+      transfer([dirEntry('notes', [fileEntry(file('a.md')), cloudOnly, locked])]),
+    );
+
+    expect(tree!.unreadable).toBe(2);
+    expect(tree!.folders[0].files.map((f) => f.name)).toEqual(['a.md']);
+
+    const target = { createFolder: () => 'f', saveDocument: () => 'd' };
+    const result = await importDroppedTree(tree!, target, async (f) => ({
+      name: f.name, content: '', size: 0, lastModified: 0,
+    }));
+    expect(result).toMatchObject({ documents: 1, failed: 2 });
   });
 });

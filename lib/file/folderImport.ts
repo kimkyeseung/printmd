@@ -11,6 +11,12 @@ export interface DroppedFolder {
 export interface DroppedTree {
   folders: DroppedFolder[];
   files: File[];
+  /**
+   * Files and folders the browser could not read. On Windows this happens with
+   * OneDrive files that are only in the cloud, locked system folders and very
+   * long paths; they are skipped so the rest of the folder still comes in.
+   */
+  unreadable: number;
 }
 
 /** Hidden entries such as .git or .DS_Store are never documents. */
@@ -33,20 +39,33 @@ async function readAllEntries(dir: FileSystemDirectoryEntry): Promise<FileSystem
   }
 }
 
-async function readDirectory(dir: FileSystemDirectoryEntry): Promise<DroppedFolder> {
-  const folder: DroppedFolder = { name: dir.name, folders: [], files: [] };
-  const entries = (await readAllEntries(dir)).sort((a, b) =>
-    a.name.localeCompare(b.name, undefined, { numeric: true }),
-  );
-  for (const entry of entries) {
+/** Read entries into `tree`'s shape, counting what can't be read instead of failing. */
+async function readEntries(
+  entries: FileSystemEntry[],
+  into: { folders: DroppedFolder[]; files: File[] },
+  tree: DroppedTree,
+): Promise<void> {
+  const sorted = [...entries].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+  for (const entry of sorted) {
     if (isHidden(entry.name)) continue;
     if (entry.isDirectory) {
-      folder.folders.push(await readDirectory(entry as FileSystemDirectoryEntry));
+      const folder: DroppedFolder = { name: entry.name, folders: [], files: [] };
+      try {
+        await readEntries(await readAllEntries(entry as FileSystemDirectoryEntry), folder, tree);
+      } catch (error) {
+        console.warn('Could not read folder', entry.fullPath, error);
+        tree.unreadable++;
+      }
+      into.folders.push(folder);
     } else if (entry.isFile) {
-      folder.files.push(await entryFile(entry as FileSystemFileEntry));
+      try {
+        into.files.push(await entryFile(entry as FileSystemFileEntry));
+      } catch (error) {
+        console.warn('Could not read file', entry.fullPath, error);
+        tree.unreadable++;
+      }
     }
   }
-  return folder;
 }
 
 /**
@@ -68,14 +87,9 @@ export function readDroppedFolders(dataTransfer: DataTransfer | null): Promise<D
   if (!entries.some((e) => e.isDirectory)) return null;
 
   return (async () => {
-    const tree: DroppedTree = { folders: [], files: [] };
-    for (const entry of entries) {
-      if (entry.isDirectory) {
-        tree.folders.push(await readDirectory(entry as FileSystemDirectoryEntry));
-      } else if (entry.isFile && !isHidden(entry.name)) {
-        tree.files.push(await entryFile(entry as FileSystemFileEntry));
-      }
-    }
+    const tree: DroppedTree = { folders: [], files: [], unreadable: 0 };
+    // Dropped items keep the order they were dropped in.
+    for (const entry of entries) await readEntries([entry], tree, tree);
     return tree;
   })();
 }
@@ -88,7 +102,7 @@ export interface FolderImportTarget {
 export interface FolderImportResult {
   folders: number;
   documents: number;
-  /** Supported files that could not be read or converted. */
+  /** Files and folders that could not be read, or documents that could not be converted. */
   failed: number;
   /** Files of other types, such as images, that were left out. */
   skipped: number;
@@ -109,7 +123,7 @@ export async function importDroppedTree(
   target: FolderImportTarget,
   read: (file: File) => Promise<FileInfo>,
 ): Promise<FolderImportResult> {
-  const result: FolderImportResult = { folders: 0, documents: 0, failed: 0, skipped: 0 };
+  const result: FolderImportResult = { folders: 0, documents: 0, failed: tree.unreadable, skipped: 0 };
 
   const addFiles = async (files: File[], folderId: string) => {
     for (const file of files) {
