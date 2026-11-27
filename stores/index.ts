@@ -1,5 +1,5 @@
 export { useEditorStore } from './editorStore';
-export { useTabsStore } from './tabsStore';
+export { useTabsStore, openNewDocumentTab } from './tabsStore';
 export { useStyleStore, themePresets } from './styleStore';
 export { usePrintStore } from './printStore';
 export { useUIStore } from './uiStore';

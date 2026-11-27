@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Tab, TabsState, TabsStore } from '@/types/editor';
 import { createDebouncedStorage } from '@/lib/storage/debouncedStorage';
 import { DEFAULT_TAB_TITLE } from '@/lib/editor/tabTitle';
+import { useUIStore } from './uiStore';
 
 type PersistedTab = Pick<Tab, 'id' | 'documentId' | 'title' | 'content' | 'isDirty'>;
 
@@ -164,3 +165,15 @@ export const useTabsStore = create<TabsStore>()(
     }
   )
 );
+
+/**
+ * Opens a blank tab for a new document. A new document starts empty, so in
+ * preview-only mode there is nothing to see: switch to the editor. Split view
+ * already shows the editor and is left as is.
+ */
+export function openNewDocumentTab(): string {
+  const id = useTabsStore.getState().addTab();
+  const ui = useUIStore.getState();
+  if (ui.viewMode === 'preview') ui.setViewMode('editor');
+  return id;
+}

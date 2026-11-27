@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useTabsStore, serializeTabs, deserializeTabs } from '../tabsStore';
+import { useTabsStore, serializeTabs, deserializeTabs, openNewDocumentTab } from '../tabsStore';
+import { useUIStore } from '../uiStore';
 
 function resetStore() {
   useTabsStore.setState({ tabs: [], activeTabId: null });
@@ -315,5 +316,24 @@ describe('tabsStore', () => {
       expect(tab.content).toBe('# Saved');
       expect(tab.isDirty).toBe(false);
     });
+  });
+});
+
+describe('openNewDocumentTab', () => {
+  beforeEach(() => {
+    resetStore();
+  });
+
+  it('switches preview-only mode to the editor', () => {
+    useUIStore.setState({ viewMode: 'preview' });
+    const id = openNewDocumentTab();
+    expect(useTabsStore.getState().activeTabId).toBe(id);
+    expect(useUIStore.getState().viewMode).toBe('editor');
+  });
+
+  it.each(['split', 'editor'] as const)('keeps %s mode', (mode) => {
+    useUIStore.setState({ viewMode: mode });
+    openNewDocumentTab();
+    expect(useUIStore.getState().viewMode).toBe(mode);
   });
 });

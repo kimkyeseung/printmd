@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useRef, useEffect } from 'react';
-import { useTabsStore } from '@/stores';
+import { useTabsStore, openNewDocumentTab } from '@/stores';
 import type { Tab } from '@/types/editor';
 import { useAppStrings, format } from '@/lib/i18n/appStrings';
 import { tabDisplayTitle } from '@/lib/editor/tabTitle';
@@ -89,7 +89,6 @@ export function TabBar() {
   const activeTabId = useTabsStore((s) => s.activeTabId);
   const setActiveTab = useTabsStore((s) => s.setActiveTab);
   const removeTab = useTabsStore((s) => s.removeTab);
-  const addTab = useTabsStore((s) => s.addTab);
   const scrollRef = useRef<HTMLDivElement>(null);
   const t = useAppStrings().tabs;
 
@@ -114,8 +113,8 @@ export function TabBar() {
   );
 
   const handleNewTab = useCallback(() => {
-    addTab();
-  }, [addTab]);
+    openNewDocumentTab();
+  }, []);
 
   return (
     <div className="hidden md:flex items-center border-b border-[var(--ui-border)] bg-[var(--ui-bg-secondary,var(--ui-bg-hover))] shrink-0">

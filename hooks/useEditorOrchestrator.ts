@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { useAppStrings } from '@/lib/i18n/appStrings';
 import { defaultLocale, isLocale, type Locale } from '@/lib/i18n/config';
 import { tabDisplayTitle } from '@/lib/editor/tabTitle';
-import { useEditorStore, useDocumentsStore, useTabsStore } from '@/stores';
+import { useEditorStore, useDocumentsStore, useTabsStore, openNewDocumentTab } from '@/stores';
 import { useFileOpener } from './useFileOpener';
 
 const DEFAULT_CONTENT: Record<Locale, string> = {
@@ -630,8 +630,8 @@ export function useEditorOrchestrator() {
   }, [displayContent, activeTab]);
 
   const handleNewTab = useCallback(() => {
-    addTab();
-  }, [addTab]);
+    openNewDocumentTab();
+  }, []);
 
   return {
     locale,
