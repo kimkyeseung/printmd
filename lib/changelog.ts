@@ -46,6 +46,30 @@ export function changelogImageSrc(entry: ChangelogEntry, image: ChangelogImage, 
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: '2026-11-27',
+    title: {
+      ko: '에디터에서 선택한 텍스트가 잘 보이도록 수정',
+      en: 'Selected text is visible again in the editor',
+      zh: '修复编辑器中选中文本不可见的问题',
+      ja: 'エディターで選択したテキストが見えるように修正',
+    },
+    summary: {
+      ko: '에디터에서 커서가 있는 줄의 텍스트를 선택하면 선택 영역이 회색 배경에 가려 보이지 않던 문제를 고쳤습니다. 이제 어느 줄에서든 선택한 부분이 파란색으로 표시됩니다.',
+      en: 'Selecting text on the line with the cursor in the editor no longer hides the selection behind the gray line highlight. The selected part now shows in blue on every line.',
+      zh: '修复了在编辑器中选中光标所在行的文本时，选区被灰色背景遮住而看不见的问题。现在无论在哪一行，选中的部分都会以蓝色显示。',
+      ja: 'エディターでカーソルのある行のテキストを選択すると、選択範囲が灰色の背景に隠れて見えなかった問題を修正しました。どの行でも選択した部分が青色で表示されます。',
+    },
+    changes: [
+      c(
+        'fixed',
+        '에디터에서 커서가 있는 줄의 텍스트를 선택하면 회색 배경에 가려 무엇을 선택했는지 보이지 않던 문제를 고쳤습니다.',
+        'Fixed text selected on the cursor line in the editor being hidden by the gray line highlight.',
+        '修复了在编辑器中选中光标所在行的文本时，被灰色背景遮住、看不出选中了什么的问题。',
+        'エディターでカーソルのある行のテキストを選択すると、灰色の背景に隠れて何を選択したか見えなかった問題を修正しました。',
+      ),
+    ],
+  },
+  {
     date: '2026-11-24',
     title: {
       ko: '중국어·일본어 버전, 언어 선택',
