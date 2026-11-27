@@ -48,18 +48,25 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: '2026-11-27',
     title: {
-      ko: '에디터에서 선택한 텍스트가 잘 보이도록 수정',
-      en: 'Selected text is visible again in the editor',
-      zh: '修复编辑器中选中文本不可见的问题',
-      ja: 'エディターで選択したテキストが見えるように修正',
+      ko: '폴더 드래그 앤 드롭, 에디터 선택 영역 표시 수정',
+      en: 'Drag and drop folders, and a fix for selected text in the editor',
+      zh: '拖放文件夹导入，修复编辑器选区显示',
+      ja: 'フォルダーのドラッグ＆ドロップ、エディターの選択範囲の表示を修正',
     },
     summary: {
-      ko: '에디터에서 커서가 있는 줄의 텍스트를 선택하면 선택 영역이 회색 배경에 가려 보이지 않던 문제를 고쳤습니다. 이제 어느 줄에서든 선택한 부분이 파란색으로 표시됩니다.',
-      en: 'Selecting text on the line with the cursor in the editor no longer hides the selection behind the gray line highlight. The selected part now shows in blue on every line.',
-      zh: '修复了在编辑器中选中光标所在行的文本时，选区被灰色背景遮住而看不见的问题。现在无论在哪一行，选中的部分都会以蓝色显示。',
-      ja: 'エディターでカーソルのある行のテキストを選択すると、選択範囲が灰色の背景に隠れて見えなかった問題を修正しました。どの行でも選択した部分が青色で表示されます。',
+      ko: '마크다운 문서가 든 폴더를 화면에 끌어다 놓으면 폴더 구조 그대로 문서 사이드바에 추가됩니다. 여러 문서를 한 번에 옮겨 오고 싶을 때 편리합니다. 에디터에서 커서가 있는 줄의 선택 영역이 보이지 않던 문제도 고쳤습니다.',
+      en: 'Drop a folder of Markdown files onto the page and it is added to the document sidebar with the same folder structure, which makes bringing in many documents at once easy. Selected text on the cursor line in the editor is also visible again.',
+      zh: '把装有 Markdown 文件的文件夹拖到页面上，就会按原有的文件夹结构添加到文档侧边栏，方便一次导入多篇文档。同时修复了编辑器中光标所在行的选区看不见的问题。',
+      ja: 'Markdown ファイルが入ったフォルダーをページにドラッグ＆ドロップすると、フォルダー構成のまま文書サイドバーに追加されます。たくさんの文書をまとめて取り込みたいときに便利です。エディターでカーソルのある行の選択範囲が見えなかった問題も修正しました。',
     },
     changes: [
+      c(
+        'new',
+        '폴더 드래그 앤 드롭: 폴더를 화면에 끌어다 놓으면 폴더 구조 그대로 문서 사이드바에 추가됩니다. 마크다운·한글 파일만 문서로 추가되고, 문서가 없는 폴더는 건너뜁니다.',
+        'Folder drag and drop: drop a folder onto the page to add it to the document sidebar with the same structure. Only Markdown and Hangul files become documents, and folders with no documents are skipped.',
+        '拖放文件夹：把文件夹拖到页面上，即可按相同结构添加到文档侧边栏。只有 Markdown 和韩文（HWP）文件会添加为文档，没有文档的文件夹会被跳过。',
+        'フォルダーのドラッグ＆ドロップ：フォルダーをページにドロップすると、同じ構成のまま文書サイドバーに追加されます。文書として追加されるのは Markdown とハングル（HWP）ファイルだけで、文書のないフォルダーはスキップされます。',
+      ),
       c(
         'fixed',
         '에디터에서 커서가 있는 줄의 텍스트를 선택하면 회색 배경에 가려 무엇을 선택했는지 보이지 않던 문제를 고쳤습니다.',
