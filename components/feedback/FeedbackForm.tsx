@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { Locale } from '@/lib/i18n/config';
 import { FEEDBACK_LIMITS, type FeedbackError } from '@/lib/feedback/submit';
 import { FEEDBACK_STRINGS } from '@/lib/feedback/strings';
-import { feedbackMailto } from '@/lib/feedback/mailto';
+import { feedbackMailto, FEEDBACK_EMAIL } from '@/lib/feedback/mailto';
+import { ToastContainer, showToast } from '@/components/ui/Toast';
 import { getAppStrings } from '@/lib/i18n/appStrings';
 
 type Status = { kind: 'idle' } | { kind: 'sending' } | { kind: 'sent' } | { kind: 'error'; error: FeedbackError };
@@ -66,6 +67,15 @@ export function FeedbackForm({ locale }: { locale: Locale }) {
   }
 
   const mailHref = feedbackMailto({ subject: getAppStrings(locale).shell.feedbackSubject, bodyIntro: '', envHeading: '' });
+
+  // The mailto: link still opens the mail app; the address is also copied for
+  // visitors whose browser has no mail app set up.
+  function copyEmail() {
+    navigator.clipboard
+      ?.writeText(FEEDBACK_EMAIL)
+      .then(() => showToast(t.emailCopied(FEEDBACK_EMAIL), 'success'))
+      .catch(() => {});
+  }
 
   if (status.kind === 'sent') {
     return (
@@ -150,13 +160,14 @@ export function FeedbackForm({ locale }: { locale: Locale }) {
         </button>
         <p className="text-sm text-gray-500">
           {t.mailFallback}{' '}
-          <a href={mailHref} className="text-blue-600 hover:underline">
+          <a href={mailHref} onClick={copyEmail} className="text-blue-600 hover:underline">
             {t.mailLink}
           </a>
         </p>
       </div>
 
       <p className="text-xs leading-relaxed text-gray-500">{t.privacyNote}</p>
+      <ToastContainer className="fixed bottom-6 left-1/2 w-max max-w-[calc(100%-2rem)] -translate-x-1/2" />
     </form>
   );
 }

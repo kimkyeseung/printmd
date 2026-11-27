@@ -49,13 +49,16 @@ const colorMap: Record<ToastType, string> = {
   info: 'text-blue-600',
 };
 
-export function ToastContainer() {
+/** `className` positions the stack; by default it sits at the bottom of the nearest positioned parent. */
+export function ToastContainer({
+  className = 'absolute bottom-16 left-4 right-4',
+}: { className?: string } = {}) {
   const items = useToasts();
 
   if (items.length === 0) return null;
 
   return (
-    <div className="absolute bottom-16 left-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+    <div className={`${className} z-50 flex flex-col gap-2 pointer-events-none`}>
       {items.map((t) => (
         <ToastItem key={t.id} toast={t} />
       ))}

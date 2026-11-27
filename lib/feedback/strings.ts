@@ -19,6 +19,7 @@ const en = {
   privacyNote: 'Along with your message we send the page you came from, your browser name and language. Nothing else is collected.',
   mailFallback: 'Prefer email?',
   mailLink: 'Write to us instead',
+  emailCopied: (email: string) => `Copied ${email} to the clipboard.`,
   errors: {
     invalid: 'Something went wrong with the form. Please reload the page and try again.',
     empty: 'Please write a message.',
@@ -47,6 +48,7 @@ const ko: typeof en = {
   privacyNote: '내용과 함께 들어온 페이지, 브라우저 종류와 언어가 전달됩니다. 그 밖의 정보는 모으지 않습니다.',
   mailFallback: '메일이 편하신가요?',
   mailLink: '메일로 보내기',
+  emailCopied: (email: string) => `${email} 주소를 클립보드에 복사했습니다.`,
   errors: {
     invalid: '양식에 문제가 생겼습니다. 페이지를 새로고침한 뒤 다시 보내 주세요.',
     empty: '내용을 적어 주세요.',
@@ -75,6 +77,7 @@ const zh: typeof en = {
   privacyNote: '随消息一起发送的只有你来自的页面、浏览器名称和语言，不会收集其他任何信息。',
   mailFallback: '更习惯用邮件？',
   mailLink: '改用邮件发送',
+  emailCopied: (email: string) => `已将 ${email} 复制到剪贴板。`,
   errors: {
     invalid: '表单出了点问题。请刷新页面后再试。',
     empty: '请写下内容。',
@@ -103,6 +106,7 @@ const ja: typeof en = {
   privacyNote: 'メッセージと一緒に、アクセス元のページ、ブラウザの種類と言語を送信します。それ以外の情報は収集しません。',
   mailFallback: 'メールのほうが便利ですか？',
   mailLink: 'メールで送る',
+  emailCopied: (email: string) => `${email} をクリップボードにコピーしました。`,
   errors: {
     invalid: 'フォームに問題が発生しました。ページを再読み込みしてからもう一度お試しください。',
     empty: '内容を入力してください。',
