@@ -55,6 +55,8 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
   const locale = (params?.locale as string) || 'en';
   const strings = useAppStrings();
   const t = strings.sidebar;
+  const toolsOpen = useUIStore((s) => s.isSidebarToolsOpen);
+  const toggleTools = useUIStore((s) => s.toggleSidebarTools);
   const tools = [
     { key: 'markdownToPdf', href: `/${locale}/markdown-to-pdf` },
     { key: 'markdownPrint', href: `/${locale}/markdown-print` },
@@ -143,8 +145,30 @@ function SiteLinks({ collapsed }: { collapsed: boolean }) {
   return (
     <div className="border-t border-[var(--ui-border)] px-3 py-3 text-xs">
       <nav aria-label={t.toolsHeading}>
-        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ui-text-muted)]">{t.toolsHeading}</h2>
-        {linkList(tools)}
+        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ui-text-muted)]">
+          <button
+            type="button"
+            onClick={toggleTools}
+            aria-expanded={toolsOpen}
+            aria-controls="sidebar-tools-list"
+            className="-mx-1 flex w-[calc(100%+0.5rem)] items-center gap-1 rounded px-1 py-0.5 text-left uppercase tracking-wide hover:bg-[var(--ui-bg-hover)] hover:text-[var(--foreground)]"
+          >
+            <svg
+              className={`h-3 w-3 shrink-0 transition-transform ${toolsOpen ? 'rotate-90' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            {t.toolsHeading}
+          </button>
+        </h2>
+        {/* Hidden rather than removed, so the links stay in the page for crawlers. */}
+        <div id="sidebar-tools-list" hidden={!toolsOpen}>
+          {linkList(tools)}
+        </div>
       </nav>
       <nav aria-label={t.linksHeading} className="mt-3">
         <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ui-text-muted)]">{t.linksHeading}</h2>
